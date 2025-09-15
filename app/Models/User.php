@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Company;
 
@@ -22,13 +23,17 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'surname',
-        'email',
-        'mobile',
-        'gender',
         'date_of_birth',
-        'tax_id_code',
-        'status',
+        'place_of_birth',
+        'country',
+        'email',
+        'phone',
+        'mobile', // Keep both phone and mobile for backward compatibility
+        'gender',
+        'cf', // Codice Fiscale
+        'photo',
         'address',
+        'status',
         'password',
     ];
 
@@ -53,23 +58,47 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'date_of_birth' => 'date',
-            'status' => 'boolean',
         ];
     }
 
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'user_companies')
-                    ->withPivot(['is_primary', 'role_in_company', 'joined_at'])
+                    ->withPivot(['is_primary', 'role_in_company', 'joined_at', 'percentage'])
                     ->withTimestamps();
     }
 
     public function primaryCompany()
     {
         return $this->belongsToMany(Company::class, 'user_companies')
-                    ->withPivot(['is_primary', 'role_in_company', 'joined_at'])
+                    ->withPivot(['is_primary', 'role_in_company', 'joined_at', 'percentage'])
                     ->wherePivot('is_primary', true)
                     ->withTimestamps();
+    }
+
+    public function getPrimaryCompanyAttribute()
+    {
+        return $this->primaryCompany()->first();
+    }
+
+    public function getPrimaryCompanyLogoAttribute()
+    {
+        $primaryCompany = $this->primary_company;
+        if ($primaryCompany) {
+            return $primaryCompany->logo_url;
+        }
+        
+        return asset('images/default-logo.png');
+    }
+
+    public function getTotalPercentageAttribute()
+    {
+        return $this->companies->sum('pivot.percentage');
+    }
+
+    public function hasValidPercentageAllocation()
+    {
+        return $this->total_percentage == 100;
     }
 
     public function getFullNameAttribute()
@@ -80,5 +109,57 @@ class User extends Authenticatable
     public function getAgeAttribute()
     {
         return $this->date_of_birth ? $this->date_of_birth->age : null;
+    }
+
+    public function getPhotoUrlAttribute()
+    {
+        if ($this->photo) {
+            $photoPath = storage_path('app/public/' . $this->photo);
+            if (file_exists($photoPath)) {
+                return asset('storage/' . $this->photo);
+            }
+        }
+        
+        return asset('images/default-avatar.png');
+    }
+
+    public function getStatusBadgeAttribute()
+    {
+        return match($this->status) {
+            'active' => '<span class="badge bg-success">Active</span>',
+            'inactive' => '<span class="badge bg-secondary">Inactive</span>',
+            'parked' => '<span class="badge bg-warning">Parked (Pending Approval)</span>',
+            default => '<span class="badge bg-secondary">Unknown</span>'
+        };
+    }
+
+    public function isParked()
+    {
+        return $this->status === 'parked';
+    }
+
+    public function isActive()
+    {
+        return $this->status === 'active';
+    }
+
+    public function needsApproval()
+    {
+        return $this->isParked();
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    public function scopeInactive($query) 
+    {
+        return $query->where('status', 'inactive');
+    }
+
+    public function scopeParked($query)
+    {
+        return $query->where('status', 'parked');
     }
 }

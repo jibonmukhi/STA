@@ -10,6 +10,7 @@ use App\Models\User;
 class Company extends Model
 {
     protected $fillable = [
+        'ateco_code',
         'name',
         'email',
         'phone',
@@ -43,8 +44,11 @@ class Company extends Model
 
     public function getLogoUrlAttribute()
     {
-        if ($this->logo && Storage::disk('public')->exists($this->logo)) {
-            return Storage::disk('public')->url($this->logo);
+        if ($this->logo) {
+            $logoPath = storage_path('app/public/' . $this->logo);
+            if (file_exists($logoPath)) {
+                return asset('storage/' . $this->logo);
+            }
         }
         
         return asset('images/default-company-logo.png');

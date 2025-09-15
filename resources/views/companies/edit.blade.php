@@ -56,6 +56,30 @@
                     
                     <div class="row">
                         <div class="col-md-8">
+                            <!-- ATECO Code - Priority Field -->
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="card bg-light border-primary mb-4">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary">
+                                                <i class="fas fa-tag me-2"></i>ATECO Classification Code
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label for="ateco_code" class="form-label fw-semibold">ATECO Code</label>
+                                                <input type="text" class="form-control form-control-lg @error('ateco_code') is-invalid @enderror" 
+                                                       id="ateco_code" name="ateco_code" value="{{ old('ateco_code', $company->ateco_code) }}" 
+                                                       placeholder="e.g. 620100" maxlength="10">
+                                                <div class="form-text">
+                                                    <i class="fas fa-info-circle me-1"></i>Economic activity classification code (numeric only)
+                                                </div>
+                                                @error('ateco_code')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -105,6 +129,8 @@
                                     </div>
                                 </div>
                             </div>
+
+                            
 
                             <div class="mb-3">
                                 <label for="website" class="form-label">Website</label>

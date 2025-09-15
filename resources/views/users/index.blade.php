@@ -28,6 +28,18 @@
     border-radius: 8px;
     border: 1px solid #dee2e6;
 }
+.user-parked {
+    background-color: #fff3cd !important;
+    border-left: 4px solid #ffc107 !important;
+}
+.approval-needed {
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
 </style>
 @endpush
 
@@ -103,6 +115,31 @@ document.addEventListener('DOMContentLoaded', function() {
 @section('content')
 <!-- Display Flash Messages -->
 @include('components.flash-messages')
+
+<!-- Pending Approvals Alert -->
+@php
+    $pendingUsers = $users->filter(fn($user) => $user->status === 'parked');
+    $pendingCount = $pendingUsers->count();
+@endphp
+
+@if($pendingCount > 0)
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-warning d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-triangle fa-lg me-3"></i>
+            <div class="flex-grow-1">
+                <h6 class="mb-1">Users Pending Approval</h6>
+                <p class="mb-0">
+                    <strong>{{ $pendingCount }}</strong> {{ $pendingCount === 1 ? 'user needs' : 'users need' }} admin approval to become active.
+                    <a href="{{ route('users.index', ['search_status' => 'parked']) }}" class="alert-link ms-2">
+                        <i class="fas fa-filter me-1"></i>View Pending Users
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- Search Section -->
 <div class="row mb-4">
@@ -189,8 +226,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <label for="search_status" class="form-label">Status</label>
                             <select class="form-select" id="search_status" name="search_status">
                                 <option value="">All Status</option>
-                                <option value="1" {{ request('search_status') == '1' ? 'selected' : '' }}>Active</option>
-                                <option value="0" {{ request('search_status') == '0' ? 'selected' : '' }}>Inactive</option>
+                                <option value="active" {{ request('search_status') == 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="inactive" {{ request('search_status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                <option value="parked" {{ request('search_status') == 'parked' ? 'selected' : '' }}>Parked (Pending Approval)</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -362,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody>
                             @forelse($users as $user)
-                            <tr>
+                            <tr class="{{ $user->status === 'parked' ? 'user-parked' : '' }}">
                                 <td>{{ $user->id }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -393,8 +431,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                     @endif
                                 </td>
                                 <td>
-                                    @if($user->status)
+                                    @if($user->status === 'active')
                                         <span class="badge bg-success">Active</span>
+                                    @elseif($user->status === 'parked')
+                                        <span class="badge bg-warning approval-needed">
+                                            <i class="fas fa-clock me-1"></i>Pending Approval
+                                        </span>
                                     @else
                                         <span class="badge bg-secondary">Inactive</span>
                                     @endif

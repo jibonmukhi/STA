@@ -41,10 +41,28 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
+                            <label class="form-label fw-bold">ATECO Code</label>
+                            <p class="form-control-plaintext">
+                                @if($company->ateco_code)
+                                    <span class="badge bg-primary fs-6">
+                                        <i class="fas fa-tag me-2"></i>{{ $company->ateco_code }}
+                                    </span>
+                                    <small class="text-muted ms-2 d-block">(Economic Activity Classification Code)</small>
+                                @else
+                                    <span class="text-muted">Not provided</span>
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
                             <label class="form-label fw-bold">Company Name</label>
                             <p class="form-control-plaintext">{{ $company->name }}</p>
                         </div>
                     </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Email</label>
@@ -56,6 +74,14 @@
                                 @else
                                     <span class="text-muted">Not provided</span>
                                 @endif
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">P.IVA / VAT Number</label>
+                            <p class="form-control-plaintext">
+                                {{ $company->piva ?: 'Not provided' }}
                             </p>
                         </div>
                     </div>
@@ -78,27 +104,21 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label fw-bold">P.IVA / VAT Number</label>
+                            <label class="form-label fw-bold">Website</label>
                             <p class="form-control-plaintext">
-                                {{ $company->piva ?: 'Not provided' }}
+                                @if($company->website)
+                                    <a href="{{ $company->website }}" target="_blank" class="text-decoration-none">
+                                        <i class="fas fa-globe me-2"></i>{{ $company->website }}
+                                        <i class="fas fa-external-link-alt ms-1"></i>
+                                    </a>
+                                @else
+                                    <span class="text-muted">Not provided</span>
+                                @endif
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Website</label>
-                    <p class="form-control-plaintext">
-                        @if($company->website)
-                            <a href="{{ $company->website }}" target="_blank" class="text-decoration-none">
-                                <i class="fas fa-globe me-2"></i>{{ $company->website }}
-                                <i class="fas fa-external-link-alt ms-1"></i>
-                            </a>
-                        @else
-                            <span class="text-muted">Not provided</span>
-                        @endif
-                    </p>
-                </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Address</label>

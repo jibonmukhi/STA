@@ -32,6 +32,10 @@ class CompanyController extends Controller
             $query->where('piva', 'like', '%' . $request->get('search_piva') . '%');
         }
         
+        if ($request->filled('search_ateco_code')) {
+            $query->where('ateco_code', 'like', '%' . $request->get('search_ateco_code') . '%');
+        }
+        
         // Handle status search
         if ($request->filled('search_status')) {
             $query->where('active', (bool) $request->get('search_status'));
@@ -56,7 +60,7 @@ class CompanyController extends Controller
         $sortField = $request->get('sort', 'name');
         $sortDirection = $request->get('direction', 'asc');
         
-        if (!in_array($sortField, ['name', 'email', 'phone', 'piva', 'active', 'created_at'])) {
+        if (!in_array($sortField, ['name', 'email', 'phone', 'piva', 'ateco_code', 'active', 'created_at'])) {
             $sortField = 'name';
         }
         
@@ -90,15 +94,43 @@ class CompanyController extends Controller
                 'email' => 'nullable|email|max:255|unique:companies',
                 'phone' => 'nullable|string|max:20',
                 'piva' => 'nullable|string|max:50',
+                'ateco_code' => 'nullable|string|max:10|regex:/^[0-9]+$/',
                 'website' => 'nullable|url|max:255',
                 'address' => 'nullable|string|max:500',
-                'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'logo' => 'nullable|file|max:2048',
                 'active' => 'sometimes|boolean'
             ]);
 
             if ($request->hasFile('logo')) {
-                $logoPath = $request->file('logo')->store('company-logos', 'public');
-                $validated['logo'] = $logoPath;
+                $logoFile = $request->file('logo');
+                
+                // Manual validation for image file extensions
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+                $fileExtension = strtolower($logoFile->getClientOriginalExtension());
+                
+                if (!in_array($fileExtension, $allowedExtensions)) {
+                    return redirect()->back()
+                        ->withErrors(['logo' => 'Logo must be an image file (jpg, jpeg, png, gif).'])
+                        ->withInput();
+                }
+                
+                // Use native PHP file operations to avoid fileinfo dependency
+                $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+                $destinationPath = storage_path('app/public/company-logos');
+                
+                // Create directory if it doesn't exist
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+                
+                // Move uploaded file to destination
+                if (move_uploaded_file($logoFile->getPathname(), $destinationPath . '/' . $fileName)) {
+                    $validated['logo'] = 'company-logos/' . $fileName;
+                } else {
+                    return redirect()->back()
+                        ->withErrors(['logo' => 'Failed to upload logo file.'])
+                        ->withInput();
+                }
             }
 
             $validated['active'] = (bool) $request->input('active', 0);
@@ -138,24 +170,55 @@ class CompanyController extends Controller
     {
         try {
             $validated = $request->validate([
+                'ateco_code' => 'nullable|string|max:10|regex:/^[0-9]+$/',
                 'name' => 'required|string|max:255',
                 'email' => 'nullable|email|max:255|unique:companies,email,' . $company->id,
                 'phone' => 'nullable|string|max:20',
                 'piva' => 'nullable|string|max:50',
                 'website' => 'nullable|url|max:255',
                 'address' => 'nullable|string|max:500',
-                'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'logo' => 'nullable|file|max:2048',
                 'active' => 'sometimes|boolean'
             ]);
 
             if ($request->hasFile('logo')) {
-                // Delete old logo
-                if ($company->logo && Storage::disk('public')->exists($company->logo)) {
-                    Storage::disk('public')->delete($company->logo);
+                $logoFile = $request->file('logo');
+                
+                // Manual validation for image file extensions
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+                $fileExtension = strtolower($logoFile->getClientOriginalExtension());
+                
+                if (!in_array($fileExtension, $allowedExtensions)) {
+                    return redirect()->back()
+                        ->withErrors(['logo' => 'Logo must be an image file (jpg, jpeg, png, gif).'])
+                        ->withInput();
                 }
                 
-                $logoPath = $request->file('logo')->store('company-logos', 'public');
-                $validated['logo'] = $logoPath;
+                // Delete old logo using native PHP
+                if ($company->logo) {
+                    $oldLogoPath = storage_path('app/public/' . $company->logo);
+                    if (file_exists($oldLogoPath)) {
+                        unlink($oldLogoPath);
+                    }
+                }
+                
+                // Use native PHP file operations to avoid fileinfo dependency
+                $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+                $destinationPath = storage_path('app/public/company-logos');
+                
+                // Create directory if it doesn't exist
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+                
+                // Move uploaded file to destination
+                if (move_uploaded_file($logoFile->getPathname(), $destinationPath . '/' . $fileName)) {
+                    $validated['logo'] = 'company-logos/' . $fileName;
+                } else {
+                    return redirect()->back()
+                        ->withErrors(['logo' => 'Failed to upload logo file.'])
+                        ->withInput();
+                }
             }
 
             $validated['active'] = (bool) $request->input('active', 0);

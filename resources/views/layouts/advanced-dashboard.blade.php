@@ -939,17 +939,35 @@
     <nav class="sidebar" id="sidebar">
         <!-- Brand Section -->
         <div class="sidebar-brand">
-            <div class="brand-logo">
-                <span class="logo-text">STA</span>
-            </div>
+            @php
+                $primaryCompany = Auth::user()->primary_company;
+                $hasLogo = $primaryCompany && $primaryCompany->logo && file_exists(storage_path('app/public/' . $primaryCompany->logo));
+            @endphp
+            
+            <a href="{{ route('dashboard') }}" style="text-decoration: none; color: inherit;">
+                @if($hasLogo)
+                    <img src="{{ Auth::user()->primary_company_logo }}" 
+                         alt="{{ $primaryCompany->name ?? 'Company' }} Logo" 
+                         style="max-height: 40px; width: auto; display: block; margin: 0 auto; cursor: pointer;">
+                @else
+                    <div class="brand-logo" style="cursor: pointer;">
+                        <span class="logo-text">STA</span>
+                    </div>
+                @endif
+            </a>
         </div>
 
         <!-- User Profile -->
         <div class="user-profile">
             <div class="d-flex align-items-center">
-                <div class="user-avatar">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                </div>
+                @if(Auth::user()->photo)
+                    <img src="{{ Auth::user()->photo_url }}" alt="{{ Auth::user()->name }}" 
+                         class="user-avatar rounded-circle" style="width: 50px; height: 50px; object-fit: cover; display: flex; align-items: center; justify-content: center;">
+                @else
+                    <div class="user-avatar">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                    </div>
+                @endif
                 <div class="user-info">
                     <div class="user-name">{{ Auth::user()->name }}</div>
                     <div class="user-email">{{ Auth::user()->email }}</div>
@@ -1064,17 +1082,6 @@
             </div>
             @endcan
 
-            <!-- Settings -->
-            <div class="nav-section">
-                <div class="nav-item">
-                    <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" data-tooltip="Profile Settings">
-                        <div class="nav-icon">
-                            <i class="fas fa-user-cog"></i>
-                        </div>
-                        <span class="nav-text">Profile Settings</span>
-                    </a>
-                </div>
-            </div>
 
             <!-- Logout -->
             <div class="nav-section logout-btn">
@@ -1131,9 +1138,14 @@
                     <div class="dropdown">
                         <button class="btn btn-link p-2" type="button" data-bs-toggle="dropdown">
                             <div class="d-flex align-items-center">
-                                <div class="user-avatar me-2" style="width: 35px; height: 35px; font-size: 0.9rem;">
-                                    {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                                </div>
+                                @if(Auth::user()->photo)
+                                    <img src="{{ Auth::user()->photo_url }}" alt="{{ Auth::user()->name }}" 
+                                         class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
+                                @else
+                                    <div class="user-avatar me-2" style="width: 35px; height: 35px; font-size: 0.9rem;">
+                                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                                    </div>
+                                @endif
                                 <span class="d-none d-md-inline user-name-display">
                                     @php
                                         $name = Auth::user()->name;

@@ -116,6 +116,15 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="card-body">
                 <form method="GET" action="{{ route('companies.index') }}">
                     <div class="row g-3">
+                        <!-- ATECO Code Search - Priority -->
+                        <div class="col-md-3">
+                            <label for="search_ateco_code" class="form-label fw-semibold text-primary">
+                                <i class="fas fa-tag me-1"></i>ATECO Code
+                            </label>
+                            <input type="text" class="form-control border-primary" id="search_ateco_code" name="search_ateco_code" 
+                                   placeholder="Search by ATECO code..." value="{{ request('search_ateco_code') }}">
+                        </div>
+                        
                         <!-- Name Search -->
                         <div class="col-md-3">
                             <label for="search_name" class="form-label">Company Name</label>
@@ -136,8 +145,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <input type="text" class="form-control" id="search_phone" name="search_phone" 
                                    placeholder="Search by phone..." value="{{ request('search_phone') }}">
                         </div>
-                        
-                        <!-- P.IVA Search -->
+                    </div>
+                    
+                    <!-- P.IVA Search Row -->
+                    <div class="row g-3 mt-2">
                         <div class="col-md-3">
                             <label for="search_piva" class="form-label">P.IVA / VAT</label>
                             <input type="text" class="form-control" id="search_piva" name="search_piva" 
@@ -152,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search me-1"></i>Search
                                 </button>
-                                @if(request('search_name') || request('search_email') || request('search_phone') || request('search_piva'))
+                                @if(request('search_name') || request('search_email') || request('search_phone') || request('search_piva') || request('search_ateco_code'))
                                     <a href="{{ route('companies.index') }}" class="btn btn-outline-secondary">
                                         <i class="fas fa-times me-1"></i>Clear All
                                     </a>
@@ -202,12 +213,13 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 @php
-                    $hasAnySearch = request('search_name') || request('search_email') || request('search_phone') || request('search_piva') || request('search_status') || request('search_date_from') || request('search_date_to');
+                    $hasAnySearch = request('search_name') || request('search_email') || request('search_phone') || request('search_piva') || request('search_ateco_code') || request('search_status') || request('search_date_from') || request('search_date_to');
                     $searchTerms = collect([
                         'Name' => request('search_name'),
                         'Email' => request('search_email'), 
                         'Phone' => request('search_phone'),
-                        'P.IVA' => request('search_piva')
+                        'P.IVA' => request('search_piva'),
+                        'ATECO' => request('search_ateco_code')
                     ])->filter()->map(function($value, $key) {
                         return $key . ': "' . $value . '"';
                     })->join(', ');
@@ -262,6 +274,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         <thead>
                             <tr>
                                 <th width="5%">#</th>
+                                <th width="8%" class="bg-light">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'ateco_code', 'direction' => request('sort') === 'ateco_code' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
+                                       class="text-decoration-none text-primary fw-semibold">
+                                        <i class="fas fa-tag me-1"></i>ATECO
+                                        @if(request('sort') === 'ateco_code')
+                                            <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                        @else
+                                            <i class="fas fa-sort ms-1 text-muted"></i>
+                                        @endif
+                                    </a>
+                                </th>
                                 <th width="8%">Logo</th>
                                 <th width="15%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'direction' => request('sort') === 'name' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
@@ -307,6 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         @endif
                                     </a>
                                 </th>
+                                
                                 <th width="8%">Website</th>
                                 <th width="8%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'active', 'direction' => request('sort') === 'active' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
@@ -338,9 +362,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tr>
                                 <td>{{ $company->id }}</td>
                                 <td>
+                                    @if($company->ateco_code)
+                                        <span class="badge bg-primary">
+                                            <i class="fas fa-tag me-1"></i>{{ $company->ateco_code }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td>
                                     <div class="d-flex align-items-center">
                                         <img src="{{ $company->logo_url }}" alt="{{ $company->name }}" 
-                                             class="rounded" width="40" height="40" style="object-fit: cover;">
+                                             class="rounded shadow-sm" width="80" height="80" style="object-fit: cover;">
                                     </div>
                                 </td>
                                 <td>
@@ -374,6 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td>
                                     {{ $company->piva ?: '-' }}
                                 </td>
+                                
                                 <td>
                                     @if($company->website)
                                         <a href="{{ $company->website }}" target="_blank" class="text-decoration-none">
@@ -420,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="10" class="text-center py-4">
+                                <td colspan="11" class="text-center py-4">
                                     <i class="fas fa-building fa-3x text-muted mb-3"></i>
                                     <p class="text-muted">No companies found.</p>
                                 </td>
