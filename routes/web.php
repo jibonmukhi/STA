@@ -36,15 +36,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Common Pages (accessible by all authenticated users with permission check)
     Route::get('/certificate', [EndUserDashboardController::class, 'certificate'])
-        ->middleware('permission:view personal reports')
+        ->middleware('can:view personal reports')
         ->name('certificate');
 
     Route::get('/calendar', [EndUserDashboardController::class, 'calendar'])
-        ->middleware('permission:view personal reports')
+        ->middleware('can:view personal reports')
         ->name('calendar');
 
     Route::get('/reports', [EndUserDashboardController::class, 'reports'])
-        ->middleware('permission:view personal reports')
+        ->middleware('can:view personal reports')
         ->name('reports');
 });
 
