@@ -270,7 +270,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-3 col-md-6 mb-3">
-                            <a href="{{ route('user.certificate') }}" class="btn btn-outline-primary w-100 py-3">
+                            <a href="{{ route('certificate') }}" class="btn btn-outline-primary w-100 py-3">
                                 <i class="fas fa-certificate fa-2x mb-2 d-block"></i>
                                 View Certificate
                             </a>

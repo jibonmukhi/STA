@@ -70,19 +70,19 @@ return [
         ],
         [
             'title' => 'Certificate',
-            'route' => 'user.certificate',
+            'route' => 'certificate',
             'icon' => 'fas fa-certificate',
             'permission' => 'view personal reports'
         ],
         [
             'title' => 'Calendar',
-            'route' => 'user.calendar',
+            'route' => 'calendar',
             'icon' => 'fas fa-calendar',
             'permission' => 'view personal reports'
         ],
         [
             'title' => 'My Reports',
-            'route' => 'user.reports',
+            'route' => 'reports',
             'icon' => 'fas fa-chart-pie',
             'permission' => 'view personal reports'
         ],
@@ -126,13 +126,13 @@ return [
         ],
         [
             'title' => 'Certificate',
-            'route' => 'user.certificate',
+            'route' => 'certificate',
             'icon' => 'fas fa-certificate',
             'permission' => 'view personal reports'
         ],
         [
             'title' => 'Calendar',
-            'route' => 'user.calendar',
+            'route' => 'calendar',
             'icon' => 'fas fa-calendar',
             'permission' => 'view personal reports'
         ],
@@ -144,7 +144,7 @@ return [
         ],
         [
             'title' => 'My Reports',
-            'route' => 'user.reports',
+            'route' => 'reports',
             'icon' => 'fas fa-chart-pie',
             'permission' => 'view personal reports'
         ]

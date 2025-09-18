@@ -34,20 +34,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:end_user')
         ->name('user.dashboard');
 
-    // End User Certificate (accessible by end_user and company_manager)
-    Route::get('/user/certificate', [EndUserDashboardController::class, 'certificate'])
-        ->middleware('role:end_user,company_manager')
-        ->name('user.certificate');
+    // Common Pages (accessible by all authenticated users with permission check)
+    Route::get('/certificate', [EndUserDashboardController::class, 'certificate'])
+        ->middleware('permission:view personal reports')
+        ->name('certificate');
 
-    // End User Calendar (accessible by end_user and company_manager)
-    Route::get('/user/calendar', [EndUserDashboardController::class, 'calendar'])
-        ->middleware('role:end_user,company_manager')
-        ->name('user.calendar');
+    Route::get('/calendar', [EndUserDashboardController::class, 'calendar'])
+        ->middleware('permission:view personal reports')
+        ->name('calendar');
 
-    // End User Reports (accessible by end_user and company_manager)
-    Route::get('/user/reports', [EndUserDashboardController::class, 'reports'])
-        ->middleware('role:end_user,company_manager')
-        ->name('user.reports');
+    Route::get('/reports', [EndUserDashboardController::class, 'reports'])
+        ->middleware('permission:view personal reports')
+        ->name('reports');
 });
 
 Route::middleware('auth')->group(function () {
