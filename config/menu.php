@@ -58,6 +58,24 @@ return [
             'route' => 'system.reports',
             'icon' => 'fas fa-chart-bar',
             'permission' => 'view system reports'
+        ],
+        [
+            'title' => 'Certificate',
+            'route' => 'certificate',
+            'icon' => 'fas fa-certificate',
+            'permission' => 'view personal reports'
+        ],
+        [
+            'title' => 'Calendar',
+            'route' => 'calendar',
+            'icon' => 'fas fa-calendar',
+            'permission' => 'view personal reports'
+        ],
+        [
+            'title' => 'My Reports',
+            'route' => 'reports',
+            'icon' => 'fas fa-chart-pie',
+            'permission' => 'view personal reports'
         ]
     ],
 
