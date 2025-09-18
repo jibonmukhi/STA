@@ -410,7 +410,7 @@
                                                    value="{{ $role->name }}" id="role_{{ $role->id }}"
                                                    {{ in_array($role->name, old('roles', [])) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="role_{{ $role->id }}">
-                                                {{ $role->name }}
+                                                {{ App\Models\User::formatRoleName($role->name) }}
                                             </label>
                                         </div>
                                     </div>

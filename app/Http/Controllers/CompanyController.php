@@ -258,4 +258,15 @@ class CompanyController extends Controller
                 ->with('error', 'Failed to delete company: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Show companies for the authenticated company manager
+     */
+    public function myCompanies(Request $request)
+    {
+        $user = auth()->user();
+        $companies = $user->companies()->with('users')->get();
+
+        return view('my-companies.index', compact('companies'));
+    }
 }

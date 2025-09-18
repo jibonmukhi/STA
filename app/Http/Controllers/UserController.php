@@ -56,6 +56,11 @@ class UserController extends Controller
         if ($request->filled('search_status')) {
             $query->where('status', $request->get('search_status'));
         }
+
+        // Handle status filter for dashboard links
+        if ($request->filled('status')) {
+            $query->where('status', $request->get('status'));
+        }
         
         if ($request->filled('search_company')) {
             $query->whereHas('companies', function($q) use ($request) {
@@ -350,6 +355,99 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('users.index')
                 ->with('error', 'Failed to delete user: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show company users for company managers
+     */
+    public function companyUsers(Request $request)
+    {
+        $user = auth()->user();
+        $userCompanies = $user->companies;
+
+        // Get all users from the companies this user manages
+        $companyUserIds = collect();
+        foreach ($userCompanies as $company) {
+            $companyUserIds = $companyUserIds->merge($company->users->pluck('id'));
+        }
+
+        $query = User::with(['roles', 'companies'])
+            ->whereIn('id', $companyUserIds->unique());
+
+        // Apply filters
+        if ($request->filled('search_name')) {
+            $query->where('name', 'like', '%' . $request->get('search_name') . '%');
+        }
+
+        if ($request->filled('search_email')) {
+            $query->where('email', 'like', '%' . $request->get('search_email') . '%');
+        }
+
+        $users = $query->paginate(15);
+
+        return view('company-users.index', compact('users', 'userCompanies'));
+    }
+
+    /**
+     * Show form for creating company user
+     */
+    public function createCompanyUser()
+    {
+        $user = auth()->user();
+        $companies = $user->companies;
+        $roles = Role::where('name', '!=', 'sta_manager')->get(); // Company managers can't assign STA manager role
+
+        return view('company-users.create', compact('companies', 'roles'));
+    }
+
+    /**
+     * Store company user
+     */
+    public function storeCompanyUser(StoreUserRequest $request)
+    {
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'surname' => $request->surname,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'date_of_birth' => $request->date_of_birth,
+                'place_of_birth' => $request->place_of_birth,
+                'country' => $request->country,
+                'gender' => $request->gender,
+                'cf' => $request->cf,
+                'address' => $request->address,
+                'status' => 'parked', // Company-created users need approval
+                'password' => Hash::make('password123'), // Default password
+            ]);
+
+            // Assign role
+            if ($request->role) {
+                $user->assignRole($request->role);
+            } else {
+                $user->assignRole('end_user');
+            }
+
+            // Attach to selected companies
+            if ($request->companies) {
+                foreach ($request->companies as $companyId) {
+                    $user->companies()->attach($companyId, [
+                        'is_primary' => count($request->companies) === 1,
+                        'role_in_company' => $request->role_in_company ?? 'Employee',
+                        'joined_at' => now(),
+                        'percentage' => $request->percentage ?? 0,
+                    ]);
+                }
+            }
+
+            return redirect()->route('company-users.index')
+                ->with('success', 'User created successfully. Default password is: password123');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to create user: ' . $e->getMessage())
+                ->withInput();
         }
     }
 }

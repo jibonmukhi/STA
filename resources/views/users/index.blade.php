@@ -455,9 +455,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </td>
                                 <td>
                                     @if($user->roles->count() > 0)
-                                        @foreach($user->roles as $role)
-                                            <span class="badge bg-info me-1">{{ $role->name }}</span>
-                                        @endforeach
+                                        <span class="badge bg-info">{{ $user->formatted_role }}</span>
                                     @else
                                         <span class="badge bg-secondary">No Role</span>
                                     @endif

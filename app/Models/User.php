@@ -162,4 +162,32 @@ class User extends Authenticatable
     {
         return $query->where('status', 'parked');
     }
+
+    public function getFormattedRoleAttribute()
+    {
+        if ($this->roles->isEmpty()) {
+            return 'No Role';
+        }
+
+        $roleNames = $this->roles->map(function($role) {
+            return match($role->name) {
+                'sta_manager' => 'STA Manager',
+                'company_manager' => 'Company Manager',
+                'end_user' => 'End User',
+                default => ucwords(str_replace('_', ' ', $role->name))
+            };
+        });
+
+        return $roleNames->implode(', ');
+    }
+
+    public static function formatRoleName($roleName)
+    {
+        return match($roleName) {
+            'sta_manager' => 'STA Manager',
+            'company_manager' => 'Company Manager',
+            'end_user' => 'End User',
+            default => ucwords(str_replace('_', ' ', $roleName))
+        };
+    }
 }

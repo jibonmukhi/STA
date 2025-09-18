@@ -28,6 +28,18 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Role-based redirect
+        $user = Auth::user();
+
+        if ($user->hasRole('sta_manager')) {
+            return redirect()->intended(route('sta.dashboard', absolute: false));
+        } elseif ($user->hasRole('company_manager')) {
+            return redirect()->intended(route('company.dashboard', absolute: false));
+        } elseif ($user->hasRole('end_user')) {
+            return redirect()->intended(route('user.dashboard', absolute: false));
+        }
+
+        // Default fallback
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

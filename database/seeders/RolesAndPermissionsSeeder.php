@@ -16,44 +16,69 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         // Create permissions
         $permissions = [
-            // User permissions
+            // User Management
             'view users',
             'create users',
             'edit users',
             'delete users',
-            
-            // Role permissions
+            'approve users',
+
+            // Company Management
+            'view companies',
+            'create companies',
+            'edit companies',
+            'delete companies',
+            'manage company users',
+
+            // Role Management (STA Manager only)
             'view roles',
             'create roles',
             'edit roles',
             'delete roles',
-            
-            // Dashboard permissions
+
+            // Dashboard & Reports
             'view dashboard',
-            'view reports',
+            'view system reports',
+            'view company reports',
+            'view personal reports',
+
+            // System Administration
+            'system administration',
+            'user approval',
+            'manage permissions',
         ];
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Create roles and assign permissions
-        $superAdmin = Role::firstOrCreate(['name' => 'Super Admin']);
-        $superAdmin->givePermissionTo(Permission::all());
+        // Create STA Manager Role (Super Admin - Full Access)
+        $staManager = Role::firstOrCreate(['name' => 'sta_manager']);
+        $staManager->givePermissionTo(Permission::all());
 
-        $admin = Role::firstOrCreate(['name' => 'Admin']);
-        $admin->givePermissionTo([
+        // Create Company Manager Role (Company-level admin)
+        $companyManager = Role::firstOrCreate(['name' => 'company_manager']);
+        $companyManager->givePermissionTo([
             'view users',
             'create users',
             'edit users',
-            'view roles',
+            'manage company users',
+            'view companies',
+            'edit companies',
             'view dashboard',
-            'view reports',
+            'view company reports',
         ]);
 
-        $user = Role::firstOrCreate(['name' => 'User']);
-        $user->givePermissionTo([
+        // Create End User Role (Limited access)
+        $endUser = Role::firstOrCreate(['name' => 'end_user']);
+        $endUser->givePermissionTo([
             'view dashboard',
+            'view personal reports',
         ]);
+
+        // Legacy roles cleanup (if they exist)
+        Role::where('name', 'Super Admin')->delete();
+        Role::where('name', 'Admin')->delete();
+        Role::where('name', 'User')->delete();
     }
 }

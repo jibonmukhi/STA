@@ -270,9 +270,7 @@
                     <label class="form-label text-muted small">Assigned Roles</label>
                     <div>
                         @if($user->roles->count() > 0)
-                            @foreach($user->roles as $role)
-                                <span class="badge bg-primary me-1 mb-1">{{ $role->name }}</span>
-                            @endforeach
+                            <span class="badge bg-primary">{{ $user->formatted_role }}</span>
                         @else
                             <span class="badge bg-secondary">No Role Assigned</span>
                         @endif
