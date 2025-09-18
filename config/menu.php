@@ -69,6 +69,24 @@ return [
             'permission' => 'view dashboard'
         ],
         [
+            'title' => 'Certificate',
+            'route' => 'user.certificate',
+            'icon' => 'fas fa-certificate',
+            'permission' => 'view personal reports'
+        ],
+        [
+            'title' => 'Calendar',
+            'route' => 'user.calendar',
+            'icon' => 'fas fa-calendar',
+            'permission' => 'view personal reports'
+        ],
+        [
+            'title' => 'My Reports',
+            'route' => 'user.reports',
+            'icon' => 'fas fa-chart-pie',
+            'permission' => 'view personal reports'
+        ],
+        [
             'title' => 'My Companies',
             'route' => 'my-companies.index',
             'icon' => 'fas fa-building',

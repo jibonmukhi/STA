@@ -67,6 +67,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'edit companies',
             'view dashboard',
             'view company reports',
+            'view personal reports',
         ]);
 
         // Create End User Role (Limited access)

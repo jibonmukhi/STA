@@ -34,19 +34,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:end_user')
         ->name('user.dashboard');
 
-    // End User Certificate
+    // End User Certificate (accessible by end_user and company_manager)
     Route::get('/user/certificate', [EndUserDashboardController::class, 'certificate'])
-        ->middleware('role:end_user')
+        ->middleware('role:end_user,company_manager')
         ->name('user.certificate');
 
-    // End User Calendar
+    // End User Calendar (accessible by end_user and company_manager)
     Route::get('/user/calendar', [EndUserDashboardController::class, 'calendar'])
-        ->middleware('role:end_user')
+        ->middleware('role:end_user,company_manager')
         ->name('user.calendar');
 
-    // End User Reports
+    // End User Reports (accessible by end_user and company_manager)
     Route::get('/user/reports', [EndUserDashboardController::class, 'reports'])
-        ->middleware('role:end_user')
+        ->middleware('role:end_user,company_manager')
         ->name('user.reports');
 });
 

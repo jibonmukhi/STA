@@ -4,19 +4,28 @@
     $userRoles = $user->roles->pluck('name')->toArray();
     $menuConfig = config('menu');
     $userMenu = [];
+    $addedRoutes = []; // Track added routes to avoid duplicates
 
-    // Get menu items for user's roles
+    // Get menu items for user's roles - collect from all matching roles
     foreach ($userRoles as $role) {
         if (isset($menuConfig[$role])) {
-            $userMenu = array_merge($userMenu, $menuConfig[$role]);
-            break; // Use the first matching role's menu
+            foreach ($menuConfig[$role] as $menuItem) {
+                // Use route as unique identifier, fallback to title if no route
+                $identifier = isset($menuItem['route']) ? $menuItem['route'] : $menuItem['title'];
+
+                // Only add if not already added and user has permission
+                if (!in_array($identifier, $addedRoutes) &&
+                    (!isset($menuItem['permission']) || $user->can($menuItem['permission']))) {
+                    $userMenu[] = $menuItem;
+                    $addedRoutes[] = $identifier;
+                }
+            }
         }
     }
 @endphp
 
 @foreach ($userMenu as $menuItem)
-    @if (isset($menuItem['permission']) && $user->can($menuItem['permission']))
-        @if (isset($menuItem['submenu']))
+    @if (isset($menuItem['submenu']))
             <!-- Menu with Submenu -->
             <div class="nav-section">
                 <div class="nav-item">
@@ -41,19 +50,18 @@
                     </div>
                 </div>
             </div>
-        @else
-            <!-- Simple Menu Item -->
-            <div class="nav-section">
-                <div class="nav-item">
-                    <a href="{{ route($menuItem['route']) }}" class="nav-link {{ request()->routeIs($menuItem['route']) ? 'active' : '' }}" data-tooltip="{{ $menuItem['title'] }}">
-                        <div class="nav-icon">
-                            <i class="{{ $menuItem['icon'] }}"></i>
-                        </div>
-                        <span class="nav-text">{{ $menuItem['title'] }}</span>
-                    </a>
-                </div>
+    @else
+        <!-- Simple Menu Item -->
+        <div class="nav-section">
+            <div class="nav-item">
+                <a href="{{ route($menuItem['route']) }}" class="nav-link {{ request()->routeIs($menuItem['route']) ? 'active' : '' }}" data-tooltip="{{ $menuItem['title'] }}">
+                    <div class="nav-icon">
+                        <i class="{{ $menuItem['icon'] }}"></i>
+                    </div>
+                    <span class="nav-text">{{ $menuItem['title'] }}</span>
+                </a>
             </div>
-        @endif
+        </div>
     @endif
 @endforeach
 
