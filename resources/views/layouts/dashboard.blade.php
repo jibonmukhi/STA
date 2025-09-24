@@ -163,7 +163,12 @@
                             <span class="navbar-toggler-icon"></span>
                         </button>
                         
-                        <div class="navbar-nav ms-auto">
+                        <div class="navbar-nav ms-auto d-flex align-items-center">
+                            <!-- Language Switcher -->
+                            <div class="me-3">
+                                <x-language-switcher />
+                            </div>
+
                             <div class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-user-circle fa-lg me-2"></i>

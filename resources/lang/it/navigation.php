@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'dashboard' => 'Dashboard',
+    'home' => 'Home',
+    'profile' => 'Profilo',
+    'settings' => 'Impostazioni',
+    'logout' => 'Esci',
+    'users' => 'Gestione Utenti',
+    'companies' => 'Gestione Aziende',
+    'roles' => 'Gestione Ruoli',
+    'reports' => 'Report',
+    'calendar' => 'Calendario',
+    'certificate' => 'Certificato',
+    'my_companies' => 'Le Mie Aziende',
+    'company_users' => 'Utenti Azienda',
+    'pending_approvals' => 'Approvazioni in Attesa',
+    'system_reports' => 'Report di Sistema',
+    'user_menu' => 'Menu Utente',
+    'admin_panel' => 'Pannello Amministratore',
+    'company_management' => 'Gestione Azienda',
+    'user_dashboard' => 'Dashboard Utente',
+    'sta_manager' => 'Manager STA',
+    'company_manager' => 'Manager Azienda',
+    'end_user' => 'Utente Finale',
+];

@@ -136,7 +136,7 @@
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen auth-background flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
             <div class="floating-shapes"></div>
-            
+
             <div class="content-wrapper text-center">
                 <a href="/">
                     <x-application-logo />

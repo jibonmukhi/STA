@@ -995,6 +995,11 @@
                 </div>
                 
                 <div class="d-flex align-items-center">
+                    <!-- Language Switcher -->
+                    <div class="me-3">
+                        <x-language-switcher />
+                    </div>
+
                     <!-- Theme Toggle -->
                     <button class="theme-toggle me-3" onclick="toggleTheme()" title="Toggle Dark Mode">
                         <i class="fas fa-moon" id="themeIcon"></i>
@@ -1061,7 +1066,10 @@
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show animate-fade-in-up" role="alert">
                     <i class="fas fa-check-circle me-2"></i>
-                    {{ session('success') }}
+                    @php
+                        $successMessage = session('success');
+                        echo is_array($successMessage) ? implode(', ', $successMessage) : $successMessage;
+                    @endphp
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
@@ -1069,7 +1077,10 @@
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show animate-fade-in-up" role="alert">
                     <i class="fas fa-exclamation-circle me-2"></i>
-                    {{ session('error') }}
+                    @php
+                        $errorMessage = session('error');
+                        echo is_array($errorMessage) ? implode(', ', $errorMessage) : $errorMessage;
+                    @endphp
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif

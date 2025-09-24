@@ -8,6 +8,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\STAManagerDashboardController;
 use App\Http\Controllers\CompanyManagerDashboardController;
 use App\Http\Controllers\EndUserDashboardController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -52,6 +53,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Language switching (available to all authenticated users)
+    Route::post('/language/switch', [SettingsController::class, 'switchLanguage'])->name('language.switch');
+
+    // Public settings API
+    Route::get('/api/settings/public', [SettingsController::class, 'getPublicSettings'])->name('settings.public');
 });
 
 // STA Manager Routes (Super Admin)
@@ -72,6 +79,10 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
 
     // Company Management Routes
     Route::resource('companies', CompanyController::class);
+
+    // Settings Management Routes (STA Manager only)
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingsController::class, 'store'])->name('settings.store');
 });
 
 // Company Manager Routes

@@ -60,6 +60,12 @@ return [
             'permission' => 'view system reports'
         ],
         [
+            'title' => 'settings.settings',
+            'route' => 'settings.index',
+            'icon' => 'fas fa-cog',
+            'permission' => 'manage settings'
+        ],
+        [
             'title' => 'Certificate',
             'route' => 'certificate',
             'icon' => 'fas fa-certificate',

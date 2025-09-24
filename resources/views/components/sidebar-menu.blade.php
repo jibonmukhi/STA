@@ -29,11 +29,16 @@
             <!-- Menu with Submenu -->
             <div class="nav-section">
                 <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="toggleSubmenu('{{ Str::slug($menuItem['title']) }}Submenu', event)" data-tooltip="{{ $menuItem['title'] }}">
+                    <a href="#" class="nav-link" onclick="toggleSubmenu('{{ Str::slug($menuItem['title']) }}Submenu', event)" data-tooltip="@php $tooltipTitle = __($menuItem['title']); echo is_array($tooltipTitle) ? $menuItem['title'] : $tooltipTitle; @endphp">
                         <div class="nav-icon">
                             <i class="{{ $menuItem['icon'] }}"></i>
                         </div>
-                        <span class="nav-text">{{ $menuItem['title'] }}</span>
+                        <span class="nav-text">
+                            @php
+                                $translatedTitle = __($menuItem['title']);
+                                echo is_array($translatedTitle) ? $menuItem['title'] : $translatedTitle;
+                            @endphp
+                        </span>
                         <i class="fas fa-chevron-down nav-toggle" id="{{ Str::slug($menuItem['title']) }}Toggle"></i>
                     </a>
                     <div class="nav-submenu" id="{{ Str::slug($menuItem['title']) }}Submenu">
@@ -43,7 +48,12 @@
                                     <div class="nav-icon">
                                         <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
                                     </div>
-                                    <span class="nav-text">{{ $subItem['title'] }}</span>
+                                    <span class="nav-text">
+                                        @php
+                                            $translatedSubTitle = __($subItem['title']);
+                                            echo is_array($translatedSubTitle) ? $subItem['title'] : $translatedSubTitle;
+                                        @endphp
+                                    </span>
                                 </a>
                             @endif
                         @endforeach
@@ -54,11 +64,16 @@
         <!-- Simple Menu Item -->
         <div class="nav-section">
             <div class="nav-item">
-                <a href="{{ route($menuItem['route']) }}" class="nav-link {{ request()->routeIs($menuItem['route']) ? 'active' : '' }}" data-tooltip="{{ $menuItem['title'] }}">
+                <a href="{{ route($menuItem['route']) }}" class="nav-link {{ request()->routeIs($menuItem['route']) ? 'active' : '' }}" data-tooltip="@php $tooltipMainTitle = __($menuItem['title']); echo is_array($tooltipMainTitle) ? $menuItem['title'] : $tooltipMainTitle; @endphp">
                     <div class="nav-icon">
                         <i class="{{ $menuItem['icon'] }}"></i>
                     </div>
-                    <span class="nav-text">{{ $menuItem['title'] }}</span>
+                    <span class="nav-text">
+                        @php
+                            $translatedMainTitle = __($menuItem['title']);
+                            echo is_array($translatedMainTitle) ? $menuItem['title'] : $translatedMainTitle;
+                        @endphp
+                    </span>
                 </a>
             </div>
         </div>
@@ -68,11 +83,11 @@
 <!-- Profile & Logout (Available to all roles) -->
 <div class="nav-section">
     <div class="nav-item">
-        <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" data-tooltip="Profile Settings">
+        <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" data-tooltip="@php $tooltipProfile = __('navigation.profile'); echo is_array($tooltipProfile) ? 'Profile' : $tooltipProfile; @endphp">
             <div class="nav-icon">
                 <i class="fas fa-user-cog"></i>
             </div>
-            <span class="nav-text">Profile Settings</span>
+            <span class="nav-text">{{ __('navigation.profile') }}</span>
         </a>
     </div>
 </div>
@@ -81,11 +96,16 @@
     <div class="nav-item">
         <form method="POST" action="{{ route('logout') }}" class="d-inline w-100">
             @csrf
-            <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start" data-tooltip="Logout">
+            <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start" data-tooltip="@php $tooltipLogout = __('navigation.logout'); echo is_array($tooltipLogout) ? 'Logout' : $tooltipLogout; @endphp">
                 <div class="nav-icon">
                     <i class="fas fa-sign-out-alt"></i>
                 </div>
-                <span class="nav-text">Logout</span>
+                <span class="nav-text">
+                    @php
+                        $translatedLogout = __('navigation.logout');
+                        echo is_array($translatedLogout) ? 'Logout' : $translatedLogout;
+                    @endphp
+                </span>
             </button>
         </form>
     </div>
