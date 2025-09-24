@@ -1,19 +1,19 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'Role Details')
+@section('page-title', __('roles.role_details'))
 
 @section('content')
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-dark">Role Details</h2>
+            <h2 class="fw-bold text-dark">{{ __('roles.role_details') }}</h2>
             <div class="btn-group">
                 <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Roles
+                    <i class="fas fa-arrow-left me-2"></i>{{ __('roles.back_to_roles') }}
                 </a>
                 @can('edit roles')
                 <a href="{{ route('roles.edit', $role) }}" class="btn btn-primary">
-                    <i class="fas fa-edit me-2"></i>Edit Role
+                    <i class="fas fa-edit me-2"></i>{{ __('roles.edit_role_btn') }}
                 </a>
                 @endcan
             </div>
@@ -26,20 +26,20 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-user-shield me-2"></i>Role Information
+                    <i class="fas fa-user-shield me-2"></i>{{ __('roles.role_information') }}
                 </h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label text-muted">Role Name</label>
+                            <label class="form-label text-muted">{{ __('roles.role_name') }}</label>
                             <p class="fw-bold fs-4">{{ $role->name }}</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label text-muted">Role ID</label>
+                            <label class="form-label text-muted">{{ __('roles.role') }} {{ __('roles.id') }}</label>
                             <p class="fw-bold">#{{ $role->id }}</p>
                         </div>
                     </div>
@@ -48,14 +48,14 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label text-muted">Created Date</label>
+                            <label class="form-label text-muted">{{ __('roles.created_at') }}</label>
                             <p class="fw-bold">{{ $role->created_at->format('F d, Y') }}</p>
                             <small class="text-muted">{{ $role->created_at->diffForHumans() }}</small>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label text-muted">Last Updated</label>
+                            <label class="form-label text-muted">{{ __('roles.updated_at') }}</label>
                             <p class="fw-bold">{{ $role->updated_at->format('F d, Y') }}</p>
                             <small class="text-muted">{{ $role->updated_at->diffForHumans() }}</small>
                         </div>
@@ -63,11 +63,11 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label text-muted">Users Count</label>
+                    <label class="form-label text-muted">{{ __('roles.users_count') }}</label>
                     <p>
-                        <span class="badge bg-info fs-6">{{ $role->users()->count() }} Users</span>
+                        <span class="badge bg-info fs-6">{{ $role->users()->count() }} {{ __('roles.users') }}</span>
                         @if($role->users()->count() > 0)
-                            <span class="text-muted ms-2">assigned to this role</span>
+                            <span class="text-muted ms-2">{{ __('assigned to this role') }}</span>
                         @endif
                     </p>
                 </div>
@@ -78,7 +78,7 @@
         <div class="card mt-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-key me-2"></i>Assigned Permissions
+                    <i class="fas fa-key me-2"></i>{{ __('roles.assign_permissions') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -92,7 +92,7 @@
                     <div class="row">
                         @foreach($groupedPermissions as $group => $permissions)
                         <div class="col-md-6 mb-4">
-                            <h6 class="text-primary text-uppercase fw-bold">{{ ucfirst($group) }} Permissions</h6>
+                            <h6 class="text-primary text-uppercase fw-bold">{{ ucfirst($group) }} {{ __('roles.permissions') }}</h6>
                             @foreach($permissions as $permission)
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="fas fa-check-circle text-success me-2"></i>
@@ -105,7 +105,7 @@
                 @else
                     <div class="text-center py-4">
                         <i class="fas fa-key fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">No permissions assigned to this role.</p>
+                        <p class="text-muted">{{ __('No permissions assigned to this role.') }}</p>
                     </div>
                 @endif
             </div>
@@ -117,7 +117,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-chart-pie me-2"></i>Role Statistics
+                    <i class="fas fa-chart-pie me-2"></i>{{ __('Role Statistics') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -125,12 +125,12 @@
                     <div class="col-6">
                         <div class="border-end">
                             <h4 class="text-primary mb-1">{{ $role->permissions->count() }}</h4>
-                            <small class="text-muted">Permissions</small>
+                            <small class="text-muted">{{ __('roles.permissions') }}</small>
                         </div>
                     </div>
                     <div class="col-6">
                         <h4 class="text-info mb-1">{{ $role->users()->count() }}</h4>
-                        <small class="text-muted">Users</small>
+                        <small class="text-muted">{{ __('roles.users') }}</small>
                     </div>
                 </div>
             </div>
@@ -141,7 +141,7 @@
         <div class="card mt-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-users me-2"></i>Users with this Role
+                    <i class="fas fa-users me-2"></i>{{ __('roles.users_with_role') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -156,7 +156,7 @@
                 @endforeach
                 @if($role->users()->count() > 5)
                 <p class="text-muted small mb-0">
-                    And {{ $role->users()->count() - 5 }} more users...
+                    {{ __('And :count more users...', ['count' => $role->users()->count() - 5]) }}
                 </p>
                 @endif
             </div>
@@ -167,30 +167,30 @@
         <div class="card mt-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-cogs me-2"></i>Actions
+                    <i class="fas fa-cogs me-2"></i>{{ __('roles.actions') }}
                 </h5>
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
                     @can('edit roles')
                     <a href="{{ route('roles.edit', $role) }}" class="btn btn-primary">
-                        <i class="fas fa-edit me-2"></i>Edit Role
+                        <i class="fas fa-edit me-2"></i>{{ __('roles.edit_role_btn') }}
                     </a>
                     @endcan
                     
                     @can('delete roles')
                     @if($role->users()->count() === 0)
                     <form method="POST" action="{{ route('roles.destroy', $role) }}" 
-                          onsubmit="return confirm('Are you sure you want to delete this role? This action cannot be undone.')">
+                          onsubmit="return confirm('{{ __('Are you sure you want to delete this role? This action cannot be undone.') }}')"
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-outline-danger w-100">
-                            <i class="fas fa-trash me-2"></i>Delete Role
+                            <i class="fas fa-trash me-2"></i>{{ __('roles.delete_role_btn') }}
                         </button>
                     </form>
                     @else
-                    <button class="btn btn-outline-secondary w-100" disabled title="Cannot delete role with assigned users">
-                        <i class="fas fa-lock me-2"></i>Cannot Delete (Users Assigned)
+                    <button class="btn btn-outline-secondary w-100" disabled title="{{ __('Cannot delete role with assigned users') }}">
+                        <i class="fas fa-lock me-2"></i>{{ __('Cannot Delete (Users Assigned)') }}
                     </button>
                     @endif
                     @endcan

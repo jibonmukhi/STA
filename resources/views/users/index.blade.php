@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'User Management')
+@section('page-title', __('users.user_management'))
 
 @push('styles')
 <style>
@@ -52,12 +52,12 @@ function toggleAdvancedSearch() {
     
     if (advancedDiv.style.display === 'none' || advancedDiv.style.display === '') {
         advancedDiv.style.display = 'flex';
-        toggleBtn.innerHTML = '<i class="fas fa-cog me-1"></i>Hide Advanced';
+        toggleBtn.innerHTML = '<i class="fas fa-cog me-1"></i>{{ __('users.hide_advanced') }}';
         toggleBtn.classList.remove('btn-outline-info');
         toggleBtn.classList.add('btn-info');
     } else {
         advancedDiv.style.display = 'none';
-        toggleBtn.innerHTML = '<i class="fas fa-cog me-1"></i>Advanced Options';
+        toggleBtn.innerHTML = '<i class="fas fa-cog me-1"></i>{{ __('users.advanced_options') }}';
         toggleBtn.classList.remove('btn-info');
         toggleBtn.classList.add('btn-outline-info');
     }
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
                 const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Searching...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>{{ __('users.searching') }}';
                 submitBtn.disabled = true;
                 
                 // Re-enable after 3 seconds in case of issues
@@ -128,11 +128,11 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="alert alert-warning d-flex align-items-center" role="alert">
             <i class="fas fa-exclamation-triangle fa-lg me-3"></i>
             <div class="flex-grow-1">
-                <h6 class="mb-1">Users Pending Approval</h6>
+                <h6 class="mb-1">{{ __('users.users_pending_approval') }}</h6>
                 <p class="mb-0">
-                    <strong>{{ $pendingCount }}</strong> {{ $pendingCount === 1 ? 'user needs' : 'users need' }} admin approval to become active.
+                    {{ __('users.users_need_approval', ['count' => $pendingCount, 'users' => $pendingCount === 1 ? __('users.user_needs') : __('users.users_need')]) }}
                     <a href="{{ route('users.index', ['search_status' => 'parked']) }}" class="alert-link ms-2">
-                        <i class="fas fa-filter me-1"></i>View Pending Users
+                        <i class="fas fa-filter me-1"></i>{{ __('users.view_pending_users') }}
                     </a>
                 </p>
             </div>
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="card search-card">
             <div class="card-header">
                 <h6 class="card-title mb-0">
-                    <i class="fas fa-search me-2"></i>Search Users
+                    <i class="fas fa-search me-2"></i>{{ __('users.search_users') }}
                 </h6>
             </div>
             <div class="card-body">
@@ -155,39 +155,39 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="row g-3">
                         <!-- Name Search -->
                         <div class="col-md-3">
-                            <label for="search_name" class="form-label">First Name</label>
+                            <label for="search_name" class="form-label">{{ __('users.first_name') }}</label>
                             <input type="text" class="form-control" id="search_name" name="search_name" 
-                                   placeholder="Search by name..." value="{{ request('search_name') }}">
+                                   placeholder="{{ __('users.search_by_name') }}" value="{{ request('search_name') }}">
                         </div>
                         
                         <!-- Surname Search -->
                         <div class="col-md-3">
-                            <label for="search_surname" class="form-label">Surname</label>
+                            <label for="search_surname" class="form-label">{{ __('users.surname') }}</label>
                             <input type="text" class="form-control" id="search_surname" name="search_surname" 
-                                   placeholder="Search by surname..." value="{{ request('search_surname') }}">
+                                   placeholder="{{ __('users.search_by_surname') }}" value="{{ request('search_surname') }}">
                         </div>
                         
                         <!-- Email Search -->
                         <div class="col-md-3">
-                            <label for="search_email" class="form-label">Email</label>
+                            <label for="search_email" class="form-label">{{ __('users.email') }}</label>
                             <input type="text" class="form-control" id="search_email" name="search_email" 
-                                   placeholder="Search by email..." value="{{ request('search_email') }}">
+                                   placeholder="{{ __('users.search_by_email') }}" value="{{ request('search_email') }}">
                         </div>
                         
                         <!-- Mobile Search -->
                         <div class="col-md-3">
-                            <label for="search_mobile" class="form-label">Mobile</label>
+                            <label for="search_mobile" class="form-label">{{ __('users.mobile') }}</label>
                             <input type="text" class="form-control" id="search_mobile" name="search_mobile" 
-                                   placeholder="Search by mobile..." value="{{ request('search_mobile') }}">
+                                   placeholder="{{ __('users.search_by_mobile') }}" value="{{ request('search_mobile') }}">
                         </div>
                     </div>
                     
                     <div class="row g-3 mt-1">
                         <!-- Tax ID Search -->
                         <div class="col-md-3">
-                            <label for="search_tax_id" class="form-label">Tax ID Code</label>
+                            <label for="search_tax_id" class="form-label">{{ __('users.tax_id_code') }}</label>
                             <input type="text" class="form-control" id="search_tax_id" name="search_tax_id" 
-                                   placeholder="Search by tax ID..." value="{{ request('search_tax_id') }}">
+                                   placeholder="{{ __('users.search_by_tax_id') }}" value="{{ request('search_tax_id') }}">
                         </div>
                         <div class="col-md-9"></div>
                     </div>
@@ -197,15 +197,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="col-12">
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search me-1"></i>Search
+                                    <i class="fas fa-search me-1"></i>{{ __('users.search') }}
                                 </button>
                                 @if(request('search_name') || request('search_surname') || request('search_email') || request('search_mobile') || request('search_tax_id'))
                                     <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">
-                                        <i class="fas fa-times me-1"></i>Clear All
+                                        <i class="fas fa-times me-1"></i>{{ __('users.clear_all') }}
                                     </a>
                                 @endif
                                 <button type="button" class="btn btn-outline-info ms-auto" onclick="toggleAdvancedSearch()">
-                                    <i class="fas fa-cog me-1"></i>Advanced Options
+                                    <i class="fas fa-cog me-1"></i>{{ __('users.advanced_options') }}
                                 </button>
                             </div>
                         </div>
@@ -214,27 +214,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     <!-- Advanced Search Options (Hidden by default) -->
                     <div id="advanced-search" class="row mt-3" style="display: none;">
                         <div class="col-md-3">
-                            <label for="search_gender" class="form-label">Gender</label>
+                            <label for="search_gender" class="form-label">{{ __('users.gender') }}</label>
                             <select class="form-select" id="search_gender" name="search_gender">
-                                <option value="">All Genders</option>
-                                <option value="male" {{ request('search_gender') == 'male' ? 'selected' : '' }}>Male</option>
-                                <option value="female" {{ request('search_gender') == 'female' ? 'selected' : '' }}>Female</option>
-                                <option value="other" {{ request('search_gender') == 'other' ? 'selected' : '' }}>Other</option>
+                                <option value="">{{ __('users.all_genders') }}</option>
+                                <option value="male" {{ request('search_gender') == 'male' ? 'selected' : '' }}>{{ __('users.male') }}</option>
+                                <option value="female" {{ request('search_gender') == 'female' ? 'selected' : '' }}>{{ __('users.female') }}</option>
+                                <option value="other" {{ request('search_gender') == 'other' ? 'selected' : '' }}>{{ __('users.other') }}</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label for="search_status" class="form-label">Status</label>
+                            <label for="search_status" class="form-label">{{ __('users.status') }}</label>
                             <select class="form-select" id="search_status" name="search_status">
-                                <option value="">All Status</option>
-                                <option value="active" {{ request('search_status') == 'active' ? 'selected' : '' }}>Active</option>
-                                <option value="inactive" {{ request('search_status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                                <option value="parked" {{ request('search_status') == 'parked' ? 'selected' : '' }}>Parked (Pending Approval)</option>
+                                <option value="">{{ __('users.all_status') }}</option>
+                                <option value="active" {{ request('search_status') == 'active' ? 'selected' : '' }}>{{ __('users.active') }}</option>
+                                <option value="inactive" {{ request('search_status') == 'inactive' ? 'selected' : '' }}>{{ __('users.inactive') }}</option>
+                                <option value="parked" {{ request('search_status') == 'parked' ? 'selected' : '' }}>{{ __('users.parked') }}</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label for="search_company" class="form-label">Company</label>
+                            <label for="search_company" class="form-label">{{ __('users.company') }}</label>
                             <select class="form-select" id="search_company" name="search_company">
-                                <option value="">All Companies</option>
+                                <option value="">{{ __('users.all_companies') }}</option>
                                 @foreach($companies as $company)
                                     <option value="{{ $company->id }}" {{ request('search_company') == $company->id ? 'selected' : '' }}>
                                         {{ $company->name }}
@@ -244,12 +244,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div class="col-md-3"></div>
                         <div class="col-md-3 mt-3">
-                            <label for="search_date_from" class="form-label">Created From</label>
+                            <label for="search_date_from" class="form-label">{{ __('users.created_from') }}</label>
                             <input type="date" class="form-control" id="search_date_from" name="search_date_from" 
                                    value="{{ request('search_date_from') }}">
                         </div>
                         <div class="col-md-3 mt-3">
-                            <label for="search_date_to" class="form-label">Created To</label>
+                            <label for="search_date_to" class="form-label">{{ __('users.created_to') }}</label>
                             <input type="date" class="form-control" id="search_date_to" name="search_date_to" 
                                    value="{{ request('search_date_to') }}">
                         </div>
@@ -273,11 +273,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 @php
                     $hasAnySearch = request('search_name') || request('search_surname') || request('search_email') || request('search_mobile') || request('search_tax_id') || request('search_gender') || request('search_status') || request('search_company') || request('search_date_from') || request('search_date_to');
                     $searchTerms = collect([
-                        'Name' => request('search_name'),
-                        'Surname' => request('search_surname'),
-                        'Email' => request('search_email'), 
-                        'Mobile' => request('search_mobile'),
-                        'Tax ID' => request('search_tax_id')
+                        __('users.name') => request('search_name'),
+                        __('users.surname') => request('search_surname'),
+                        __('users.email') => request('search_email'),
+                        __('users.mobile') => request('search_mobile'),
+                        __('users.tax_id_code') => request('search_tax_id')
                     ])->filter()->map(function($value, $key) {
                         return $key . ': "' . $value . '"';
                     })->join(', ');
@@ -286,20 +286,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 @if($hasAnySearch)
                     <h5 class="mb-0">
                         <i class="fas fa-search me-2"></i>
-                        Search Results
-                        <small class="text-muted">({{ $users->total() }} found)</small>
+                        {{ __('users.search_results') }}
+                        <small class="text-muted">({{ $users->total() }} {{ __('users.found') }})</small>
                     </h5>
                     @if($searchTerms)
                         <p class="mb-0 mt-1 text-muted small">
-                            <i class="fas fa-filter me-1"></i>Filtered by: {{ $searchTerms }}
+                            <i class="fas fa-filter me-1"></i>{{ __('users.filtered_by') }}: {{ $searchTerms }}
                             @if(request('search_gender'))
-                                , Gender: {{ ucfirst(request('search_gender')) }}
+                                , {{ __('users.gender') }}: {{ ucfirst(request('search_gender')) }}
                             @endif
                             @if(request('search_status'))
-                                , Status: {{ request('search_status') == '1' ? 'Active' : 'Inactive' }}
+                                , {{ __('users.status') }}: {{ request('search_status') == 'active' ? __('users.active') : (request('search_status') == 'inactive' ? __('users.inactive') : __('users.parked')) }}
                             @endif
                             @if(request('search_company'))
-                                , Company: {{ $companies->find(request('search_company'))->name ?? 'Unknown' }}
+                                , {{ __('users.company') }}: {{ $companies->find(request('search_company'))->name ?? 'Unknown' }}
                             @endif
                             @if(request('search_date_from') || request('search_date_to'))
                                 , Date: {{ request('search_date_from') ?? 'Any' }} to {{ request('search_date_to') ?? 'Any' }}
@@ -309,15 +309,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 @else
                     <h5 class="mb-0">
                         <i class="fas fa-users me-2"></i>
-                        All Users
-                        <small class="text-muted">({{ $users->total() }} total)</small>
+                        {{ __('users.all_users') }}
+                        <small class="text-muted">({{ $users->total() }} {{ __('users.total') }})</small>
                     </h5>
                 @endif
             </div>
             
             @can('create users')
             <a href="{{ route('users.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Add New User
+                <i class="fas fa-plus me-2"></i>{{ __('users.add_new_user') }}
             </a>
             @endcan
         </div>
@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-users me-2"></i>All Users
+                    <i class="fas fa-users me-2"></i>{{ __('users.all_users') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <th width="20%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'direction' => request('sort') === 'name' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        Name
+                                        {{ __('users.name') }}
                                         @if(request('sort') === 'name')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <th width="15%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'email', 'direction' => request('sort') === 'email' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        Email
+                                        {{ __('users.email') }}
                                         @if(request('sort') === 'email')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -363,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <th width="10%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'mobile', 'direction' => request('sort') === 'mobile' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        Mobile
+                                        {{ __('users.mobile') }}
                                         @if(request('sort') === 'mobile')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <th width="8%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => request('sort') === 'status' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        Status
+                                        {{ __('users.status') }}
                                         @if(request('sort') === 'status')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -382,12 +382,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                         @endif
                                     </a>
                                 </th>
-                                <th width="12%">Primary Company</th>
-                                <th width="8%">Roles</th>
+                                <th width="12%">{{ __('users.primary_company') }}</th>
+                                <th width="8%">{{ __('users.roles') }}</th>
                                 <th width="10%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => request('sort') === 'created_at' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        Created At
+                                        {{ __('users.created_at') }}
                                         @if(request('sort') === 'created_at')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         @endif
                                     </a>
                                 </th>
-                                <th width="12%">Actions</th>
+                                <th width="12%">{{ __('users.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -408,10 +408,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <div>
                                             <div class="fw-bold">{{ $user->full_name }}</div>
                                             @if($user->id === auth()->id())
-                                                <small class="text-muted">(You)</small>
+                                                <small class="text-muted">({{ __('users.you') }})</small>
                                             @endif
                                             @if($user->age)
-                                                <small class="text-muted">Age: {{ $user->age }}</small>
+                                                <small class="text-muted">{{ __('users.age') }}: {{ $user->age }}</small>
                                             @endif
                                         </div>
                                     </div>
@@ -432,13 +432,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </td>
                                 <td>
                                     @if($user->status === 'active')
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge bg-success">{{ __('users.active') }}</span>
                                     @elseif($user->status === 'parked')
                                         <span class="badge bg-warning approval-needed">
-                                            <i class="fas fa-clock me-1"></i>Pending Approval
+                                            <i class="fas fa-clock me-1"></i>{{ __('users.pending_approval') }}
                                         </span>
                                     @else
-                                        <span class="badge bg-secondary">Inactive</span>
+                                        <span class="badge bg-secondary">{{ __('users.inactive') }}</span>
                                     @endif
                                 </td>
                                 <td>
@@ -457,20 +457,20 @@ document.addEventListener('DOMContentLoaded', function() {
                                     @if($user->roles->count() > 0)
                                         <span class="badge bg-info">{{ $user->formatted_role }}</span>
                                     @else
-                                        <span class="badge bg-secondary">No Role</span>
+                                        <span class="badge bg-secondary">{{ __('users.no_role_assigned') }}</span>
                                     @endif
                                 </td>
                                 <td>{{ $user->created_at->format('M d, Y') }}</td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         @can('view users')
-                                        <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-outline-info" title="View">
+                                        <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-outline-info" title="{{ __('users.view') }}">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         @endcan
                                         
                                         @can('edit users')
-                                        <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-outline-primary" title="{{ __('users.edit') }}">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         @endcan
@@ -478,10 +478,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                         @can('delete users')
                                         @if($user->id !== auth()->id())
                                         <form method="POST" action="{{ route('users.destroy', $user) }}" style="display: inline;" 
-                                              onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                              onsubmit="return confirm('{{ __('users.delete_confirmation') }}')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('users.delete') }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tr>
                                 <td colspan="9" class="text-center py-4">
                                     <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                                    <p class="text-muted">No users found.</p>
+                                    <p class="text-muted">{{ __('users.no_users_found') }}</p>
                                 </td>
                             </tr>
                             @endforelse
@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="d-flex justify-content-between align-items-center mt-4">
                     <!-- Per Page Dropdown (Left) -->
                     <div class="d-flex align-items-center">
-                        <label class="form-label me-2 mb-0">Show:</label>
+                        <label class="form-label me-2 mb-0">{{ __('users.show') }}:</label>
                         <form method="GET" action="{{ route('users.index') }}" class="d-flex align-items-center">
                             <!-- Preserve search parameters -->
                             @if(request('search_name'))
@@ -550,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
                                 <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                             </select>
-                            <span class="text-muted small">entries per page</span>
+                            <span class="text-muted small">{{ __('users.entries_per_page') }}</span>
                         </form>
                     </div>
 
@@ -565,11 +565,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <!-- Results Summary -->
                 <div class="d-flex justify-content-between align-items-center mt-3 text-muted small">
                     <div>
-                        Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} 
-                        of {{ $users->total() }} results
+                        {{ __('users.showing') }} {{ $users->firstItem() ?? 0 }} {{ __('users.to') }} {{ $users->lastItem() ?? 0 }}
+                        {{ __('users.of') }} {{ $users->total() }} {{ __('users.results') }}
                     </div>
                     <div>
-                        Page {{ $users->currentPage() }} of {{ $users->lastPage() }}
+                        {{ __('users.page') }} {{ $users->currentPage() }} {{ __('users.of') }} {{ $users->lastPage() }}
                     </div>
                 </div>
                 @endif

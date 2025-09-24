@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'Company Management')
+@section('page-title', __('companies.company_management'))
 
 @push('styles')
 <style>
@@ -40,12 +40,12 @@ function toggleAdvancedSearch() {
     
     if (advancedDiv.style.display === 'none' || advancedDiv.style.display === '') {
         advancedDiv.style.display = 'flex';
-        toggleBtn.innerHTML = '<i class="fas fa-cog me-1"></i>Hide Advanced';
+        toggleBtn.innerHTML = '<i class="fas fa-cog me-1"></i>{{ __('companies.hide_advanced') }}';
         toggleBtn.classList.remove('btn-outline-info');
         toggleBtn.classList.add('btn-info');
     } else {
         advancedDiv.style.display = 'none';
-        toggleBtn.innerHTML = '<i class="fas fa-cog me-1"></i>Advanced Options';
+        toggleBtn.innerHTML = '<i class="fas fa-cog me-1"></i>{{ __('companies.advanced_options') }}';
         toggleBtn.classList.remove('btn-info');
         toggleBtn.classList.add('btn-outline-info');
     }
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
                 const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Searching...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>{{ __('companies.searching') }}';
                 submitBtn.disabled = true;
                 
                 // Re-enable after 3 seconds in case of issues
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="card search-card">
             <div class="card-header">
                 <h6 class="card-title mb-0">
-                    <i class="fas fa-search me-2"></i>Search Companies
+                    <i class="fas fa-search me-2"></i>{{ __('companies.search_companies') }}
                 </h6>
             </div>
             <div class="card-body">
@@ -127,23 +127,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         <!-- Name Search -->
                         <div class="col-md-3">
-                            <label for="search_name" class="form-label">Company Name</label>
+                            <label for="search_name" class="form-label">{{ __('companies.company_name') }}</label>
                             <input type="text" class="form-control" id="search_name" name="search_name" 
-                                   placeholder="Search by name..." value="{{ request('search_name') }}">
+                                   placeholder="{{ __('companies.search_by_name') }}" value="{{ request('search_name') }}">
                         </div>
                         
                         <!-- Email Search -->
                         <div class="col-md-3">
-                            <label for="search_email" class="form-label">Email</label>
+                            <label for="search_email" class="form-label">{{ __('companies.email') }}</label>
                             <input type="text" class="form-control" id="search_email" name="search_email" 
-                                   placeholder="Search by email..." value="{{ request('search_email') }}">
+                                   placeholder="{{ __('companies.search_by_email') }}" value="{{ request('search_email') }}">
                         </div>
                         
                         <!-- Phone Search -->
                         <div class="col-md-3">
-                            <label for="search_phone" class="form-label">Phone</label>
+                            <label for="search_phone" class="form-label">{{ __('companies.phone') }}</label>
                             <input type="text" class="form-control" id="search_phone" name="search_phone" 
-                                   placeholder="Search by phone..." value="{{ request('search_phone') }}">
+                                   placeholder="{{ __('companies.search_by_phone') }}" value="{{ request('search_phone') }}">
                         </div>
                     </div>
                     
@@ -161,15 +161,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="col-12">
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search me-1"></i>Search
+                                    <i class="fas fa-search me-1"></i>{{ __('companies.search') }}
                                 </button>
                                 @if(request('search_name') || request('search_email') || request('search_phone') || request('search_piva') || request('search_ateco_code'))
                                     <a href="{{ route('companies.index') }}" class="btn btn-outline-secondary">
-                                        <i class="fas fa-times me-1"></i>Clear All
+                                        <i class="fas fa-times me-1"></i>{{ __('companies.clear_all') }}
                                     </a>
                                 @endif
                                 <button type="button" class="btn btn-outline-info ms-auto" onclick="toggleAdvancedSearch()">
-                                    <i class="fas fa-cog me-1"></i>Advanced Options
+                                    <i class="fas fa-cog me-1"></i>{{ __('companies.advanced_options') }}
                                 </button>
                             </div>
                         </div>
@@ -178,20 +178,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     <!-- Advanced Search Options (Hidden by default) -->
                     <div id="advanced-search" class="row mt-3" style="display: none;">
                         <div class="col-md-4">
-                            <label for="search_status" class="form-label">Status</label>
+                            <label for="search_status" class="form-label">{{ __('companies.status') }}</label>
                             <select class="form-select" id="search_status" name="search_status">
-                                <option value="">All Status</option>
-                                <option value="1" {{ request('search_status') == '1' ? 'selected' : '' }}>Active</option>
-                                <option value="0" {{ request('search_status') == '0' ? 'selected' : '' }}>Inactive</option>
+                                <option value="">{{ __('companies.all_status') }}</option>
+                                <option value="1" {{ request('search_status') == '1' ? 'selected' : '' }}>{{ __('companies.active') }}</option>
+                                <option value="0" {{ request('search_status') == '0' ? 'selected' : '' }}>{{ __('companies.inactive') }}</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="search_date_from" class="form-label">Created From</label>
+                            <label for="search_date_from" class="form-label">{{ __('companies.created_from') }}</label>
                             <input type="date" class="form-control" id="search_date_from" name="search_date_from" 
                                    value="{{ request('search_date_from') }}">
                         </div>
                         <div class="col-md-4">
-                            <label for="search_date_to" class="form-label">Created To</label>
+                            <label for="search_date_to" class="form-label">{{ __('companies.created_to') }}</label>
                             <input type="date" class="form-control" id="search_date_to" name="search_date_to" 
                                    value="{{ request('search_date_to') }}">
                         </div>
@@ -215,10 +215,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 @php
                     $hasAnySearch = request('search_name') || request('search_email') || request('search_phone') || request('search_piva') || request('search_ateco_code') || request('search_status') || request('search_date_from') || request('search_date_to');
                     $searchTerms = collect([
-                        'Name' => request('search_name'),
-                        'Email' => request('search_email'), 
-                        'Phone' => request('search_phone'),
-                        'P.IVA' => request('search_piva'),
+                        __('companies.name') => request('search_name'),
+                        __('companies.email') => request('search_email'),
+                        __('companies.phone') => request('search_phone'),
+                        __('companies.tax_id') => request('search_piva'),
                         'ATECO' => request('search_ateco_code')
                     ])->filter()->map(function($value, $key) {
                         return $key . ': "' . $value . '"';
@@ -228,14 +228,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 @if($hasAnySearch)
                     <h5 class="mb-0">
                         <i class="fas fa-search me-2"></i>
-                        Search Results
-                        <small class="text-muted">({{ $companies->total() }} found)</small>
+                        {{ __('companies.search_results') }}
+                        <small class="text-muted">({{ $companies->total() }} {{ __('companies.found') }})</small>
                     </h5>
                     @if($searchTerms)
                         <p class="mb-0 mt-1 text-muted small">
-                            <i class="fas fa-filter me-1"></i>Filtered by: {{ $searchTerms }}
+                            <i class="fas fa-filter me-1"></i>{{ __('companies.filtered_by') }}: {{ $searchTerms }}
                             @if(request('search_status'))
-                                , Status: {{ request('search_status') == '1' ? 'Active' : 'Inactive' }}
+                                , {{ __('companies.status') }}: {{ request('search_status') == '1' ? __('companies.active') : __('companies.inactive') }}
                             @endif
                             @if(request('search_date_from') || request('search_date_to'))
                                 , Date: {{ request('search_date_from') ?? 'Any' }} to {{ request('search_date_to') ?? 'Any' }}
@@ -245,15 +245,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 @else
                     <h5 class="mb-0">
                         <i class="fas fa-building me-2"></i>
-                        All Companies
-                        <small class="text-muted">({{ $companies->total() }} total)</small>
+                        {{ __('companies.all_companies') }}
+                        <small class="text-muted">({{ $companies->total() }} {{ __('companies.total') }})</small>
                     </h5>
                 @endif
             </div>
             
             @can('create companies')
             <a href="{{ route('companies.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Add New Company
+                <i class="fas fa-plus me-2"></i>{{ __('companies.add_new_company') }}
             </a>
             @endcan
         </div>
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-building me-2"></i>All Companies
+                    <i class="fas fa-building me-2"></i>{{ __('companies.all_companies') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -285,11 +285,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                         @endif
                                     </a>
                                 </th>
-                                <th width="8%">Logo</th>
+                                <th width="8%">{{ __('companies.logo') }}</th>
                                 <th width="15%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'direction' => request('sort') === 'name' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        Name
+                                        {{ __('companies.name') }}
                                         @if(request('sort') === 'name')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <th width="15%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'email', 'direction' => request('sort') === 'email' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        Email
+                                        {{ __('companies.email') }}
                                         @if(request('sort') === 'email')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <th width="10%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'phone', 'direction' => request('sort') === 'phone' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        Phone
+                                        {{ __('companies.phone') }}
                                         @if(request('sort') === 'phone')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <th width="10%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'piva', 'direction' => request('sort') === 'piva' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        P.IVA
+                                        {{ __('companies.tax_id') }}
                                         @if(request('sort') === 'piva')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -331,11 +331,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </a>
                                 </th>
                                 
-                                <th width="8%">Website</th>
+                                <th width="8%">{{ __('companies.website') }}</th>
                                 <th width="8%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'active', 'direction' => request('sort') === 'active' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        Status
+                                        {{ __('companies.status') }}
                                         @if(request('sort') === 'active')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <th width="10%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => request('sort') === 'created_at' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
-                                        Created At
+                                        {{ __('companies.created_at') }}
                                         @if(request('sort') === 'created_at')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else
@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         @endif
                                     </a>
                                 </th>
-                                <th width="11%">Actions</th>
+                                <th width="11%">{{ __('companies.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -419,32 +419,32 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </td>
                                 <td>
                                     @if($company->active)
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge bg-success">{{ __('companies.active') }}</span>
                                     @else
-                                        <span class="badge bg-secondary">Inactive</span>
+                                        <span class="badge bg-secondary">{{ __('companies.inactive') }}</span>
                                     @endif
                                 </td>
                                 <td>{{ $company->created_at->format('M d, Y') }}</td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         @can('view companies')
-                                        <a href="{{ route('companies.show', $company) }}" class="btn btn-sm btn-outline-info" title="View">
+                                        <a href="{{ route('companies.show', $company) }}" class="btn btn-sm btn-outline-info" title="{{ __('companies.view') }}">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         @endcan
                                         
                                         @can('edit companies')
-                                        <a href="{{ route('companies.edit', $company) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <a href="{{ route('companies.edit', $company) }}" class="btn btn-sm btn-outline-primary" title="{{ __('companies.edit') }}">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         @endcan
                                         
                                         @can('delete companies')
                                         <form method="POST" action="{{ route('companies.destroy', $company) }}" style="display: inline;" 
-                                              onsubmit="return confirm('Are you sure you want to delete this company?')">
+                                              onsubmit="return confirm('{{ __('companies.delete_confirmation') }}')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('companies.delete') }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -456,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tr>
                                 <td colspan="11" class="text-center py-4">
                                     <i class="fas fa-building fa-3x text-muted mb-3"></i>
-                                    <p class="text-muted">No companies found.</p>
+                                    <p class="text-muted">{{ __('companies.no_companies_found') }}</p>
                                 </td>
                             </tr>
                             @endforelse
@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="d-flex justify-content-between align-items-center mt-4">
                     <!-- Per Page Dropdown (Left) -->
                     <div class="d-flex align-items-center">
-                        <label class="form-label me-2 mb-0">Show:</label>
+                        <label class="form-label me-2 mb-0">{{ __('companies.show') }}:</label>
                         <form method="GET" action="{{ route('companies.index') }}" class="d-flex align-items-center">
                             <!-- Preserve search parameters -->
                             @if(request('search_name'))
@@ -503,7 +503,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
                                 <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                             </select>
-                            <span class="text-muted small">entries per page</span>
+                            <span class="text-muted small">{{ __('companies.entries_per_page') }}</span>
                         </form>
                     </div>
 
@@ -518,14 +518,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 <!-- Results Summary -->
                 <div class="d-flex justify-content-between align-items-center mt-3 text-muted small">
                     <div>
-                        Showing {{ $companies->firstItem() ?? 0 }} to {{ $companies->lastItem() ?? 0 }} 
-                        of {{ $companies->total() }} results
+                        {{ __('companies.showing') }} {{ $companies->firstItem() ?? 0 }} {{ __('companies.to') }} {{ $companies->lastItem() ?? 0 }}
+                        {{ __('companies.of') }} {{ $companies->total() }} {{ __('companies.results') }}
                         @if(request('search'))
                             for "{{ request('search') }}"
                         @endif
                     </div>
                     <div>
-                        Page {{ $companies->currentPage() }} of {{ $companies->lastPage() }}
+                        {{ __('companies.page') }} {{ $companies->currentPage() }} {{ __('companies.of') }} {{ $companies->lastPage() }}
                     </div>
                 </div>
                 @endif

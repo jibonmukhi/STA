@@ -1,16 +1,16 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'Create New User')
+@section('page-title', __('users.create_new_user'))
 
 @section('content')
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="mb-0">
-                <i class="fas fa-user-plus me-2"></i>Create New User
+                <i class="fas fa-user-plus me-2"></i>{{ __('users.create_new_user') }}
             </h4>
             <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Users
+                <i class="fas fa-arrow-left me-2"></i>{{ __('users.back_to_users') }}
             </a>
         </div>
     </div>
@@ -21,7 +21,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-user me-2"></i>User Information
+                    <i class="fas fa-user me-2"></i>{{ __('users.user_information') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -40,7 +40,7 @@
                 @if($errors->any() && !$errors->has('error'))
                     <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
                         <i class="fas fa-exclamation-circle me-2"></i>
-                        <strong>Please fix the following errors:</strong>
+                        <strong>{{ __('users.please_fix_errors') }}</strong>
                         <ul class="mb-0 mt-2">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -57,7 +57,7 @@
                     <div class="row">
                         <div class="col-12">
                             <h6 class="border-bottom pb-2 mb-3">
-                                <i class="fas fa-user me-2"></i>Personal Information
+                                <i class="fas fa-user me-2"></i>{{ __('users.personal_information') }}
                             </h6>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="name" class="form-label">
-                                    First Name <span class="text-danger">*</span>
+                                    {{ __('users.first_name') }} <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" 
                                        id="name" name="name" value="{{ old('name') }}" required>
@@ -78,7 +78,7 @@
 
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="surname" class="form-label">Surname</label>
+                                <label for="surname" class="form-label">{{ __('users.surname') }}</label>
                                 <input type="text" class="form-control @error('surname') is-invalid @enderror" 
                                        id="surname" name="surname" value="{{ old('surname') }}">
                                 @error('surname')
@@ -91,12 +91,12 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="gender" class="form-label">Gender</label>
+                                <label for="gender" class="form-label">{{ __('users.gender') }}</label>
                                 <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender">
-                                    <option value="">Select Gender</option>
-                                    <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
-                                    <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
-                                    <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
+                                    <option value="">{{ __('users.select_gender') }}</option>
+                                    <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>{{ __('users.male') }}</option>
+                                    <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>{{ __('users.female') }}</option>
+                                    <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>{{ __('users.other') }}</option>
                                 </select>
                                 @error('gender')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -106,7 +106,7 @@
 
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                <label for="date_of_birth" class="form-label">{{ __('users.date_of_birth') }}</label>
                                 <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" 
                                        id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') }}">
                                 @error('date_of_birth')
@@ -117,7 +117,7 @@
 
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="place_of_birth" class="form-label">Place of Birth</label>
+                                <label for="place_of_birth" class="form-label">{{ __('users.place_of_birth') }}</label>
                                 <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror" 
                                        id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth') }}">
                                 @error('place_of_birth')
@@ -131,14 +131,14 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="country" class="form-label">Country</label>
+                                <label for="country" class="form-label">{{ __('users.country') }}</label>
                                 <select class="form-select @error('country') is-invalid @enderror" id="country" name="country">
-                                    <option value="IT" {{ old('country', 'IT') == 'IT' ? 'selected' : '' }}>Italy</option>
-                                    <option value="US" {{ old('country') == 'US' ? 'selected' : '' }}>United States</option>
-                                    <option value="GB" {{ old('country') == 'GB' ? 'selected' : '' }}>United Kingdom</option>
-                                    <option value="FR" {{ old('country') == 'FR' ? 'selected' : '' }}>France</option>
-                                    <option value="DE" {{ old('country') == 'DE' ? 'selected' : '' }}>Germany</option>
-                                    <option value="ES" {{ old('country') == 'ES' ? 'selected' : '' }}>Spain</option>
+                                    <option value="IT" {{ old('country', 'IT') == 'IT' ? 'selected' : '' }}>{{ __('users.italy') }}</option>
+                                    <option value="US" {{ old('country') == 'US' ? 'selected' : '' }}>{{ __('users.united_states') }}</option>
+                                    <option value="GB" {{ old('country') == 'GB' ? 'selected' : '' }}>{{ __('users.united_kingdom') }}</option>
+                                    <option value="FR" {{ old('country') == 'FR' ? 'selected' : '' }}>{{ __('users.france') }}</option>
+                                    <option value="DE" {{ old('country') == 'DE' ? 'selected' : '' }}>{{ __('users.germany') }}</option>
+                                    <option value="ES" {{ old('country') == 'ES' ? 'selected' : '' }}>{{ __('users.spain') }}</option>
                                 </select>
                                 @error('country')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -147,11 +147,11 @@
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="cf" class="form-label">Codice Fiscale (CF)</label>
+                                <label for="cf" class="form-label">{{ __('users.codice_fiscale') }}</label>
                                 <input type="text" class="form-control @error('cf') is-invalid @enderror" 
                                        id="cf" name="cf" value="{{ old('cf') }}" maxlength="16" 
                                        placeholder="e.g. RSSMRA90A01H501X">
-                                <div class="form-text">Italian tax identification code</div>
+                                <div class="form-text">{{ __('users.italian_tax_code') }}</div>
                                 @error('cf')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -159,10 +159,10 @@
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="photo" class="form-label">Profile Photo</label>
+                                <label for="photo" class="form-label">{{ __('users.profile_photo') }}</label>
                                 <input type="file" class="form-control @error('photo') is-invalid @enderror" 
                                        id="photo" name="photo" accept="image/*" onchange="previewPhoto(this)">
-                                <div class="form-text">Max file size: 2MB. Supported formats: JPEG, PNG, JPG, GIF</div>
+                                <div class="form-text">{{ __('users.max_file_size') }}</div>
                                 @error('photo')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -184,7 +184,7 @@
                     <div class="row">
                         <div class="col-12">
                             <h6 class="border-bottom pb-2 mb-3 mt-4">
-                                <i class="fas fa-address-card me-2"></i>Contact Information
+                                <i class="fas fa-address-card me-2"></i>{{ __('users.contact_information') }}
                             </h6>
                         </div>
                     </div>
@@ -193,7 +193,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="email" class="form-label">
-                                    Email Address <span class="text-danger">*</span>
+                                    {{ __('users.email_address') }} <span class="text-danger">*</span>
                                 </label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror" 
                                        id="email" name="email" value="{{ old('email') }}" required>
@@ -205,7 +205,7 @@
 
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="phone" class="form-label">Phone Number</label>
+                                <label for="phone" class="form-label">{{ __('users.phone_number') }}</label>
                                 <input type="text" class="form-control @error('phone') is-invalid @enderror" 
                                        id="phone" name="phone" value="{{ old('phone') }}">
                                 @error('phone')
@@ -218,7 +218,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="mb-3">
-                                <label for="address" class="form-label">Address</label>
+                                <label for="address" class="form-label">{{ __('users.address') }}</label>
                                 <textarea class="form-control @error('address') is-invalid @enderror" 
                                           id="address" name="address" rows="3">{{ old('address') }}</textarea>
                                 @error('address')
@@ -232,7 +232,7 @@
                     <div class="row">
                         <div class="col-12">
                             <h6 class="border-bottom pb-2 mb-3 mt-4">
-                                <i class="fas fa-building me-2"></i>Company Associations & Work Allocation
+                                <i class="fas fa-building me-2"></i>{{ __('users.work_allocation') }}
                             </h6>
                         </div>
                     </div>
@@ -242,9 +242,9 @@
                             <div class="mb-3">
                                 <div class="card">
                                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                        <span><strong>Company Work Allocation</strong></span>
+                                        <span><strong>{{ __('users.company_work_allocation') }}</strong></span>
                                         <button type="button" class="btn btn-sm btn-success" onclick="addCompanyRow()">
-                                            <i class="fas fa-plus me-1"></i>Add Company
+                                            <i class="fas fa-plus me-1"></i>{{ __('users.add_company') }}
                                         </button>
                                     </div>
                                     <div class="card-body">
@@ -252,9 +252,9 @@
                                         <div id="company-row-template" class="company-allocation-row d-none">
                                             <div class="row align-items-center mb-3 border-bottom pb-3">
                                                 <div class="col-md-4">
-                                                    <label class="form-label small">Company</label>
+                                                    <label class="form-label small">{{ __('users.company') }}</label>
                                                     <select class="form-select company-select" onchange="updateCompanySelection(this)" disabled>
-                                                        <option value="">Select Company...</option>
+                                                        <option value="">{{ __('users.select_company_placeholder') }}</option>
                                                         @foreach($companies as $company)
                                                         <option value="{{ $company->id }}" data-name="{{ $company->name }}" data-email="{{ $company->email }}">
                                                             {{ $company->name }}
@@ -265,7 +265,7 @@
                                                     <input type="hidden" class="company-input" name="companies[]" value="" disabled>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label small">Percentage</label>
+                                                    <label class="form-label small">{{ __('users.percentage') }}</label>
                                                     <div class="input-group">
                                                         <input type="number" class="form-control percentage-input" 
                                                                min="0" max="100" step="0.01" 
@@ -277,24 +277,24 @@
                                                     <input type="hidden" class="percentage-hidden" value="0" disabled>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label small">Primary</label>
+                                                    <label class="form-label small">{{ __('users.primary') }}</label>
                                                     <div class="form-check pt-2">
                                                         <input class="form-check-input primary-radio" type="radio" 
                                                                name="primary_company" 
                                                                disabled>
                                                         <label class="form-check-label">
-                                                            Primary
+                                                            {{ __('users.primary') }}
                                                         </label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label small">Current</label>
+                                                    <label class="form-label small">{{ __('users.current') }}</label>
                                                     <div class="pt-2">
                                                         <span class="badge bg-secondary company-badge">0%</span>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label small">Action</label>
+                                                    <label class="form-label small">{{ __('users.action') }}</label>
                                                     <div class="pt-2">
                                                         <button type="button" class="btn btn-sm btn-danger" onclick="removeCompanyRow(this)">
                                                             <i class="fas fa-trash"></i>
@@ -312,7 +312,7 @@
                                         <!-- Empty State -->
                                         <div id="no-companies-message" class="text-center text-muted py-4">
                                             <i class="fas fa-building fa-2x mb-3 d-block"></i>
-                                            <p>No companies added yet. Click "Add Company" to start.</p>
+                                            <p>{{ __('users.no_companies_added') }}</p>
                                         </div>
                                     </div>
                                     <div class="card-footer">
@@ -320,13 +320,13 @@
                                             <div class="col-md-8">
                                                 <div class="form-text">
                                                     <i class="fas fa-info-circle me-1"></i>
-                                                    Add companies and assign work percentages. Total must equal 100%.
+                                                    {{ __('users.allocation_info') }}
                                                 </div>
                                             </div>
                                             <div class="col-md-4 text-end">
-                                                <strong>Total: <span id="total-percentage" class="text-primary">0.00</span>%</strong>
+                                                <strong>{{ __('users.total_percentage') }}: <span id="total-percentage" class="text-primary">0.00</span>%</strong>
                                                 <div id="percentage-status" class="small">
-                                                    <i class="fas fa-info-circle text-muted"></i> No allocation set
+                                                    <i class="fas fa-info-circle text-muted"></i> {{ __('users.no_allocation_set') }}
                                                 </div>
                                             </div>
                                         </div>
@@ -351,7 +351,7 @@
                     <div class="row">
                         <div class="col-12">
                             <h6 class="border-bottom pb-2 mb-3 mt-4">
-                                <i class="fas fa-cog me-2"></i>System Information
+                                <i class="fas fa-cog me-2"></i>{{ __('users.system_information') }}
                             </h6>
                         </div>
                     </div>
@@ -360,7 +360,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="password" class="form-label">
-                                    Password <span class="text-danger">*</span>
+                                    {{ __('users.password') }} <span class="text-danger">*</span>
                                 </label>
                                 <input type="password" class="form-control @error('password') is-invalid @enderror" 
                                        id="password" name="password" required>
@@ -373,7 +373,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="password_confirmation" class="form-label">
-                                    Confirm Password <span class="text-danger">*</span>
+                                    {{ __('users.confirm_password') }} <span class="text-danger">*</span>
                                 </label>
                                 <input type="password" class="form-control" 
                                        id="password_confirmation" name="password_confirmation" required>
@@ -384,11 +384,11 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="status" class="form-label">User Status</label>
+                                <label for="status" class="form-label">{{ __('users.user_status') }}</label>
                                 <select class="form-select @error('status') is-invalid @enderror" id="status" name="status">
-                                    <option value="parked" {{ old('status', 'parked') == 'parked' ? 'selected' : '' }}>Parked (Pending Approval)</option>
-                                    <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                    <option value="parked" {{ old('status', 'parked') == 'parked' ? 'selected' : '' }}>{{ __('users.parked') }}</option>
+                                    <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>{{ __('users.active') }}</option>
+                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>{{ __('users.inactive') }}</option>
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -401,7 +401,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label">User Roles</label>
+                                <label class="form-label">{{ __('users.user_roles') }}</label>
                                 <div class="row">
                                     @foreach($roles as $role)
                                     <div class="col-md-4">
@@ -428,10 +428,10 @@
 
                     <div class="d-flex justify-content-end gap-2">
                         <a href="{{ route('users.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-times me-2"></i>Cancel
+                            <i class="fas fa-times me-2"></i>{{ __('users.cancel') }}
                         </a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Create User
+                            <i class="fas fa-save me-2"></i>{{ __('users.create_user_btn') }}
                         </button>
                     </div>
                 </form>
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (activeCompanies === 0) {
                 e.preventDefault();
-                alert('Please add at least one company before submitting.');
+                alert('{{ __('users.at_least_one_company') }}');
                 return false;
             }
         });

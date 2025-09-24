@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'User Details')
+@section('page-title', __('users.user_details'))
 
 @section('content')
 <div class="row">
@@ -9,21 +9,21 @@
             <h4 class="mb-0">
                 <i class="fas fa-user me-2"></i>{{ $user->full_name }}
                 @if($user->status)
-                    <span class="badge bg-success ms-2">Active</span>
+                    <span class="badge bg-success ms-2">{{ __('users.active') }}</span>
                 @else
-                    <span class="badge bg-secondary ms-2">Inactive</span>
+                    <span class="badge bg-secondary ms-2">{{ __('users.inactive') }}</span>
                 @endif
                 @if($user->id === auth()->id())
-                    <span class="badge bg-info ms-1">You</span>
+                    <span class="badge bg-info ms-1">{{ __('users.you') }}</span>
                 @endif
             </h4>
             <div class="btn-group">
                 <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Users
+                    <i class="fas fa-arrow-left me-2"></i>{{ __('users.back_to_users') }}
                 </a>
                 @can('edit users')
                 <a href="{{ route('users.edit', $user) }}" class="btn btn-primary">
-                    <i class="fas fa-edit me-2"></i>Edit User
+                    <i class="fas fa-edit me-2"></i>{{ __('users.edit_user_btn') }}
                 </a>
                 @endcan
             </div>
@@ -40,20 +40,20 @@
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-user me-2"></i>Personal Information
+                    <i class="fas fa-user me-2"></i>{{ __('users.personal_information') }}
                 </h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label text-muted small">First Name</label>
+                            <label class="form-label text-muted small">{{ __('users.first_name') }}</label>
                             <p class="fw-bold mb-1">{{ $user->name ?: '-' }}</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Surname</label>
+                            <label class="form-label text-muted small">{{ __('users.surname') }}</label>
                             <p class="fw-bold mb-1">{{ $user->surname ?: '-' }}</p>
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Gender</label>
+                            <label class="form-label text-muted small">{{ __('users.gender') }}</label>
                             <p class="fw-bold mb-1">
                                 @if($user->gender)
                                     <span class="badge bg-info">{{ ucfirst($user->gender) }}</span>
@@ -74,11 +74,11 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Date of Birth</label>
+                            <label class="form-label text-muted small">{{ __('users.date_of_birth') }}</label>
                             <p class="fw-bold mb-1">
                                 @if($user->date_of_birth)
                                     {{ $user->date_of_birth->format('F d, Y') }}
-                                    <small class="text-muted d-block">Age: {{ $user->age }} years old</small>
+                                    <small class="text-muted d-block">{{ __('users.age') }}: {{ $user->age }} {{ __('users.years_old') }}</small>
                                 @else
                                     -
                                 @endif
@@ -87,7 +87,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Tax ID Code</label>
+                            <label class="form-label text-muted small">{{ __('users.tax_id_code') }}</label>
                             <p class="fw-bold mb-1">{{ $user->tax_id_code ?: '-' }}</p>
                         </div>
                     </div>
@@ -99,14 +99,14 @@
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-address-card me-2"></i>Contact Information
+                    <i class="fas fa-address-card me-2"></i>{{ __('users.contact_information') }}
                 </h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Email Address</label>
+                            <label class="form-label text-muted small">{{ __('users.email_address') }}</label>
                             <p class="fw-bold mb-1">
                                 <a href="mailto:{{ $user->email }}" class="text-decoration-none">
                                     {{ $user->email }}
@@ -116,7 +116,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Mobile Phone</label>
+                            <label class="form-label text-muted small">{{ __('users.mobile') }}</label>
                             <p class="fw-bold mb-1">
                                 @if($user->mobile)
                                     <a href="tel:{{ $user->mobile }}" class="text-decoration-none">

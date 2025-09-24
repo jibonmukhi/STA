@@ -23,4 +23,15 @@ return [
     'sta_manager' => 'Manager STA',
     'company_manager' => 'Manager Azienda',
     'end_user' => 'Utente Finale',
+
+    // Sidebar menu items
+    'user_management' => 'Gestione Utenti',
+    'all_users' => 'Tutti gli Utenti',
+    'add_user' => 'Aggiungi Utente',
+    'all_companies' => 'Tutte le Aziende',
+    'add_company' => 'Aggiungi Azienda',
+    'role_management' => 'Gestione Ruoli',
+    'my_reports' => 'I Miei Report',
+    'company_reports' => 'Report Azienda',
+    'view_users' => 'Visualizza Utenti',
 ];

@@ -41,4 +41,110 @@ return [
     'view_personal_reports' => 'Visualizzare Report Personali',
     'approve_users' => 'Approvare Utenti',
     'system_settings' => 'Impostazioni Sistema',
+
+    // Page Titles & Headers
+    'role_management' => 'Gestione Ruoli',
+    'create_new_role' => 'Crea Nuovo Ruolo',
+    'add_new_role' => 'Aggiungi Nuovo Ruolo',
+    'all_roles' => 'Tutti i Ruoli',
+    'back_to_roles' => 'Torna ai Ruoli',
+    'role_information' => 'Informazioni Ruolo',
+
+    // Search & Filtering
+    'search_by_role_name' => 'Cerca per nome ruolo...',
+    'search_by_permission_name' => 'Cerca per nome permesso...',
+    'role_name' => 'Nome Ruolo',
+    'permission' => 'Permesso',
+    'users_count' => 'Numero Utenti',
+    'created_from' => 'Creato Dal',
+    'created_to' => 'Creato Al',
+    'filter_by_users_count' => 'Filtra per numero utenti...',
+    'advanced_options' => 'Opzioni Avanzate',
+    'hide_advanced' => 'Nascondi Avanzate',
+    'search' => 'Cerca',
+    'searching' => 'Cercando...',
+    'clear_all' => 'Cancella Tutto',
+    'search_results' => 'Risultati Ricerca',
+    'filtered_by' => 'Filtrato per',
+    'found' => 'trovati',
+    'total' => 'totale',
+    'any' => 'Qualsiasi',
+    'date' => 'Data',
+
+    // Table Headers & Data
+    'id' => 'ID',
+    'role_name_column' => 'Nome Ruolo',
+    'permissions_column' => 'Permessi',
+    'users_count_column' => 'Numero Utenti',
+    'created_at_column' => 'Creato Il',
+    'actions_column' => 'Azioni',
+    'no_permissions' => 'Nessun Permesso',
+    'more' => 'di più',
+
+    // Actions & Buttons
+    'view' => 'Visualizza',
+    'edit' => 'Modifica',
+    'delete' => 'Elimina',
+    'cancel' => 'Annulla',
+    'save' => 'Salva',
+    'create' => 'Crea',
+    'update' => 'Aggiorna',
+    'create_role_btn' => 'Crea Ruolo',
+    'update_role' => 'Aggiorna Ruolo',
+    'view_role' => 'Visualizza Ruolo',
+    'edit_role_btn' => 'Modifica Ruolo',
+    'delete_role_btn' => 'Elimina Ruolo',
+
+    // Form Elements
+    'enter_role_name' => 'Inserisci nome ruolo',
+    'select_all_that_apply' => 'Seleziona tutti quelli applicabili',
+    'select_all_permissions' => 'Seleziona Tutti i Permessi',
+    'required_field' => 'Campo obbligatorio',
+
+    // Pagination & Display
+    'show' => 'Mostra',
+    'entries_per_page' => 'voci per pagina',
+    'showing' => 'Mostrando',
+    'to' => 'a',
+    'of' => 'di',
+    'results' => 'risultati',
+    'page' => 'Pagina',
+
+    // Permission Groups
+    'general_permissions' => 'Permessi Generali',
+    'users_permissions' => 'Permessi Utenti',
+    'companies_permissions' => 'Permessi Aziende',
+    'roles_permissions' => 'Permessi Ruoli',
+    'reports_permissions' => 'Permessi Report',
+    'settings_permissions' => 'Permessi Impostazioni',
+
+    // Guidelines & Help
+    'guidelines' => 'Linee Guida',
+    'use_descriptive_names' => 'Usa nomi descrittivi per i ruoli (es. "Responsabile Contenuti", "Assistente HR")',
+    'assign_necessary_permissions' => 'Assegna solo i permessi necessari per il ruolo',
+    'review_permissions_carefully' => 'Rivedi i permessi attentamente prima della creazione',
+    'role_names_unique' => 'I nomi dei ruoli dovrebbero essere unici e chiari',
+
+    // Empty States
+    'no_roles_found_message' => 'Nessun ruolo trovato.',
+
+    // Success Messages
+    'role_created_success' => 'Ruolo creato con successo.',
+    'role_updated_success' => 'Ruolo aggiornato con successo.',
+    'role_deleted_success' => 'Ruolo eliminato con successo.',
+
+    // Confirmation Messages
+    'delete_role_confirmation' => 'Sei sicuro di voler eliminare questo ruolo?',
+
+    // Warnings & Messages
+    'Warning' => 'Avviso',
+    'Changing permissions will affect all users assigned to this role immediately.' => 'La modifica dei permessi influenzerà immediatamente tutti gli utenti assegnati a questo ruolo.',
+    'assigned to this role' => 'assegnati a questo ruolo',
+    'No permissions assigned to this role.' => 'Nessun permesso assegnato a questo ruolo.',
+    'Role Statistics' => 'Statistiche Ruolo',
+    'And :count more users...' => 'E :count altri utenti...',
+    'Are you sure you want to delete this role? This action cannot be undone.' => 'Sei sicuro di voler eliminare questo ruolo? Questa azione non può essere annullata.',
+    'Cannot delete role with assigned users' => 'Impossibile eliminare ruolo con utenti assegnati',
+    'Cannot Delete (Users Assigned)' => 'Impossibile Eliminare (Utenti Assegnati)',
+    'users' => 'utenti',
 ];

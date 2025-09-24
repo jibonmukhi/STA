@@ -41,4 +41,110 @@ return [
     'view_personal_reports' => 'View Personal Reports',
     'approve_users' => 'Approve Users',
     'system_settings' => 'System Settings',
+
+    // Page Titles & Headers
+    'role_management' => 'Role Management',
+    'create_new_role' => 'Create New Role',
+    'add_new_role' => 'Add New Role',
+    'all_roles' => 'All Roles',
+    'back_to_roles' => 'Back to Roles',
+    'role_information' => 'Role Information',
+
+    // Search & Filtering
+    'search_by_role_name' => 'Search by role name...',
+    'search_by_permission_name' => 'Search by permission name...',
+    'role_name' => 'Role Name',
+    'permission' => 'Permission',
+    'users_count' => 'Users Count',
+    'created_from' => 'Created From',
+    'created_to' => 'Created To',
+    'filter_by_users_count' => 'Filter by users count...',
+    'advanced_options' => 'Advanced Options',
+    'hide_advanced' => 'Hide Advanced',
+    'search' => 'Search',
+    'searching' => 'Searching...',
+    'clear_all' => 'Clear All',
+    'search_results' => 'Search Results',
+    'filtered_by' => 'Filtered by',
+    'found' => 'found',
+    'total' => 'total',
+    'any' => 'Any',
+    'date' => 'Date',
+
+    // Table Headers & Data
+    'id' => 'ID',
+    'role_name_column' => 'Role Name',
+    'permissions_column' => 'Permissions',
+    'users_count_column' => 'Users Count',
+    'created_at_column' => 'Created At',
+    'actions_column' => 'Actions',
+    'no_permissions' => 'No Permissions',
+    'more' => 'more',
+
+    // Actions & Buttons
+    'view' => 'View',
+    'edit' => 'Edit',
+    'delete' => 'Delete',
+    'cancel' => 'Cancel',
+    'save' => 'Save',
+    'create' => 'Create',
+    'update' => 'Update',
+    'create_role_btn' => 'Create Role',
+    'update_role' => 'Update Role',
+    'view_role' => 'View Role',
+    'edit_role_btn' => 'Edit Role',
+    'delete_role_btn' => 'Delete Role',
+
+    // Form Elements
+    'enter_role_name' => 'Enter role name',
+    'select_all_that_apply' => 'Select all that apply',
+    'select_all_permissions' => 'Select All Permissions',
+    'required_field' => 'Required field',
+
+    // Pagination & Display
+    'show' => 'Show',
+    'entries_per_page' => 'entries per page',
+    'showing' => 'Showing',
+    'to' => 'to',
+    'of' => 'of',
+    'results' => 'results',
+    'page' => 'Page',
+
+    // Permission Groups
+    'general_permissions' => 'General Permissions',
+    'users_permissions' => 'Users Permissions',
+    'companies_permissions' => 'Companies Permissions',
+    'roles_permissions' => 'Roles Permissions',
+    'reports_permissions' => 'Reports Permissions',
+    'settings_permissions' => 'Settings Permissions',
+
+    // Guidelines & Help
+    'guidelines' => 'Guidelines',
+    'use_descriptive_names' => 'Use descriptive role names (e.g., "Content Manager", "HR Assistant")',
+    'assign_necessary_permissions' => 'Only assign necessary permissions for the role',
+    'review_permissions_carefully' => 'Review permissions carefully before creating',
+    'role_names_unique' => 'Role names should be unique and clear',
+
+    // Empty States
+    'no_roles_found_message' => 'No roles found.',
+
+    // Success Messages
+    'role_created_success' => 'Role created successfully.',
+    'role_updated_success' => 'Role updated successfully.',
+    'role_deleted_success' => 'Role deleted successfully.',
+
+    // Confirmation Messages
+    'delete_role_confirmation' => 'Are you sure you want to delete this role?',
+
+    // Warnings & Messages
+    'Warning' => 'Warning',
+    'Changing permissions will affect all users assigned to this role immediately.' => 'Changing permissions will affect all users assigned to this role immediately.',
+    'assigned to this role' => 'assigned to this role',
+    'No permissions assigned to this role.' => 'No permissions assigned to this role.',
+    'Role Statistics' => 'Role Statistics',
+    'And :count more users...' => 'And :count more users...',
+    'Are you sure you want to delete this role? This action cannot be undone.' => 'Are you sure you want to delete this role? This action cannot be undone.',
+    'Cannot delete role with assigned users' => 'Cannot delete role with assigned users',
+    'Cannot Delete (Users Assigned)' => 'Cannot Delete (Users Assigned)',
+    'users' => 'users',
 ];

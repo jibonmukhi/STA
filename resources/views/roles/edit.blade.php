@@ -1,14 +1,14 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'Edit Role')
+@section('page-title', __('roles.edit_role'))
 
 @section('content')
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-dark">Edit Role</h2>
+            <h2 class="fw-bold text-dark">{{ __('roles.edit_role') }}</h2>
             <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Roles
+                <i class="fas fa-arrow-left me-2"></i>{{ __('roles.back_to_roles') }}
             </a>
         </div>
     </div>
@@ -19,7 +19,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-edit me-2"></i>Edit Role Information
+                    <i class="fas fa-edit me-2"></i>{{ __('roles.edit_role') }} {{ __('roles.role_information') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -28,9 +28,9 @@
                     @method('PUT')
 
                     <div class="mb-4">
-                        <label for="name" class="form-label">Role Name <span class="text-danger">*</span></label>
+                        <label for="name" class="form-label">{{ __('roles.role_name') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                               id="name" name="name" value="{{ old('name', $role->name) }}" required placeholder="Enter role name">
+                               id="name" name="name" value="{{ old('name', $role->name) }}" required placeholder="{{ __('roles.enter_role_name') }}">
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -38,14 +38,14 @@
 
                     @if($permissions->count() > 0)
                     <div class="mb-4">
-                        <label class="form-label">Permissions <span class="text-muted">(Select all that apply)</span></label>
+                        <label class="form-label">{{ __('roles.permissions') }} <span class="text-muted">({{ __('roles.select_all_that_apply') }})</span></label>
                         
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="select_all">
                                     <label class="form-check-label fw-bold" for="select_all">
-                                        Select All Permissions
+                                        {{ __('roles.select_all_permissions') }}
                                     </label>
                                 </div>
                             </div>
@@ -62,7 +62,7 @@
 
                                 @foreach($groupedPermissions as $group => $perms)
                                 <div class="col-md-6 mb-3">
-                                    <h6 class="text-primary text-uppercase">{{ ucfirst($group) }} Permissions</h6>
+                                    <h6 class="text-primary text-uppercase">{{ ucfirst($group) }} {{ __('roles.permissions') }}</h6>
                                     @foreach($perms as $permission)
                                     <div class="form-check mb-2">
                                         <input class="form-check-input permission-checkbox" type="checkbox" name="permissions[]" 
@@ -84,9 +84,9 @@
                     @endif
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{{ route('roles.index') }}" class="btn btn-secondary">Cancel</a>
+                        <a href="{{ route('roles.index') }}" class="btn btn-secondary">{{ __('roles.cancel') }}</a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Update Role
+                            <i class="fas fa-save me-2"></i>{{ __('roles.update_role') }}
                         </button>
                     </div>
                 </form>
@@ -98,23 +98,23 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-info-circle me-2"></i>Role Details
+                    <i class="fas fa-info-circle me-2"></i>{{ __('roles.role_details') }}
                 </h5>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled">
                     <li class="mb-2">
-                        <strong>Created:</strong> {{ $role->created_at->format('M d, Y H:i') }}
+                        <strong>{{ __('roles.created_at') }}:</strong> {{ $role->created_at->format('M d, Y H:i') }}
                     </li>
                     <li class="mb-2">
-                        <strong>Last Updated:</strong> {{ $role->updated_at->format('M d, Y H:i') }}
+                        <strong>{{ __('roles.updated_at') }}:</strong> {{ $role->updated_at->format('M d, Y H:i') }}
                     </li>
                     <li class="mb-2">
-                        <strong>Users with this role:</strong>
+                        <strong>{{ __('roles.users_with_role') }}:</strong>
                         <span class="badge bg-info">{{ $role->users()->count() }}</span>
                     </li>
                     <li class="mb-2">
-                        <strong>Current Permissions:</strong>
+                        <strong>{{ __('roles.role_permissions') }}:</strong>
                         <div class="mt-1">
                             @foreach($role->permissions as $permission)
                                 <span class="badge bg-success me-1 mb-1">{{ $permission->name }}</span>
@@ -128,12 +128,12 @@
         <div class="card mt-3">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Warning
+                    <i class="fas fa-exclamation-triangle me-2"></i>{{ __('Warning') }}
                 </h5>
             </div>
             <div class="card-body">
                 <p class="text-muted small mb-0">
-                    Changing permissions will affect all users assigned to this role immediately.
+                    {{ __('Changing permissions will affect all users assigned to this role immediately.') }}
                 </p>
             </div>
         </div>

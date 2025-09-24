@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'Pending User Approvals')
+@section('page-title', __('users.pending_user_approvals'))
 
 @section('content')
 <div class="container-fluid">
@@ -26,15 +26,15 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="card-title mb-1">Pending User Approvals</h3>
-                            <p class="card-text opacity-75 mb-0">Review and approve user registrations awaiting validation</p>
+                            <h3 class="card-title mb-1">{{ __('users.pending_user_approvals') }}</h3>
+                            <p class="card-text opacity-75 mb-0">{{ __('users.review_approve_registrations') }}</p>
                         </div>
                         <div class="d-flex gap-2">
                             <a href="{{ route('users.index') }}" class="btn btn-outline-light">
-                                <i class="fas fa-users me-1"></i> All Users
+                                <i class="fas fa-users me-1"></i> {{ __('users.all_users') }}
                             </a>
                             <a href="{{ route('sta.dashboard') }}" class="btn btn-light">
-                                <i class="fas fa-arrow-left me-1"></i> Dashboard
+                                <i class="fas fa-arrow-left me-1"></i> {{ __('users.dashboard') }}
                             </a>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Total Pending</h6>
+                            <h6 class="mb-0">{{ __('users.total_pending') }}</h6>
                             <h4 class="mb-0 text-warning">{{ $stats['total_pending'] }}</h4>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">This Week</h6>
+                            <h6 class="mb-0">{{ __('users.this_week') }}</h6>
                             <h4 class="mb-0 text-info">{{ $stats['pending_this_week'] }}</h4>
                         </div>
                     </div>
@@ -91,7 +91,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">This Month</h6>
+                            <h6 class="mb-0">{{ __('users.this_month') }}</h6>
                             <h4 class="mb-0 text-primary">{{ $stats['pending_this_month'] }}</h4>
                         </div>
                     </div>
@@ -108,14 +108,14 @@
                     <form method="GET" action="{{ route('users.pending.approvals') }}">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-6">
-                                <label for="search" class="form-label">Search Users</label>
+                                <label for="search" class="form-label">{{ __('users.search_users') }}</label>
                                 <input type="text" class="form-control" id="search" name="search"
-                                       value="{{ request('search') }}" placeholder="Search by name, surname, or email...">
+                                       value="{{ request('search') }}" placeholder="{{ __('users.search_by_email') }}...">
                             </div>
                             <div class="col-md-4">
-                                <label for="company_filter" class="form-label">Company</label>
+                                <label for="company_filter" class="form-label">{{ __('users.company') }}</label>
                                 <select class="form-select" id="company_filter" name="company_filter">
-                                    <option value="">All Companies</option>
+                                    <option value="">{{ __('users.all_companies') }}</option>
                                     @foreach($companies as $company)
                                         <option value="{{ $company->id }}"
                                                 {{ request('company_filter') == $company->id ? 'selected' : '' }}>
@@ -127,7 +127,7 @@
                             <div class="col-md-2">
                                 <div class="d-flex gap-1">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-search"></i> Search
+                                        <i class="fas fa-search"></i> {{ __('users.search') }}
                                     </button>
                                     <a href="{{ route('users.pending.approvals') }}" class="btn btn-outline-secondary">
                                         <i class="fas fa-times"></i>
@@ -147,21 +147,21 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">
-                        Users Awaiting Approval
+                        {{ __('users.users_awaiting_approval') }}
                         @if(request()->filled('search') || request()->filled('company_filter'))
-                            <span class="badge bg-info ms-2">Filtered</span>
+                            <span class="badge bg-info ms-2">{{ __('users.filtered') }}</span>
                         @endif
                     </h5>
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-cog me-1"></i> Bulk Actions
+                            <i class="fas fa-cog me-1"></i> {{ __('users.bulk_actions') }}
                         </button>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#" onclick="bulkApprove()">
-                                <i class="fas fa-check me-2 text-success"></i>Approve Selected
+                                <i class="fas fa-check me-2 text-success"></i>{{ __('users.approve_selected') }}
                             </a></li>
                             <li><a class="dropdown-item" href="#" onclick="bulkReject()">
-                                <i class="fas fa-times me-2 text-danger"></i>Reject Selected
+                                <i class="fas fa-times me-2 text-danger"></i>{{ __('users.reject_selected') }}
                             </a></li>
                         </ul>
                     </div>
@@ -175,14 +175,14 @@
                                         <th>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="selectAll">
-                                                <label class="form-check-label" for="selectAll">Select All</label>
+                                                <label class="form-check-label" for="selectAll">{{ __('users.select_all') }}</label>
                                             </div>
                                         </th>
-                                        <th>User Details</th>
-                                        <th>Contact</th>
-                                        <th>Company</th>
-                                        <th>Registration Date</th>
-                                        <th>Actions</th>
+                                        <th>{{ __('users.user_details') }}</th>
+                                        <th>{{ __('users.contact') }}</th>
+                                        <th>{{ __('users.company') }}</th>
+                                        <th>{{ __('users.registration_date') }}</th>
+                                        <th>{{ __('users.actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>

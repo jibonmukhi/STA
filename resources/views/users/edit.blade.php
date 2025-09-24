@@ -1,16 +1,16 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'Edit User')
+@section('page-title', __('users.edit_user'))
 
 @section('content')
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="mb-0">
-                <i class="fas fa-user-edit me-2"></i>Edit User: {{ $user->full_name }}
+                <i class="fas fa-user-edit me-2"></i>{{ __('users.edit_user') }}: {{ $user->full_name }}
             </h4>
             <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Users
+                <i class="fas fa-arrow-left me-2"></i>{{ __('users.back_to_users') }}
             </a>
         </div>
     </div>
@@ -21,7 +21,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-user me-2"></i>User Information
+                    <i class="fas fa-user me-2"></i>{{ __('users.user_information') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -40,7 +40,7 @@
                 @if($errors->any() && !$errors->has('error'))
                     <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
                         <i class="fas fa-exclamation-circle me-2"></i>
-                        <strong>Please fix the following errors:</strong>
+                        <strong>{{ __('users.please_fix_errors') }}</strong>
                         <ul class="mb-0 mt-2">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -58,7 +58,7 @@
                     <div class="row">
                         <div class="col-12">
                             <h6 class="border-bottom pb-2 mb-3">
-                                <i class="fas fa-user me-2"></i>Personal Information
+                                <i class="fas fa-user me-2"></i>{{ __('users.personal_information') }}
                             </h6>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="name" class="form-label">
-                                    First Name <span class="text-danger">*</span>
+                                    {{ __('users.first_name') }} <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" 
                                        id="name" name="name" value="{{ old('name', $user->name) }}" required>
@@ -80,7 +80,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="surname" class="form-label">
-                                    Surname <span class="text-danger">*</span>
+                                    {{ __('users.surname') }} <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control @error('surname') is-invalid @enderror" 
                                        id="surname" name="surname" value="{{ old('surname', $user->surname) }}" required>

@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'My Dashboard')
+@section('page-title', __('dashboard.my_dashboard'))
 
 @section('content')
 <div class="container-fluid">
@@ -9,8 +9,8 @@
         <div class="col-12">
             <div class="card border-0 bg-gradient-success text-white">
                 <div class="card-body">
-                    <h3 class="card-title mb-1">Welcome, {{ Auth::user()->name }}!</h3>
-                    <p class="card-text opacity-75">Your personal dashboard - View your profile and company information</p>
+                    <h3 class="card-title mb-1">{{ __('dashboard.welcome') }}, {{ Auth::user()->name }}!</h3>
+                    <p class="card-text opacity-75">{{ __('dashboard.user_description') }}</p>
                 </div>
             </div>
         </div>
@@ -28,7 +28,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">My Companies</h6>
+                            <h6 class="mb-0">{{ __('dashboard.my_companies') }}</h6>
                             <h4 class="mb-0 text-success">{{ $stats['my_companies'] }}</h4>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Total Ownership</h6>
+                            <h6 class="mb-0">{{ __('dashboard.total_ownership') }}</h6>
                             <h4 class="mb-0 text-info">{{ $stats['total_percentage'] }}%</h4>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Profile Completion</h6>
+                            <h6 class="mb-0">{{ __('dashboard.profile_completion') }}</h6>
                             <h4 class="mb-0 text-primary">{{ $stats['profile_completion'] }}%</h4>
                         </div>
                     </div>
@@ -79,9 +79,9 @@
             <!-- My Companies -->
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">My Companies</h5>
+                    <h5 class="card-title mb-0">{{ __('dashboard.my_companies') }}</h5>
                     @if($primaryCompany)
-                        <span class="badge bg-success">Primary: {{ $primaryCompany->name }}</span>
+                        <span class="badge bg-success">{{ __('dashboard.primary_company') }}: {{ $primaryCompany->name }}</span>
                     @endif
                 </div>
                 <div class="card-body">
@@ -107,15 +107,15 @@
                                             <div class="mt-3">
                                                 <div class="row text-center">
                                                     <div class="col">
-                                                        <div class="text-muted small">Role</div>
+                                                        <div class="text-muted small">{{ __('dashboard.role') }}</div>
                                                         <div class="fw-bold">{{ $company->pivot->role_in_company ?? 'Member' }}</div>
                                                     </div>
                                                     <div class="col">
-                                                        <div class="text-muted small">Ownership</div>
+                                                        <div class="text-muted small">{{ __('dashboard.ownership') }}</div>
                                                         <div class="fw-bold">{{ $company->pivot->percentage ?? 0 }}%</div>
                                                     </div>
                                                     <div class="col">
-                                                        <div class="text-muted small">Joined</div>
+                                                        <div class="text-muted small">{{ __('dashboard.joined') }}</div>
                                                         <div class="fw-bold">{{ $company->pivot->joined_at ? \Carbon\Carbon::parse($company->pivot->joined_at)->format('M Y') : 'N/A' }}</div>
                                                     </div>
                                                 </div>
@@ -137,15 +137,14 @@
                         @if($stats['total_percentage'] != 100)
                             <div class="alert alert-warning mt-3">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
-                                Your total ownership percentage is {{ $stats['total_percentage'] }}%.
-                                Please contact your company administrator to verify your allocations.
+                                {{ __('dashboard.ownership_verification_warning', ['percentage' => $stats['total_percentage']]) }}
                             </div>
                         @endif
                     @else
                         <div class="text-center py-4">
                             <i class="fas fa-building text-muted" style="font-size: 3rem;"></i>
-                            <h6 class="mt-3 text-muted">No companies assigned</h6>
-                            <p class="text-muted">Contact your system administrator to assign you to companies</p>
+                            <h6 class="mt-3 text-muted">{{ __('dashboard.no_companies_assigned') }}</h6>
+                            <p class="text-muted">{{ __('dashboard.contact_admin_for_assignment') }}</p>
                         </div>
                     @endif
                 </div>
@@ -156,7 +155,7 @@
             <!-- Profile Summary -->
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Profile Summary</h5>
+                    <h5 class="card-title mb-0">{{ __('dashboard.profile_summary') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="text-center mb-3">
@@ -168,42 +167,48 @@
 
                     <div class="profile-info">
                         <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Status:</span>
+                            <span class="text-muted">{{ __('dashboard.status') }}:</span>
                             <span class="badge bg-{{ Auth::user()->status === 'active' ? 'success' : (Auth::user()->status === 'parked' ? 'warning' : 'secondary') }}">
-                                {{ ucfirst(Auth::user()->status) }}
+                                @if(Auth::user()->status === 'active')
+                                    {{ __('dashboard.active') }}
+                                @elseif(Auth::user()->status === 'parked')
+                                    {{ __('dashboard.pending_approval') }}
+                                @else
+                                    {{ __('dashboard.inactive') }}
+                                @endif
                             </span>
                         </div>
 
                         @if(Auth::user()->phone)
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Phone:</span>
+                                <span class="text-muted">{{ __('dashboard.phone') }}:</span>
                                 <span>{{ Auth::user()->phone }}</span>
                             </div>
                         @endif
 
                         @if(Auth::user()->date_of_birth)
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Age:</span>
+                                <span class="text-muted">{{ __('dashboard.age') }}:</span>
                                 <span>{{ Auth::user()->age }} years</span>
                             </div>
                         @endif
 
                         @if(Auth::user()->country)
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Country:</span>
+                                <span class="text-muted">{{ __('dashboard.country') }}:</span>
                                 <span>{{ Auth::user()->country }}</span>
                             </div>
                         @endif
 
                         <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Member Since:</span>
+                            <span class="text-muted">{{ __('dashboard.member_since') }}:</span>
                             <span>{{ Auth::user()->created_at->format('M Y') }}</span>
                         </div>
 
                         <!-- Profile Completion -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
-                                <span class="text-muted small">Profile Completion</span>
+                                <span class="text-muted small">{{ __('dashboard.profile_completion') }}</span>
                                 <span class="text-muted small">{{ $stats['profile_completion'] }}%</span>
                             </div>
                             <div class="progress" style="height: 6px;">
@@ -215,7 +220,7 @@
 
                         <a href="{{ route('profile.edit') }}" class="btn btn-outline-primary w-100">
                             <i class="fas fa-edit me-1"></i>
-                            Edit Profile
+                            {{ __('dashboard.edit_profile') }}
                         </a>
                     </div>
                 </div>
@@ -228,32 +233,32 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Quick Actions</h5>
+                    <h5 class="card-title mb-0">{{ __('dashboard.quick_actions') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-3 col-md-6 mb-3">
                             <a href="{{ route('profile.edit') }}" class="btn btn-outline-primary w-100 py-3">
                                 <i class="fas fa-user-edit fa-2x mb-2 d-block"></i>
-                                Update Profile
+                                {{ __('dashboard.update_profile') }}
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-6 mb-3">
                             <a href="{{ route('user.dashboard') }}" class="btn btn-outline-success w-100 py-3">
                                 <i class="fas fa-building fa-2x mb-2 d-block"></i>
-                                View Companies
+                                {{ __('dashboard.view_companies') }}
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-6 mb-3">
                             <a href="{{ route('user.dashboard') }}" class="btn btn-outline-info w-100 py-3">
                                 <i class="fas fa-chart-pie fa-2x mb-2 d-block"></i>
-                                My Reports
+                                {{ __('dashboard.my_reports') }}
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-6 mb-3">
                             <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary w-100 py-3">
                                 <i class="fas fa-cog fa-2x mb-2 d-block"></i>
-                                Settings
+                                {{ __('dashboard.settings') }}
                             </a>
                         </div>
                     </div>

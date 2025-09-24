@@ -23,4 +23,15 @@ return [
     'sta_manager' => 'STA Manager',
     'company_manager' => 'Company Manager',
     'end_user' => 'End User',
+
+    // Sidebar menu items
+    'user_management' => 'User Management',
+    'all_users' => 'All Users',
+    'add_user' => 'Add User',
+    'all_companies' => 'All Companies',
+    'add_company' => 'Add Company',
+    'role_management' => 'Role Management',
+    'my_reports' => 'My Reports',
+    'company_reports' => 'Company Reports',
+    'view_users' => 'View Users',
 ];

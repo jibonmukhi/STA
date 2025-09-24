@@ -3,82 +3,82 @@
 return [
     'sta_manager' => [
         [
-            'title' => 'Dashboard',
+            'title' => 'navigation.dashboard',
             'route' => 'sta.dashboard',
             'icon' => 'fas fa-tachometer-alt',
             'permission' => 'view dashboard'
         ],
         [
-            'title' => 'User Management',
+            'title' => 'navigation.user_management',
             'icon' => 'fas fa-users',
             'permission' => 'view users',
             'submenu' => [
                 [
-                    'title' => 'All Users',
+                    'title' => 'navigation.all_users',
                     'route' => 'users.index',
                     'permission' => 'view users'
                 ],
                 [
-                    'title' => 'Add User',
+                    'title' => 'navigation.add_user',
                     'route' => 'users.create',
                     'permission' => 'create users'
                 ],
                 [
-                    'title' => 'Pending Approvals',
+                    'title' => 'navigation.pending_approvals',
                     'route' => 'users.pending.approvals',
                     'permission' => 'approve users'
                 ]
             ]
         ],
         [
-            'title' => 'Company Management',
+            'title' => 'navigation.company_management',
             'icon' => 'fas fa-building',
             'permission' => 'view companies',
             'submenu' => [
                 [
-                    'title' => 'All Companies',
+                    'title' => 'navigation.all_companies',
                     'route' => 'companies.index',
                     'permission' => 'view companies'
                 ],
                 [
-                    'title' => 'Add Company',
+                    'title' => 'navigation.add_company',
                     'route' => 'companies.create',
                     'permission' => 'create companies'
                 ]
             ]
         ],
         [
-            'title' => 'Role Management',
+            'title' => 'navigation.role_management',
             'route' => 'roles.index',
             'icon' => 'fas fa-user-shield',
             'permission' => 'view roles'
         ],
         [
-            'title' => 'System Reports',
+            'title' => 'navigation.system_reports',
             'route' => 'system.reports',
             'icon' => 'fas fa-chart-bar',
             'permission' => 'view system reports'
         ],
         [
-            'title' => 'settings.settings',
+            'title' => 'navigation.settings',
             'route' => 'settings.index',
             'icon' => 'fas fa-cog',
             'permission' => 'manage settings'
         ],
         [
-            'title' => 'Certificate',
+            'title' => 'navigation.certificate',
             'route' => 'certificate',
             'icon' => 'fas fa-certificate',
             'permission' => 'view personal reports'
         ],
         [
-            'title' => 'Calendar',
+            'title' => 'navigation.calendar',
             'route' => 'calendar',
             'icon' => 'fas fa-calendar',
             'permission' => 'view personal reports'
         ],
         [
-            'title' => 'My Reports',
+            'title' => 'navigation.my_reports',
             'route' => 'reports',
             'icon' => 'fas fa-chart-pie',
             'permission' => 'view personal reports'
@@ -87,54 +87,54 @@ return [
 
     'company_manager' => [
         [
-            'title' => 'Dashboard',
+            'title' => 'navigation.dashboard',
             'route' => 'company.dashboard',
             'icon' => 'fas fa-tachometer-alt',
             'permission' => 'view dashboard'
         ],
         [
-            'title' => 'Certificate',
+            'title' => 'navigation.certificate',
             'route' => 'certificate',
             'icon' => 'fas fa-certificate',
             'permission' => 'view personal reports'
         ],
         [
-            'title' => 'Calendar',
+            'title' => 'navigation.calendar',
             'route' => 'calendar',
             'icon' => 'fas fa-calendar',
             'permission' => 'view personal reports'
         ],
         [
-            'title' => 'My Reports',
+            'title' => 'navigation.my_reports',
             'route' => 'reports',
             'icon' => 'fas fa-chart-pie',
             'permission' => 'view personal reports'
         ],
         [
-            'title' => 'My Companies',
+            'title' => 'navigation.my_companies',
             'route' => 'my-companies.index',
             'icon' => 'fas fa-building',
             'permission' => 'view companies'
         ],
         [
-            'title' => 'Company Users',
+            'title' => 'navigation.company_users',
             'icon' => 'fas fa-users',
             'permission' => 'manage company users',
             'submenu' => [
                 [
-                    'title' => 'View Users',
+                    'title' => 'navigation.view_users',
                     'route' => 'company-users.index',
                     'permission' => 'manage company users'
                 ],
                 [
-                    'title' => 'Add User',
+                    'title' => 'navigation.add_user',
                     'route' => 'company-users.create',
                     'permission' => 'create users'
                 ]
             ]
         ],
         [
-            'title' => 'Company Reports',
+            'title' => 'navigation.company_reports',
             'route' => 'my-companies.index',
             'icon' => 'fas fa-chart-line',
             'permission' => 'view company reports'
@@ -143,31 +143,31 @@ return [
 
     'end_user' => [
         [
-            'title' => 'Dashboard',
+            'title' => 'navigation.dashboard',
             'route' => 'user.dashboard',
             'icon' => 'fas fa-home',
             'permission' => 'view dashboard'
         ],
         [
-            'title' => 'Certificate',
+            'title' => 'navigation.certificate',
             'route' => 'certificate',
             'icon' => 'fas fa-certificate',
             'permission' => 'view personal reports'
         ],
         [
-            'title' => 'Calendar',
+            'title' => 'navigation.calendar',
             'route' => 'calendar',
             'icon' => 'fas fa-calendar',
             'permission' => 'view personal reports'
         ],
         [
-            'title' => 'My Companies',
+            'title' => 'navigation.my_companies',
             'route' => 'user.dashboard',
             'icon' => 'fas fa-building',
             'permission' => 'view personal reports'
         ],
         [
-            'title' => 'My Reports',
+            'title' => 'navigation.my_reports',
             'route' => 'reports',
             'icon' => 'fas fa-chart-pie',
             'permission' => 'view personal reports'
