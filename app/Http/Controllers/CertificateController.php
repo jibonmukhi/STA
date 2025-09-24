@@ -121,6 +121,8 @@ class CertificateController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Certificate::class);
+
         $companies = Company::active()->orderBy('name')->get();
         $users = User::active()->orderBy('name')->get();
         $certificateTypes = Certificate::getCertificateTypes();
@@ -139,6 +141,8 @@ class CertificateController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Certificate::class);
+
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'company_id' => 'nullable|exists:companies,id',
@@ -231,17 +235,7 @@ class CertificateController extends Controller
      */
     public function edit(Certificate $certificate)
     {
-        $user = Auth::user();
-
-        // Authorization check
-        if ($user->hasRole('end_user') && $certificate->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        } elseif ($user->hasRole('company_manager')) {
-            $userCompanyIds = $user->companies()->pluck('companies.id')->toArray();
-            if ($certificate->user_id !== $user->id && !in_array($certificate->company_id, $userCompanyIds)) {
-                abort(403, 'Unauthorized');
-            }
-        }
+        $this->authorize('update', $certificate);
 
         $companies = Company::active()->orderBy('name')->get();
         $users = User::active()->orderBy('name')->get();
@@ -262,17 +256,7 @@ class CertificateController extends Controller
      */
     public function update(Request $request, Certificate $certificate)
     {
-        $user = Auth::user();
-
-        // Authorization check
-        if ($user->hasRole('end_user') && $certificate->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        } elseif ($user->hasRole('company_manager')) {
-            $userCompanyIds = $user->companies()->pluck('companies.id')->toArray();
-            if ($certificate->user_id !== $user->id && !in_array($certificate->company_id, $userCompanyIds)) {
-                abort(403, 'Unauthorized');
-            }
-        }
+        $this->authorize('update', $certificate);
 
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -346,17 +330,7 @@ class CertificateController extends Controller
      */
     public function destroy(Certificate $certificate)
     {
-        $user = Auth::user();
-
-        // Authorization check
-        if ($user->hasRole('end_user') && $certificate->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        } elseif ($user->hasRole('company_manager')) {
-            $userCompanyIds = $user->companies()->pluck('companies.id')->toArray();
-            if ($certificate->user_id !== $user->id && !in_array($certificate->company_id, $userCompanyIds)) {
-                abort(403, 'Unauthorized');
-            }
-        }
+        $this->authorize('delete', $certificate);
 
         // Delete associated files
         if ($certificate->certificate_file_path) {

@@ -332,9 +332,11 @@
                                         </a>
 
                                         <!-- Edit Button -->
+                                        @can('update', $certificate)
                                         <a href="{{ route('certificates.edit', $certificate) }}" class="btn btn-sm btn-outline-primary" title="{{ __('certificates.edit') }}">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        @endcan
 
                                         <!-- Download Button -->
                                         @if($certificate->hasFile())
@@ -344,6 +346,7 @@
                                         @endif
 
                                         <!-- Delete Button -->
+                                        @can('delete', $certificate)
                                         <form method="POST" action="{{ route('certificates.destroy', $certificate) }}" style="display: inline;"
                                               onsubmit="return confirm('{{ __('certificates.delete_confirmation') }}')">
                                             @csrf
@@ -352,6 +355,7 @@
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

@@ -214,25 +214,8 @@ return [
                     'title' => 'navigation.my_certificates',
                     'route' => 'certificates.index',
                     'permission' => 'view personal reports'
-                ],
-                [
-                    'title' => 'navigation.add_certificate',
-                    'route' => 'certificates.create',
-                    'permission' => 'view personal reports'
                 ]
             ]
-        ],
-        [
-            'title' => 'navigation.calendar',
-            'route' => 'calendar',
-            'icon' => 'fas fa-calendar',
-            'permission' => 'view personal reports'
-        ],
-        [
-            'title' => 'navigation.my_companies',
-            'route' => 'user.dashboard',
-            'icon' => 'fas fa-building',
-            'permission' => 'view personal reports'
         ],
         [
             'title' => 'navigation.course_management',
@@ -247,6 +230,18 @@ return [
                     'route' => 'courses.planning'
                 ]
             ]
+        ],
+        [
+            'title' => 'navigation.calendar',
+            'route' => 'calendar',
+            'icon' => 'fas fa-calendar',
+            'permission' => 'view personal reports'
+        ],
+        [
+            'title' => 'navigation.my_companies',
+            'route' => 'user.dashboard',
+            'icon' => 'fas fa-building',
+            'permission' => 'view personal reports'
         ],
         [
             'title' => 'navigation.my_reports',

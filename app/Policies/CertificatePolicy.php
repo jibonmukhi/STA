@@ -46,8 +46,8 @@ class CertificatePolicy
      */
     public function create(User $user): bool
     {
-        // All authenticated users can create certificates
-        return true;
+        // Only STA managers and company managers can create certificates
+        return $user->hasRole(['sta_manager', 'company_manager']);
     }
 
     /**
@@ -66,11 +66,7 @@ class CertificatePolicy
             return $certificate->user_id === $user->id || in_array($certificate->company_id, $userCompanyIds);
         }
 
-        // End users can only update their own certificates
-        if ($user->hasRole('end_user')) {
-            return $certificate->user_id === $user->id;
-        }
-
+        // End users cannot update certificates
         return false;
     }
 
@@ -90,11 +86,7 @@ class CertificatePolicy
             return $certificate->user_id === $user->id || in_array($certificate->company_id, $userCompanyIds);
         }
 
-        // End users can only delete their own certificates
-        if ($user->hasRole('end_user')) {
-            return $certificate->user_id === $user->id;
-        }
-
+        // End users cannot delete certificates
         return false;
     }
 
