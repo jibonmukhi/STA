@@ -21,9 +21,11 @@
                     <a href="{{ route('courses.index') }}" class="btn btn-outline-primary">
                         <i class="fas fa-list"></i> {{ trans('courses.all_courses') }}
                     </a>
+                    @can('create', App\Models\Course::class)
                     <a href="{{ route('courses.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> {{ trans('courses.add_course') }}
                     </a>
+                    @endcan
                 </div>
             </div>
         </div>
@@ -178,10 +180,12 @@
                                                            class="btn btn-sm btn-outline-success">
                                                             <i class="fas fa-calendar"></i> {{ trans('courses.schedule') }}
                                                         </a>
+                                                        @can('update', $course)
                                                         <a href="{{ route('courses.edit', $course) }}"
                                                            class="btn btn-sm btn-outline-primary">
                                                             <i class="fas fa-edit"></i> {{ trans('courses.edit') }}
                                                         </a>
+                                                        @endcan
                                                     </div>
                                                 </div>
                                             </div>
@@ -202,9 +206,11 @@
                         <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
                         <h4 class="text-muted">{{ trans('courses.no_active_courses') }}</h4>
                         <p class="text-muted">{{ trans('courses.no_active_courses_message') }}</p>
+                        @can('create', App\Models\Course::class)
                         <a href="{{ route('courses.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus"></i> {{ trans('courses.create_first_course') }}
                         </a>
+                        @endcan
                     </div>
                 </div>
             </div>

@@ -20,9 +20,11 @@
                     <a href="{{ route('courses.planning') }}" class="btn btn-outline-info">
                         <i class="fas fa-calendar-alt"></i> {{ trans('courses.course_planning') }}
                     </a>
+                    @can('create', App\Models\Course::class)
                     <a href="{{ route('courses.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> {{ trans('courses.add_course') }}
                     </a>
+                    @endcan
                 </div>
             </div>
         </div>
@@ -162,9 +164,12 @@
                             <a href="{{ route('courses.show', $course) }}" class="btn btn-sm btn-outline-info flex-fill">
                                 <i class="fas fa-eye"></i> {{ trans('courses.view') }}
                             </a>
+                            @can('update', $course)
                             <a href="{{ route('courses.edit', $course) }}" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> {{ trans('courses.edit') }}
                             </a>
+                            @endcan
+                            @can('delete', $course)
                             <form action="{{ route('courses.destroy', $course) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
@@ -173,6 +178,7 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
+                            @endcan
                         </div>
                     </div>
                 </div>
@@ -184,9 +190,11 @@
                         <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
                         <h4 class="text-muted">{{ trans('courses.no_courses_found') }}</h4>
                         <p class="text-muted">{{ trans('courses.no_courses_message') }}</p>
+                        @can('create', App\Models\Course::class)
                         <a href="{{ route('courses.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus"></i> {{ trans('courses.create_first_course') }}
                         </a>
+                        @endcan
                     </div>
                 </div>
             </div>

@@ -18,9 +18,11 @@
                     </nav>
                 </div>
                 <div>
+                    @can('update', $course)
                     <a href="{{ route('courses.edit', $course) }}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edit Course
                     </a>
+                    @endcan
                     <a href="{{ route('courses.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Back to List
                     </a>

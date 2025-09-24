@@ -50,6 +50,8 @@ class CoursesController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Course::class);
+
         $categories = Course::getCategories();
         $levels = Course::getLevels();
         $deliveryMethods = Course::getDeliveryMethods();
@@ -59,6 +61,8 @@ class CoursesController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', Course::class);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'course_code' => 'required|string|max:255|unique:courses',
@@ -92,6 +96,8 @@ class CoursesController extends Controller
 
     public function edit(Course $course): View
     {
+        $this->authorize('update', $course);
+
         $categories = Course::getCategories();
         $levels = Course::getLevels();
         $deliveryMethods = Course::getDeliveryMethods();
@@ -101,6 +107,8 @@ class CoursesController extends Controller
 
     public function update(Request $request, Course $course): RedirectResponse
     {
+        $this->authorize('update', $course);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'course_code' => 'required|string|max:255|unique:courses,course_code,' . $course->id,
@@ -129,6 +137,8 @@ class CoursesController extends Controller
 
     public function destroy(Course $course): RedirectResponse
     {
+        $this->authorize('delete', $course);
+
         $course->delete();
 
         return redirect()->route('courses.index')
