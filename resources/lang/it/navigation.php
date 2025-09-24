@@ -38,4 +38,10 @@ return [
     'my_reports' => 'I Miei Report',
     'company_reports' => 'Report Azienda',
     'view_users' => 'Visualizza Utenti',
+
+    // Course management
+    'course_management' => 'Gestione Corsi',
+    'all_courses' => 'Tutti i Corsi',
+    'add_course' => 'Aggiungi Corso',
+    'course_planning' => 'Pianificazione Corsi',
 ];

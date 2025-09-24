@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Models\Setting;
 use App\Models\Certificate;
+use App\Models\Course;
 use App\Policies\CertificatePolicy;
+use App\Policies\CoursePolicy;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register policies
         Gate::policy(Certificate::class, CertificatePolicy::class);
+        Gate::policy(Course::class, CoursePolicy::class);
 
         // Set default locale from settings if available
         try {

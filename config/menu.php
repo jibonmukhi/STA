@@ -84,6 +84,24 @@ return [
             ]
         ],
         [
+            'title' => 'navigation.course_management',
+            'icon' => 'fas fa-graduation-cap',
+            'submenu' => [
+                [
+                    'title' => 'navigation.all_courses',
+                    'route' => 'courses.index'
+                ],
+                [
+                    'title' => 'navigation.add_course',
+                    'route' => 'courses.create'
+                ],
+                [
+                    'title' => 'navigation.course_planning',
+                    'route' => 'courses.planning'
+                ]
+            ]
+        ],
+        [
             'title' => 'navigation.calendar',
             'route' => 'calendar',
             'icon' => 'fas fa-calendar',
@@ -158,6 +176,20 @@ return [
             ]
         ],
         [
+            'title' => 'navigation.course_management',
+            'icon' => 'fas fa-graduation-cap',
+            'submenu' => [
+                [
+                    'title' => 'navigation.all_courses',
+                    'route' => 'courses.index'
+                ],
+                [
+                    'title' => 'navigation.course_planning',
+                    'route' => 'courses.planning'
+                ]
+            ]
+        ],
+        [
             'title' => 'navigation.company_reports',
             'route' => 'my-companies.index',
             'icon' => 'fas fa-chart-line',
@@ -201,6 +233,20 @@ return [
             'route' => 'user.dashboard',
             'icon' => 'fas fa-building',
             'permission' => 'view personal reports'
+        ],
+        [
+            'title' => 'navigation.course_management',
+            'icon' => 'fas fa-graduation-cap',
+            'submenu' => [
+                [
+                    'title' => 'navigation.all_courses',
+                    'route' => 'courses.index'
+                ],
+                [
+                    'title' => 'navigation.course_planning',
+                    'route' => 'courses.planning'
+                ]
+            ]
         ],
         [
             'title' => 'navigation.my_reports',

@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'My Calendar')
+@section('page-title', trans('calendar.calendar'))
 
 @section('content')
 <div class="container-fluid">
@@ -11,17 +11,83 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h4 class="card-title mb-1">My Calendar</h4>
-                            <p class="text-muted mb-0">Manage your schedule and appointments</p>
+                            <h4 class="card-title mb-1">{{ trans('calendar.calendar') }}</h4>
+                            <p class="text-muted mb-0">{{ trans('courses.view_scheduled_courses') }}</p>
                         </div>
                         <div class="d-flex gap-2">
                             <button class="btn btn-outline-primary" onclick="goToPreviousMonth()">
-                                <i class="fas fa-chevron-left"></i>
+                                <i class="fas fa-chevron-left"></i> {{ trans('calendar.previous') }}
                             </button>
-                            <button class="btn btn-primary" onclick="goToToday()">Today</button>
+                            <button class="btn btn-primary" onclick="goToToday()">{{ trans('calendar.today') }}</button>
                             <button class="btn btn-outline-primary" onclick="goToNextMonth()">
-                                <i class="fas fa-chevron-right"></i>
+                                {{ trans('calendar.next') }} <i class="fas fa-chevron-right"></i>
                             </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Stats -->
+        <div class="col-12 mb-3">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">{{ $stats['total_events'] }}</h3>
+                                    <p class="mb-0">{{ trans('calendar.events_this_month') }}</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-calendar-alt fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">{{ $stats['todays_events'] }}</h3>
+                                    <p class="mb-0">{{ trans('calendar.events_today') }}</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-clock fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">{{ $stats['upcoming_events'] }}</h3>
+                                    <p class="mb-0">{{ trans('calendar.upcoming_events') }}</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-calendar-check fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h3 class="mb-0">{{ $stats['completed_events'] }}</h3>
+                                    <p class="mb-0">{{ trans('calendar.completed_events') }}</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-check-circle fa-2x"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -34,7 +100,7 @@
                 <div class="card-body py-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h5 class="mb-0" id="currentMonth">{{ date('F Y') }}</h5>
+                            <h5 class="mb-0" id="currentMonth">{{ now()->setMonth($currentMonth)->format('F Y') }}</h5>
                         </div>
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-outline-secondary active" onclick="changeView('month')">Month</button>
@@ -55,13 +121,13 @@
                         <table class="table table-bordered mb-0" id="calendar-table">
                             <thead class="bg-primary text-white">
                                 <tr>
-                                    <th class="text-center py-3">Sunday</th>
-                                    <th class="text-center py-3">Monday</th>
-                                    <th class="text-center py-3">Tuesday</th>
-                                    <th class="text-center py-3">Wednesday</th>
-                                    <th class="text-center py-3">Thursday</th>
-                                    <th class="text-center py-3">Friday</th>
-                                    <th class="text-center py-3">Saturday</th>
+                                    <th class="text-center py-3">{{ trans('calendar.days.sunday') }}</th>
+                                    <th class="text-center py-3">{{ trans('calendar.days.monday') }}</th>
+                                    <th class="text-center py-3">{{ trans('calendar.days.tuesday') }}</th>
+                                    <th class="text-center py-3">{{ trans('calendar.days.wednesday') }}</th>
+                                    <th class="text-center py-3">{{ trans('calendar.days.thursday') }}</th>
+                                    <th class="text-center py-3">{{ trans('calendar.days.friday') }}</th>
+                                    <th class="text-center py-3">{{ trans('calendar.days.saturday') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="calendar-body">
@@ -89,54 +155,94 @@
 
             <!-- Today's Events -->
             <div class="card mb-3">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="card-title mb-0">Today's Events</h6>
-                    <button class="btn btn-sm btn-outline-primary" onclick="addEvent()">
-                        <i class="fas fa-plus"></i>
-                    </button>
+                <div class="card-header">
+                    <h6 class="card-title mb-0">{{ trans('calendar.todays_events') }}</h6>
                 </div>
                 <div class="card-body">
                     <div id="todays-events">
-                        <div class="event-item mb-2 p-2 border-left border-primary bg-light">
-                            <div class="fw-bold text-sm">Team Meeting</div>
-                            <div class="text-muted small">10:00 AM - 11:00 AM</div>
-                        </div>
-                        <div class="event-item mb-2 p-2 border-left border-success bg-light">
-                            <div class="fw-bold text-sm">Lunch Break</div>
-                            <div class="text-muted small">12:00 PM - 1:00 PM</div>
-                        </div>
-                        <div class="event-item mb-2 p-2 border-left border-warning bg-light">
-                            <div class="fw-bold text-sm">Project Review</div>
-                            <div class="text-muted small">3:00 PM - 4:00 PM</div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <small class="text-muted">No more events for today</small>
-                        </div>
+                        @forelse($todaysEvents as $event)
+                            <div class="event-item mb-2 p-2 border-left border-{{ $event->event_type_color }} bg-light">
+                                <div class="fw-bold text-sm">{{ $event->title }}</div>
+                                <div class="text-muted small">
+                                    {{ $event->formatted_time }}
+                                    @if($event->is_online)
+                                        <span class="badge bg-info ms-1">Online</span>
+                                    @endif
+                                    @if($event->is_mandatory)
+                                        <span class="badge bg-danger ms-1">Mandatory</span>
+                                    @endif
+                                </div>
+                                @if($event->location)
+                                    <div class="text-muted small">
+                                        <i class="fas fa-map-marker-alt me-1"></i>{{ $event->location }}
+                                    </div>
+                                @endif
+                            </div>
+                        @empty
+                            <div class="text-center mt-3">
+                                <small class="text-muted">{{ trans('calendar.no_events_today') }}</small>
+                            </div>
+                        @endforelse
                     </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Events -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Upcoming Events</h6>
+                </div>
+                <div class="card-body">
+                    @forelse($upcomingEvents as $event)
+                        <div class="event-item mb-2 p-2 border-left border-{{ $event->event_type_color }} bg-light">
+                            <div class="fw-bold text-sm">{{ $event->title }}</div>
+                            <div class="text-muted small">
+                                {{ $event->formatted_date }} - {{ $event->formatted_time }}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <span class="badge bg-{{ $event->event_type_color }}">{{ ucfirst($event->event_type) }}</span>
+                                @if($event->credits)
+                                    <small class="text-muted">{{ $event->credits }} credits</small>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center mt-3">
+                            <small class="text-muted">No upcoming events</small>
+                        </div>
+                    @endforelse
                 </div>
             </div>
 
             <!-- Calendar Legend -->
             <div class="card">
                 <div class="card-header">
-                    <h6 class="card-title mb-0">Legend</h6>
+                    <h6 class="card-title mb-0">Event Types</h6>
                 </div>
                 <div class="card-body">
                     <div class="legend-item d-flex align-items-center mb-2">
                         <div class="legend-color bg-primary me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
-                        <small>Meetings</small>
+                        <small>Courses</small>
                     </div>
                     <div class="legend-item d-flex align-items-center mb-2">
                         <div class="legend-color bg-success me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
-                        <small>Personal</small>
+                        <small>Training</small>
                     </div>
                     <div class="legend-item d-flex align-items-center mb-2">
-                        <div class="legend-color bg-warning me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
-                        <small>Work Tasks</small>
+                        <div class="legend-color bg-danger me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
+                        <small>Exams</small>
                     </div>
                     <div class="legend-item d-flex align-items-center mb-2">
                         <div class="legend-color bg-info me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
-                        <small>Reminders</small>
+                        <small>Webinars</small>
+                    </div>
+                    <div class="legend-item d-flex align-items-center mb-2">
+                        <div class="legend-color bg-warning me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
+                        <small>Workshops</small>
+                    </div>
+                    <div class="legend-item d-flex align-items-center mb-2">
+                        <div class="legend-color bg-secondary me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
+                        <small>Meetings</small>
                     </div>
                 </div>
             </div>
@@ -144,52 +250,19 @@
     </div>
 </div>
 
-<!-- Event Modal -->
+<!-- Event Details Modal (Read-Only) -->
 <div class="modal fade" id="eventModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="eventModalTitle">Add Event</h5>
+                <h5 class="modal-title" id="eventModalTitle">{{ trans('calendar.event_details') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form id="eventForm">
-                    <div class="mb-3">
-                        <label for="eventTitle" class="form-label">Event Title</label>
-                        <input type="text" class="form-control" id="eventTitle" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="eventDate" class="form-label">Date</label>
-                        <input type="date" class="form-control" id="eventDate" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="eventStartTime" class="form-label">Start Time</label>
-                            <input type="time" class="form-control" id="eventStartTime">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="eventEndTime" class="form-label">End Time</label>
-                            <input type="time" class="form-control" id="eventEndTime">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="eventCategory" class="form-label">Category</label>
-                        <select class="form-select" id="eventCategory">
-                            <option value="meeting">Meeting</option>
-                            <option value="personal">Personal</option>
-                            <option value="work">Work Task</option>
-                            <option value="reminder">Reminder</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="eventDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="eventDescription" rows="3"></textarea>
-                    </div>
-                </form>
+            <div class="modal-body" id="eventModalBody">
+                <!-- Event details will be populated by JavaScript -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveEvent()">Save Event</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ trans('courses.close') }}</button>
             </div>
         </div>
     </div>
@@ -228,26 +301,43 @@
         padding: 2px 5px;
         margin-bottom: 2px;
         border-radius: 2px;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
-    .event-item.meeting {
+    .event-item:hover {
+        transform: translateX(2px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .event-item.course {
         border-color: #007bff;
         background-color: rgba(0, 123, 255, 0.1);
     }
 
-    .event-item.personal {
+    .event-item.training {
         border-color: #28a745;
         background-color: rgba(40, 167, 69, 0.1);
     }
 
-    .event-item.work {
+    .event-item.exam {
+        border-color: #dc3545;
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+
+    .event-item.webinar {
+        border-color: #17a2b8;
+        background-color: rgba(23, 162, 184, 0.1);
+    }
+
+    .event-item.workshop {
         border-color: #ffc107;
         background-color: rgba(255, 193, 7, 0.1);
     }
 
-    .event-item.reminder {
-        border-color: #17a2b8;
-        background-color: rgba(23, 162, 184, 0.1);
+    .event-item.meeting {
+        border-color: #6c757d;
+        background-color: rgba(108, 117, 125, 0.1);
     }
 
     .mini-calendar {
@@ -273,24 +363,31 @@
         color: white;
         border-radius: 50%;
     }
+
+    .border-left {
+        border-left: 3px solid !important;
+    }
 </style>
 
 <script>
-    let currentDate = new Date();
+    let currentDate = new Date({{ $currentYear }}, {{ $currentMonth - 1 }}, 1);
     let currentView = 'month';
-    let events = [
-        { id: 1, title: 'Team Meeting', date: new Date(), startTime: '10:00', endTime: '11:00', category: 'meeting' },
-        { id: 2, title: 'Lunch Break', date: new Date(), startTime: '12:00', endTime: '13:00', category: 'personal' },
-        { id: 3, title: 'Project Review', date: new Date(), startTime: '15:00', endTime: '16:00', category: 'work' }
-    ];
+
+    // Localized month and day names from controller
+    const monthNames = @json($monthNames);
+    const dayNames = @json($dayNames);
+    const dayNamesShort = @json($dayNamesShort);
+
+    // Course events from server
+    let courseEvents = @json($formattedEvents);
 
     function generateCalendar() {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
-        // Update month display
+        // Update month display using localized names
         document.getElementById('currentMonth').textContent =
-            new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
+            monthNames[month] + ' ' + year;
 
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
@@ -309,7 +406,6 @@
 
                 const cell = document.createElement('td');
                 cell.className = 'calendar-day p-2';
-                cell.onclick = () => selectDate(cellDate);
 
                 if (cellDate.getMonth() !== month) {
                     cell.classList.add('other-month');
@@ -324,18 +420,18 @@
                 dayNumber.textContent = cellDate.getDate();
                 cell.appendChild(dayNumber);
 
-                // Add events for this date
-                const dayEvents = events.filter(event =>
-                    event.date.toDateString() === cellDate.toDateString()
+                // Add course events for this date
+                const dayEvents = courseEvents.filter(event =>
+                    event.date === cellDate.toISOString().split('T')[0]
                 );
 
                 dayEvents.forEach(event => {
                     const eventEl = document.createElement('div');
-                    eventEl.className = `event-item ${event.category}`;
+                    eventEl.className = `event-item ${event.eventType}`;
                     eventEl.textContent = event.title;
                     eventEl.onclick = (e) => {
                         e.stopPropagation();
-                        viewEvent(event);
+                        viewEventDetails(event);
                     };
                     cell.appendChild(eventEl);
                 });
@@ -387,22 +483,24 @@
 
     function goToPreviousMonth() {
         currentDate.setMonth(currentDate.getMonth() - 1);
-        generateCalendar();
+        // Reload page with new month parameter
+        window.location.href = `?month=${currentDate.getMonth() + 1}&year=${currentDate.getFullYear()}`;
     }
 
     function goToNextMonth() {
         currentDate.setMonth(currentDate.getMonth() + 1);
-        generateCalendar();
+        // Reload page with new month parameter
+        window.location.href = `?month=${currentDate.getMonth() + 1}&year=${currentDate.getFullYear()}`;
     }
 
     function goToToday() {
-        currentDate = new Date();
-        generateCalendar();
+        const today = new Date();
+        window.location.href = `?month=${today.getMonth() + 1}&year=${today.getFullYear()}`;
     }
 
     function goToDate(dateString) {
-        currentDate = new Date(dateString);
-        generateCalendar();
+        const date = new Date(dateString);
+        window.location.href = `?month=${date.getMonth() + 1}&year=${date.getFullYear()}`;
     }
 
     function changeView(view) {
@@ -411,60 +509,70 @@
         event.target.classList.add('active');
 
         // In a real implementation, you would switch between different calendar views here
-        alert(`Switching to ${view} view - this would be implemented in a full calendar widget`);
+        alert(`Switching to ${view} view - this feature can be implemented based on your needs`);
     }
 
-    function selectDate(date) {
-        document.getElementById('eventDate').value = date.toISOString().split('T')[0];
-        addEvent();
-    }
+    function viewEventDetails(event) {
+        document.getElementById('eventModalTitle').textContent = event.title;
 
-    function addEvent() {
-        document.getElementById('eventModalTitle').textContent = 'Add Event';
-        document.getElementById('eventForm').reset();
+        let modalBody = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Event Information</h6>
+                    <table class="table table-borderless table-sm">
+                        <tr><td><strong>Course Code:</strong></td><td>${event.courseCode || 'N/A'}</td></tr>
+                        <tr><td><strong>Type:</strong></td><td><span class="badge bg-${getEventTypeColor(event.eventType)}">${event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1)}</span></td></tr>
+                        <tr><td><strong>Status:</strong></td><td><span class="badge bg-${getStatusColor(event.status)}">${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span></td></tr>
+                        <tr><td><strong>Date:</strong></td><td>${new Date(event.date).toLocaleDateString()}</td></tr>
+                        <tr><td><strong>Time:</strong></td><td>${event.startTime && event.endTime ? event.startTime + ' - ' + event.endTime : 'All Day'}</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6>Details</h6>
+                    <table class="table table-borderless table-sm">
+                        <tr><td><strong>Instructor:</strong></td><td>${event.instructor || 'N/A'}</td></tr>
+                        <tr><td><strong>Location:</strong></td><td>${event.location || 'N/A'}</td></tr>
+                        <tr><td><strong>Duration:</strong></td><td>${event.durationHours ? event.durationHours + ' hours' : 'N/A'}</td></tr>
+                        <tr><td><strong>Credits:</strong></td><td>${event.credits || 'N/A'}</td></tr>
+                        <tr><td><strong>Mandatory:</strong></td><td>${event.isMandatory ? 'Yes' : 'No'}</td></tr>
+                        <tr><td><strong>Online:</strong></td><td>${event.isOnline ? 'Yes' : 'No'}</td></tr>
+                    </table>
+                </div>
+            </div>
+        `;
 
-        // Set today's date if no date is selected
-        if (!document.getElementById('eventDate').value) {
-            document.getElementById('eventDate').value = new Date().toISOString().split('T')[0];
+        if (event.description) {
+            modalBody += `<div class="mt-3"><h6>Description</h6><p>${event.description}</p></div>`;
         }
 
+        if (event.isOnline && event.meetingUrl) {
+            modalBody += `<div class="mt-3"><h6>Meeting Link</h6><a href="${event.meetingUrl}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-external-link-alt me-1"></i>Join Meeting</a></div>`;
+        }
+
+        document.getElementById('eventModalBody').innerHTML = modalBody;
         new bootstrap.Modal(document.getElementById('eventModal')).show();
     }
 
-    function saveEvent() {
-        const title = document.getElementById('eventTitle').value;
-        const date = new Date(document.getElementById('eventDate').value);
-        const startTime = document.getElementById('eventStartTime').value;
-        const endTime = document.getElementById('eventEndTime').value;
-        const category = document.getElementById('eventCategory').value;
-        const description = document.getElementById('eventDescription').value;
-
-        if (!title || !date) {
-            alert('Please fill in the required fields');
-            return;
-        }
-
-        const newEvent = {
-            id: events.length + 1,
-            title,
-            date,
-            startTime,
-            endTime,
-            category,
-            description
+    function getEventTypeColor(type) {
+        const colors = {
+            'course': 'primary',
+            'training': 'success',
+            'exam': 'danger',
+            'webinar': 'info',
+            'workshop': 'warning',
+            'meeting': 'secondary'
         };
-
-        events.push(newEvent);
-        generateCalendar();
-
-        bootstrap.Modal.getInstance(document.getElementById('eventModal')).hide();
-
-        // Show success message
-        alert('Event added successfully!');
+        return colors[type] || 'primary';
     }
 
-    function viewEvent(event) {
-        alert(`Event: ${event.title}\nTime: ${event.startTime} - ${event.endTime}\nCategory: ${event.category}`);
+    function getStatusColor(status) {
+        const colors = {
+            'scheduled': 'primary',
+            'ongoing': 'warning',
+            'completed': 'success',
+            'cancelled': 'danger'
+        };
+        return colors[status] || 'primary';
     }
 
     // Initialize calendar on page load

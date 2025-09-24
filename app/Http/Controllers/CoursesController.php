@@ -1,0 +1,160 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Course;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+
+class CoursesController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $query = Course::query();
+
+        if ($request->has('category') && $request->category) {
+            $query->byCategory($request->category);
+        }
+
+        if ($request->has('level') && $request->level) {
+            $query->byLevel($request->level);
+        }
+
+        if ($request->has('delivery_method') && $request->delivery_method) {
+            $query->where('delivery_method', $request->delivery_method);
+        }
+
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('course_code', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('instructor', 'like', "%{$search}%");
+            });
+        }
+
+        if (!$request->has('show_inactive')) {
+            $query->active();
+        }
+
+        $courses = $query->orderBy('title')->paginate(12);
+
+        $categories = Course::getCategories();
+        $levels = Course::getLevels();
+        $deliveryMethods = Course::getDeliveryMethods();
+
+        return view('courses.index', compact('courses', 'categories', 'levels', 'deliveryMethods'));
+    }
+
+    public function create(): View
+    {
+        $categories = Course::getCategories();
+        $levels = Course::getLevels();
+        $deliveryMethods = Course::getDeliveryMethods();
+
+        return view('courses.create', compact('categories', 'levels', 'deliveryMethods'));
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'course_code' => 'required|string|max:255|unique:courses',
+            'description' => 'nullable|string',
+            'objectives' => 'nullable|string',
+            'category' => 'required|string',
+            'level' => 'required|string|in:beginner,intermediate,advanced',
+            'duration_hours' => 'required|integer|min:1',
+            'credits' => 'nullable|numeric|min:0',
+            'price' => 'required|numeric|min:0',
+            'instructor' => 'nullable|string|max:255',
+            'prerequisites' => 'nullable|string',
+            'delivery_method' => 'required|string|in:online,offline,hybrid',
+            'max_participants' => 'nullable|integer|min:1',
+            'is_active' => 'boolean',
+            'is_mandatory' => 'boolean',
+            'available_from' => 'nullable|date',
+            'available_until' => 'nullable|date|after_or_equal:available_from',
+        ]);
+
+        $course = Course::create($validated);
+
+        return redirect()->route('courses.show', $course)
+                        ->with('success', 'Course created successfully.');
+    }
+
+    public function show(Course $course): View
+    {
+        return view('courses.show', compact('course'));
+    }
+
+    public function edit(Course $course): View
+    {
+        $categories = Course::getCategories();
+        $levels = Course::getLevels();
+        $deliveryMethods = Course::getDeliveryMethods();
+
+        return view('courses.edit', compact('course', 'categories', 'levels', 'deliveryMethods'));
+    }
+
+    public function update(Request $request, Course $course): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'course_code' => 'required|string|max:255|unique:courses,course_code,' . $course->id,
+            'description' => 'nullable|string',
+            'objectives' => 'nullable|string',
+            'category' => 'required|string',
+            'level' => 'required|string|in:beginner,intermediate,advanced',
+            'duration_hours' => 'required|integer|min:1',
+            'credits' => 'nullable|numeric|min:0',
+            'price' => 'required|numeric|min:0',
+            'instructor' => 'nullable|string|max:255',
+            'prerequisites' => 'nullable|string',
+            'delivery_method' => 'required|string|in:online,offline,hybrid',
+            'max_participants' => 'nullable|integer|min:1',
+            'is_active' => 'boolean',
+            'is_mandatory' => 'boolean',
+            'available_from' => 'nullable|date',
+            'available_until' => 'nullable|date|after_or_equal:available_from',
+        ]);
+
+        $course->update($validated);
+
+        return redirect()->route('courses.show', $course)
+                        ->with('success', 'Course updated successfully.');
+    }
+
+    public function destroy(Course $course): RedirectResponse
+    {
+        $course->delete();
+
+        return redirect()->route('courses.index')
+                        ->with('success', 'Course deleted successfully.');
+    }
+
+    public function planning(): View
+    {
+        $courses = Course::active()->get();
+        $categories = Course::getCategories();
+        $levels = Course::getLevels();
+        $deliveryMethods = Course::getDeliveryMethods();
+
+        // Group courses by category for better organization
+        $coursesByCategory = $courses->groupBy('category');
+
+        return view('courses.planning', compact('courses', 'coursesByCategory', 'categories', 'levels', 'deliveryMethods'));
+    }
+
+    public function schedule(Course $course): View
+    {
+        $events = $course->courseEvents()
+                         ->orderBy('start_date', 'asc')
+                         ->orderBy('start_time', 'asc')
+                         ->get();
+
+        return view('courses.schedule', compact('course', 'events'));
+    }
+}

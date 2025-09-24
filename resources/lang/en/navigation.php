@@ -38,4 +38,10 @@ return [
     'my_reports' => 'My Reports',
     'company_reports' => 'Company Reports',
     'view_users' => 'View Users',
+
+    // Course management
+    'course_management' => 'Course Management',
+    'all_courses' => 'All Courses',
+    'add_course' => 'Add Course',
+    'course_planning' => 'Course Planning',
 ];

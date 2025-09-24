@@ -10,11 +10,13 @@ use App\Http\Controllers\CompanyManagerDashboardController;
 use App\Http\Controllers\EndUserDashboardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\CoursesController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
 
 // Legacy dashboard route (fallback)
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
@@ -64,6 +66,12 @@ Route::middleware('auth')->group(function () {
     // Certificate Management Routes (accessible to all authenticated users with role-based filtering)
     Route::resource('certificates', CertificateController::class);
     Route::get('/certificates/{certificate}/download/{type?}', [CertificateController::class, 'download'])->name('certificates.download');
+
+    // Course Management Routes (accessible to all authenticated users with role-based filtering)
+    Route::resource('courses', CoursesController::class);
+    Route::get('/courses/planning/overview', [CoursesController::class, 'planning'])->name('courses.planning');
+    Route::get('/courses/{course}/schedule', [CoursesController::class, 'schedule'])->name('courses.schedule');
+
 });
 
 // STA Manager Routes (Super Admin)
