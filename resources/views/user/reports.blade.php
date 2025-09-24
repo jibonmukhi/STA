@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'My Reports')
+@section('page-title', __('reports.my_reports'))
 
 @section('content')
 <div class="container-fluid">
@@ -11,11 +11,11 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="card-title mb-1">My Reports</h3>
-                            <p class="card-text opacity-75 mb-0">Personal analytics and company information overview</p>
+                            <h3 class="card-title mb-1">{{ __('reports.my_reports') }}</h3>
+                            <p class="card-text opacity-75 mb-0">{{ __('reports.personal_analytics_overview') }}</p>
                         </div>
                         <div class="text-end">
-                            <div class="text-white-50 small">Last Updated</div>
+                            <div class="text-white-50 small">{{ __('reports.last_updated') }}</div>
                             <div class="h6 mb-0">{{ now()->format('M d, Y - H:i') }}</div>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0 text-muted">Total Companies</h6>
+                            <h6 class="mb-0 text-muted">{{ __('reports.total_companies') }}</h6>
                             <h3 class="mb-0 text-primary">{{ $reportData['monthly_summary']['total_companies'] }}</h3>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0 text-muted">Total Ownership</h6>
+                            <h6 class="mb-0 text-muted">{{ __('reports.total_ownership') }}</h6>
                             <h3 class="mb-0 text-success">{{ $reportData['monthly_summary']['total_ownership'] }}%</h3>
                         </div>
                     </div>
@@ -72,7 +72,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0 text-muted">Profile Complete</h6>
+                            <h6 class="mb-0 text-muted">{{ __('reports.profile_complete') }}</h6>
                             <h3 class="mb-0 text-warning">{{ $reportData['monthly_summary']['profile_completion'] }}%</h3>
                         </div>
                     </div>
@@ -90,7 +90,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0 text-muted">Active Since</h6>
+                            <h6 class="mb-0 text-muted">{{ __('reports.active_since') }}</h6>
                             <h3 class="mb-0 text-info">{{ $reportData['monthly_summary']['active_since'] }}</h3>
                         </div>
                     </div>
@@ -104,15 +104,15 @@
         <div class="col-lg-8 mb-4">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Company Ownership Breakdown</h5>
+                    <h5 class="card-title mb-0">{{ __('reports.company_ownership_breakdown') }}</h5>
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-download me-1"></i> Export
+                            <i class="fas fa-download me-1"></i> {{ __('reports.export') }}
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="exportReport('pdf')"><i class="fas fa-file-pdf me-2"></i>Export as PDF</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="exportReport('excel')"><i class="fas fa-file-excel me-2"></i>Export as Excel</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="exportReport('csv')"><i class="fas fa-file-csv me-2"></i>Export as CSV</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportReport('pdf')"><i class="fas fa-file-pdf me-2"></i>{{ __('reports.export_as_pdf') }}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportReport('excel')"><i class="fas fa-file-excel me-2"></i>{{ __('reports.export_as_excel') }}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportReport('csv')"><i class="fas fa-file-csv me-2"></i>{{ __('reports.export_as_csv') }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -122,11 +122,11 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Company</th>
-                                        <th>Role</th>
-                                        <th>Ownership</th>
-                                        <th>Joined</th>
-                                        <th>Status</th>
+                                        <th>{{ __('reports.company') }}</th>
+                                        <th>{{ __('reports.role') }}</th>
+                                        <th>{{ __('reports.ownership') }}</th>
+                                        <th>{{ __('reports.joined') }}</th>
+                                        <th>{{ __('reports.status') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -136,7 +136,7 @@
                                             <div class="d-flex align-items-center">
                                                 <div class="fw-bold">{{ $company['name'] }}</div>
                                                 @if($company['is_primary'])
-                                                    <span class="badge bg-success ms-2">Primary</span>
+                                                    <span class="badge bg-success ms-2">{{ __('reports.primary') }}</span>
                                                 @endif
                                             </div>
                                         </td>
@@ -154,7 +154,7 @@
                                         </td>
                                         <td>{{ $company['joined_date'] }}</td>
                                         <td>
-                                            <span class="badge bg-success">Active</span>
+                                            <span class="badge bg-success">{{ __('reports.active') }}</span>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -164,14 +164,14 @@
 
                         <!-- Ownership Chart -->
                         <div class="mt-4">
-                            <h6 class="mb-3">Ownership Distribution</h6>
+                            <h6 class="mb-3">{{ __('reports.ownership_distribution') }}</h6>
                             <canvas id="ownershipChart" style="max-height: 300px;"></canvas>
                         </div>
                     @else
                         <div class="text-center py-5">
                             <i class="fas fa-building text-muted" style="font-size: 3rem;"></i>
-                            <h6 class="mt-3 text-muted">No Companies</h6>
-                            <p class="text-muted">You are not assigned to any companies yet.</p>
+                            <h6 class="mt-3 text-muted">{{ __('reports.no_companies') }}</h6>
+                            <p class="text-muted">{{ __('reports.not_assigned_to_companies') }}</p>
                         </div>
                     @endif
                 </div>
@@ -183,15 +183,15 @@
             <!-- Activity Summary -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Activity Summary</h5>
+                    <h5 class="card-title mb-0">{{ __('reports.activity_summary') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="activity-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-sign-in-alt text-primary me-3"></i>
                             <div>
-                                <div class="fw-bold">Last Login</div>
-                                <small class="text-muted">Account activity</small>
+                                <div class="fw-bold">{{ __('reports.last_login') }}</div>
+                                <small class="text-muted">{{ __('reports.account_activity') }}</small>
                             </div>
                         </div>
                         <span class="text-primary">{{ $reportData['activity_summary']['last_login'] }}</span>
@@ -201,8 +201,8 @@
                         <div class="d-flex align-items-center">
                             <i class="fas fa-user-check text-success me-3"></i>
                             <div>
-                                <div class="fw-bold">Account Status</div>
-                                <small class="text-muted">Current status</small>
+                                <div class="fw-bold">{{ __('reports.account_status') }}</div>
+                                <small class="text-muted">{{ __('reports.current_status') }}</small>
                             </div>
                         </div>
                         <span class="badge bg-success">{{ $reportData['activity_summary']['account_status'] }}</span>
@@ -212,8 +212,8 @@
                         <div class="d-flex align-items-center">
                             <i class="fas fa-building text-info me-3"></i>
                             <div>
-                                <div class="fw-bold">Primary Company</div>
-                                <small class="text-muted">Main affiliation</small>
+                                <div class="fw-bold">{{ __('reports.primary_company') }}</div>
+                                <small class="text-muted">{{ __('reports.main_affiliation') }}</small>
                             </div>
                         </div>
                         <span class="text-info">{{ $reportData['activity_summary']['primary_company'] }}</span>
@@ -223,8 +223,8 @@
                         <div class="d-flex align-items-center">
                             <i class="fas fa-users text-warning me-3"></i>
                             <div>
-                                <div class="fw-bold">Total Companies</div>
-                                <small class="text-muted">Affiliated organizations</small>
+                                <div class="fw-bold">{{ __('reports.total_companies_joined') }}</div>
+                                <small class="text-muted">{{ __('reports.affiliated_organizations') }}</small>
                             </div>
                         </div>
                         <span class="badge bg-warning">{{ $reportData['activity_summary']['total_companies_joined'] }}</span>
@@ -235,14 +235,14 @@
             <!-- Monthly Performance -->
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Monthly Overview</h5>
+                    <h5 class="card-title mb-0">{{ __('reports.monthly_overview') }}</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="monthlyChart" style="max-height: 200px;"></canvas>
 
                     <div class="mt-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="small text-muted">Profile Completion</span>
+                            <span class="small text-muted">{{ __('reports.profile_completion') }}</span>
                             <span class="fw-bold">{{ $reportData['monthly_summary']['profile_completion'] }}%</span>
                         </div>
                         <div class="progress mb-3">
@@ -252,7 +252,7 @@
                         </div>
 
                         <div class="text-center">
-                            <small class="text-muted">Updated {{ now()->format('M d, Y') }}</small>
+                            <small class="text-muted">{{ __('reports.updated') }} {{ now()->format('M d, Y') }}</small>
                         </div>
                     </div>
                 </div>
@@ -265,32 +265,32 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Quick Actions</h5>
+                    <h5 class="card-title mb-0">{{ __('reports.quick_actions') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-3 col-md-6 mb-3">
                             <a href="{{ route('certificate') }}" class="btn btn-outline-primary w-100 py-3">
                                 <i class="fas fa-certificate fa-2x mb-2 d-block"></i>
-                                View Certificate
+                                {{ __('reports.view_certificate') }}
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-6 mb-3">
                             <button onclick="generateReport()" class="btn btn-outline-success w-100 py-3">
                                 <i class="fas fa-file-alt fa-2x mb-2 d-block"></i>
-                                Generate Report
+                                {{ __('reports.generate_report') }}
                             </button>
                         </div>
                         <div class="col-lg-3 col-md-6 mb-3">
                             <button onclick="exportReport('pdf')" class="btn btn-outline-info w-100 py-3">
                                 <i class="fas fa-download fa-2x mb-2 d-block"></i>
-                                Export Data
+                                {{ __('reports.export_data') }}
                             </button>
                         </div>
                         <div class="col-lg-3 col-md-6 mb-3">
                             <a href="{{ route('user.dashboard') }}" class="btn btn-outline-secondary w-100 py-3">
                                 <i class="fas fa-home fa-2x mb-2 d-block"></i>
-                                Back to Dashboard
+                                {{ __('reports.back_to_dashboard') }}
                             </a>
                         </div>
                     </div>
@@ -341,9 +341,9 @@
     new Chart(monthlyCtx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            labels: @json(array_slice(__('reports.months'), 0, 6)),
             datasets: [{
-                label: 'Activity Score',
+                label: '{{ __('reports.activity_score') }}',
                 data: [65, 75, 80, 78, 85, 90],
                 borderColor: '#4f46e5',
                 backgroundColor: 'rgba(79, 70, 229, 0.1)',
@@ -369,11 +369,11 @@
     });
 
     function exportReport(format) {
-        alert(`Exporting report as ${format.toUpperCase()}...\nThis feature would be implemented in a real application.`);
+        alert(`{{ __('reports.exporting_report_format', ['format' => '${format.toUpperCase()}']) }}\n{{ __('reports.feature_would_be_implemented') }}`);
     }
 
     function generateReport() {
-        alert('Generating comprehensive report...\nThis would compile all your data into a detailed document.');
+        alert('{{ __('reports.generating_comprehensive_report') }}\n{{ __('reports.compile_all_data') }}');
     }
 </script>
 @endsection

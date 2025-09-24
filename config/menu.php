@@ -66,10 +66,22 @@ return [
             'permission' => 'manage settings'
         ],
         [
-            'title' => 'navigation.certificate',
-            'route' => 'certificate',
+            'title' => 'navigation.certificate_management',
+            'route' => 'certificates.index',
             'icon' => 'fas fa-certificate',
-            'permission' => 'view personal reports'
+            'permission' => 'view personal reports',
+            'submenu' => [
+                [
+                    'title' => 'navigation.all_certificates',
+                    'route' => 'certificates.index',
+                    'permission' => 'view personal reports'
+                ],
+                [
+                    'title' => 'navigation.add_certificate',
+                    'route' => 'certificates.create',
+                    'permission' => 'view personal reports'
+                ]
+            ]
         ],
         [
             'title' => 'navigation.calendar',
@@ -93,10 +105,22 @@ return [
             'permission' => 'view dashboard'
         ],
         [
-            'title' => 'navigation.certificate',
-            'route' => 'certificate',
+            'title' => 'navigation.certificate_management',
+            'route' => 'certificates.index',
             'icon' => 'fas fa-certificate',
-            'permission' => 'view personal reports'
+            'permission' => 'view personal reports',
+            'submenu' => [
+                [
+                    'title' => 'navigation.all_certificates',
+                    'route' => 'certificates.index',
+                    'permission' => 'view personal reports'
+                ],
+                [
+                    'title' => 'navigation.add_certificate',
+                    'route' => 'certificates.create',
+                    'permission' => 'view personal reports'
+                ]
+            ]
         ],
         [
             'title' => 'navigation.calendar',
@@ -149,10 +173,22 @@ return [
             'permission' => 'view dashboard'
         ],
         [
-            'title' => 'navigation.certificate',
-            'route' => 'certificate',
+            'title' => 'navigation.certificate_management',
+            'route' => 'certificates.index',
             'icon' => 'fas fa-certificate',
-            'permission' => 'view personal reports'
+            'permission' => 'view personal reports',
+            'submenu' => [
+                [
+                    'title' => 'navigation.my_certificates',
+                    'route' => 'certificates.index',
+                    'permission' => 'view personal reports'
+                ],
+                [
+                    'title' => 'navigation.add_certificate',
+                    'route' => 'certificates.create',
+                    'permission' => 'view personal reports'
+                ]
+            ]
         ],
         [
             'title' => 'navigation.calendar',

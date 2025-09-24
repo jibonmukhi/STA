@@ -1,0 +1,236 @@
+<?php
+
+return [
+    // Page Titles
+    'certificates' => 'Certificati',
+    'certificate' => 'Certificato',
+    'certificate_management' => 'Gestione Certificati',
+    'my_certificates' => 'I Miei Certificati',
+    'all_certificates' => 'Tutti i Certificati',
+    'certificate_details' => 'Dettagli Certificato',
+    'create_certificate' => 'Crea Certificato',
+    'add_new_certificate' => 'Aggiungi Nuovo Certificato',
+    'edit_certificate' => 'Modifica Certificato',
+    'certificate_information' => 'Informazioni Certificato',
+
+    // Navigation & Actions
+    'back_to_certificates' => 'Torna ai Certificati',
+    'view_certificate' => 'Visualizza Certificato',
+    'edit_certificate_btn' => 'Modifica Certificato',
+    'delete_certificate' => 'Elimina Certificato',
+    'create_certificate_btn' => 'Crea Certificato',
+    'update_certificate' => 'Aggiorna Certificato',
+    'download_certificate' => 'Scarica Certificato',
+    'download_transcript' => 'Scarica Trascrizione',
+    'verify_certificate' => 'Verifica Certificato',
+
+    // Form Fields
+    'certificate_name' => 'Nome Certificato',
+    'description' => 'Descrizione',
+    'subject' => 'Materia',
+    'certificate_number' => 'Numero Certificato',
+    'issue_date' => 'Data di Rilascio',
+    'expiration_date' => 'Data di Scadenza',
+    'duration' => 'Durata',
+    'duration_months' => 'Durata (Mesi)',
+    'training_organization' => 'Ente di Formazione',
+    'training_organization_code' => 'Codice Ente di Formazione',
+    'instructor_name' => 'Nome Istruttore',
+    'training_organization_address' => 'Indirizzo Ente di Formazione',
+    'certificate_type' => 'Tipo Certificato',
+    'level' => 'Livello',
+    'hours_completed' => 'Ore Completate',
+    'credits' => 'Crediti',
+    'score' => 'Punteggio',
+    'grade' => 'Voto',
+    'regulatory_body' => 'Ente Regolatore',
+    'compliance_standard' => 'Standard di Conformità',
+    'renewal_required' => 'Rinnovo Richiesto',
+    'renewal_period_months' => 'Periodo di Rinnovo (Mesi)',
+    'next_renewal_date' => 'Prossima Data di Rinnovo',
+    'status' => 'Stato',
+    'verification_code' => 'Codice di Verifica',
+    'issuer_signature' => 'Firma dell\'Emittente',
+    'verified_at' => 'Verificato Il',
+    'certificate_file' => 'File Certificato',
+    'transcript_file' => 'File Trascrizione',
+    'supporting_documents' => 'Documenti di Supporto',
+    'notes' => 'Note',
+    'is_public' => 'Visibilità Pubblica',
+    'language' => 'Lingua',
+    'user' => 'Utente',
+    'company' => 'Azienda',
+
+    // Certificate Types
+    'type_training' => 'Formazione',
+    'type_qualification' => 'Qualifica',
+    'type_compliance' => 'Conformità',
+    'type_professional' => 'Professionale',
+    'type_academic' => 'Accademico',
+
+    // Certificate Levels
+    'level_beginner' => 'Principiante',
+    'level_intermediate' => 'Intermedio',
+    'level_advanced' => 'Avanzato',
+    'level_professional' => 'Professionale',
+    'level_expert' => 'Esperto',
+
+    // Status Labels
+    'status_active' => 'Attivo',
+    'status_expired' => 'Scaduto',
+    'status_revoked' => 'Revocato',
+    'status_pending' => 'In Attesa',
+    'status_suspended' => 'Sospeso',
+    'status_expiring_soon' => 'In Scadenza',
+
+    // Search & Filters
+    'search_certificates' => 'Cerca Certificati',
+    'search_by_name' => 'Cerca per nome...',
+    'search_by_subject' => 'Cerca per materia...',
+    'search_by_organization' => 'Cerca per ente...',
+    'filter_by_type' => 'Filtra per tipo',
+    'filter_by_status' => 'Filtra per stato',
+    'filter_by_company' => 'Filtra per azienda',
+    'expiration_from' => 'Scadenza Dal',
+    'expiration_to' => 'Scadenza Al',
+    'advanced_search' => 'Ricerca Avanzata',
+    'advanced_options' => 'Opzioni Avanzate',
+    'hide_advanced' => 'Nascondi Avanzate',
+    'search' => 'Cerca',
+    'searching' => 'Cercando...',
+    'clear_all' => 'Cancella Tutto',
+    'search_results' => 'Risultati Ricerca',
+    'filtered_by' => 'Filtrato per',
+    'found' => 'trovati',
+    'total' => 'totale',
+
+    // Table Headers
+    'name' => 'Nome',
+    'subject_column' => 'Materia',
+    'organization' => 'Ente',
+    'issue_date_column' => 'Data Rilascio',
+    'expiration_date_column' => 'Data Scadenza',
+    'status_column' => 'Stato',
+    'actions' => 'Azioni',
+    'type' => 'Tipo',
+    'level_column' => 'Livello',
+
+    // Actions & Buttons
+    'view' => 'Visualizza',
+    'edit' => 'Modifica',
+    'delete' => 'Elimina',
+    'download' => 'Scarica',
+    'cancel' => 'Annulla',
+    'save' => 'Salva',
+    'create' => 'Crea',
+    'update' => 'Aggiorna',
+
+    // Pagination & Display
+    'show' => 'Mostra',
+    'entries_per_page' => 'voci per pagina',
+    'showing' => 'Mostrando',
+    'to' => 'a',
+    'of' => 'di',
+    'results' => 'risultati',
+    'page' => 'Pagina',
+
+    // Messages & Alerts
+    'certificate_created' => 'Certificato creato con successo.',
+    'certificate_updated' => 'Certificato aggiornato con successo.',
+    'certificate_deleted' => 'Certificato eliminato con successo.',
+    'no_certificates_found' => 'Nessun certificato trovato.',
+    'delete_confirmation' => 'Sei sicuro di voler eliminare questo certificato? Questa azione non può essere annullata.',
+    'please_fix_errors' => 'Si prega di correggere i seguenti errori:',
+
+    // File Upload
+    'upload_certificate' => 'Carica Certificato',
+    'upload_transcript' => 'Carica Trascrizione',
+    'max_file_size_5mb' => 'Dimensione max file: 5MB. Formati supportati: PDF, JPG, JPEG, PNG',
+    'current_file' => 'File Attuale',
+    'no_file_uploaded' => 'Nessun file caricato',
+
+    // Certificate Information Sections
+    'basic_information' => 'Informazioni di Base',
+    'training_details' => 'Dettagli Formazione',
+    'assessment_results' => 'Risultati Valutazione',
+    'compliance_info' => 'Informazioni Conformità',
+    'renewal_info' => 'Informazioni Rinnovo',
+    'verification_info' => 'Informazioni Verifica',
+    'file_attachments' => 'Allegati',
+    'additional_info' => 'Informazioni Aggiuntive',
+
+    // Statistics
+    'certificate_statistics' => 'Statistiche Certificati',
+    'total_certificates' => 'Certificati Totali',
+    'active_certificates' => 'Certificati Attivi',
+    'expired_certificates' => 'Certificati Scaduti',
+    'expiring_soon_certificates' => 'In Scadenza',
+    'days_until_expiration' => 'Giorni alla Scadenza',
+    'expires_in_days' => 'scade tra :days giorni',
+    'expired_days_ago' => 'scaduto :days giorni fa',
+
+    // Verification
+    'certificate_verification' => 'Verifica Certificato',
+    'verification_successful' => 'Verifica certificato riuscita.',
+    'verification_failed' => 'Verifica certificato fallita. Il codice di verifica non è valido o il certificato non è attivo.',
+    'verification_instructions' => 'Inserisci il codice di verifica presente sul certificato per verificarne l\'autenticità.',
+    'enter_verification_code' => 'Inserisci codice di verifica',
+    'verify_now' => 'Verifica Ora',
+
+    // Empty States
+    'no_certificates_available' => 'Nessun certificato disponibile',
+    'no_certificates_message' => 'Non hai ancora nessun certificato. Crea il tuo primo certificato per iniziare.',
+    'no_file_available' => 'Nessun file disponibile',
+
+    // Form Validation & Help
+    'required_field' => 'Questo campo è obbligatorio',
+    'optional_field' => 'Opzionale',
+    'certificate_name_help' => 'Inserisci il nome completo del certificato',
+    'subject_help' => 'La materia o area principale di certificazione',
+    'expiration_after_issue' => 'La data di scadenza deve essere successiva alla data di rilascio',
+    'training_org_help' => 'L\'organizzazione che ha emesso questo certificato',
+    'verification_code_help' => 'Codice univoco per la verifica del certificato',
+
+    // Quick Actions
+    'quick_actions' => 'Azioni Rapide',
+    'export_certificates' => 'Esporta Certificati',
+    'bulk_actions' => 'Azioni di Massa',
+    'select_all' => 'Seleziona Tutto',
+    'selected_certificates' => 'Certificati Selezionati',
+
+    // Certificate Details View
+    'certificate_overview' => 'Panoramica Certificato',
+    'training_information' => 'Informazioni Formazione',
+    'assessment_information' => 'Informazioni Valutazione',
+    'validity_period' => 'Periodo di Validità',
+    'issued_on' => 'Rilasciato il',
+    'valid_until' => 'Valido fino al',
+    'certificate_holder' => 'Titolare Certificato',
+    'issuing_organization' => 'Organizzazione Emittente',
+
+    // Languages
+    'english' => 'Inglese',
+    'italian' => 'Italiano',
+
+    // Additional Status Messages
+    'certificate_active' => 'Questo certificato è attualmente attivo e valido.',
+    'certificate_expired' => 'Questo certificato è scaduto e potrebbe necessitare di rinnovo.',
+    'certificate_expiring_soon' => 'Questo certificato scadrà presto. Considera il rinnovo.',
+    'certificate_pending' => 'Questo certificato è in attesa di verifica.',
+    'certificate_suspended' => 'Questo certificato è stato sospeso.',
+    'certificate_revoked' => 'Questo certificato è stato revocato e non è più valido.',
+
+    // Renewal Information
+    'renewal_information' => 'Informazioni Rinnovo',
+    'renewal_due' => 'Rinnovo Dovuto',
+    'auto_renewal' => 'Rinnovo Automatico',
+    'manual_renewal' => 'Rinnovo Manuale',
+    'renew_certificate' => 'Rinnova Certificato',
+    'renewal_history' => 'Storico Rinnovi',
+
+    // Advanced Features
+    'certificate_qr_code' => 'Codice QR Certificato',
+    'digital_signature' => 'Firma Digitale',
+    'blockchain_verified' => 'Verificato Blockchain',
+    'tamper_proof' => 'A Prova di Manomissione',
+];

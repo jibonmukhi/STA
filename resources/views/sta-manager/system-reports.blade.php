@@ -1,20 +1,20 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'System Reports')
+@section('page-title', __('reports.system_reports'))
 
 @section('content')
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="mb-0">
-                <i class="fas fa-chart-bar me-2"></i>System Reports & Analytics
+                <i class="fas fa-chart-bar me-2"></i>{{ __('reports.system_reports_analytics') }}
             </h4>
             <div class="btn-group">
                 <button type="button" class="btn btn-outline-primary">
-                    <i class="fas fa-download me-2"></i>Export Report
+                    <i class="fas fa-download me-2"></i>{{ __('reports.export_report') }}
                 </button>
                 <button type="button" class="btn btn-outline-info">
-                    <i class="fas fa-sync-alt me-2"></i>Refresh Data
+                    <i class="fas fa-sync-alt me-2"></i>{{ __('reports.refresh_data') }}
                 </button>
             </div>
         </div>
@@ -31,7 +31,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title">Total Users</h5>
+                        <h5 class="card-title">{{ __('reports.total_users') }}</h5>
                         <h2 class="mb-0">{{ number_format($stats['total_users']) }}</h2>
                     </div>
                     <i class="fas fa-users fa-2x opacity-75"></i>
@@ -45,9 +45,9 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title">Active Users</h5>
+                        <h5 class="card-title">{{ __('reports.active_users') }}</h5>
                         <h2 class="mb-0">{{ number_format($stats['active_users']) }}</h2>
-                        <small class="opacity-75">{{ $stats['total_users'] > 0 ? round(($stats['active_users'] / $stats['total_users']) * 100, 1) : 0 }}% of total</small>
+                        <small class="opacity-75">{{ $stats['total_users'] > 0 ? round(($stats['active_users'] / $stats['total_users']) * 100, 1) : 0 }}% {{ __('reports.of_total') }}</small>
                     </div>
                     <i class="fas fa-user-check fa-2x opacity-75"></i>
                 </div>
@@ -60,9 +60,9 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title">Pending Users</h5>
+                        <h5 class="card-title">{{ __('reports.pending_users') }}</h5>
                         <h2 class="mb-0">{{ number_format($stats['parked_users']) }}</h2>
-                        <small class="opacity-75">Awaiting approval</small>
+                        <small class="opacity-75">{{ __('reports.awaiting_approval') }}</small>
                     </div>
                     <i class="fas fa-user-clock fa-2x opacity-75"></i>
                 </div>
@@ -75,9 +75,9 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title">Total Companies</h5>
+                        <h5 class="card-title">{{ __('reports.total_companies') }}</h5>
                         <h2 class="mb-0">{{ number_format($stats['total_companies']) }}</h2>
-                        <small class="opacity-75">{{ number_format($stats['active_companies']) }} active</small>
+                        <small class="opacity-75">{{ number_format($stats['active_companies']) }} {{ __('reports.active') }}</small>
                     </div>
                     <i class="fas fa-building fa-2x opacity-75"></i>
                 </div>
@@ -92,7 +92,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-user-shield me-2"></i>Users by Role Distribution
+                    <i class="fas fa-user-shield me-2"></i>{{ __('reports.users_by_role_distribution') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -103,15 +103,15 @@
                             <span class="badge bg-{{ $role === 'sta_manager' ? 'primary' : ($role === 'company_manager' ? 'success' : 'info') }}">
                                 {{
                                     match($role) {
-                                        'sta_manager' => 'STA Manager',
-                                        'company_manager' => 'Company Manager',
-                                        'end_user' => 'End User',
-                                        'no_role' => 'No Role Assigned',
+                                        'sta_manager' => __('reports.sta_manager'),
+                                        'company_manager' => __('reports.company_manager'),
+                                        'end_user' => __('reports.end_user'),
+                                        'no_role' => __('reports.no_role_assigned'),
                                         default => ucwords(str_replace('_', ' ', $role))
                                     }
                                 }}
                             </span>
-                            <strong>{{ $count }} users</strong>
+                            <strong>{{ $count }} {{ __('reports.users') }}</strong>
                         </div>
                     @endforeach
                 </div>
@@ -124,7 +124,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-chart-line me-2"></i>User Registrations (Last 12 Months)
+                    <i class="fas fa-chart-line me-2"></i>{{ __('reports.user_registrations_last_12_months') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -140,18 +140,18 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-building me-2"></i>Company Statistics
+                    <i class="fas fa-building me-2"></i>{{ __('reports.company_statistics') }}
                 </h5>
             </div>
             <div class="card-body">
                 <div class="row text-center">
                     <div class="col-6">
                         <h4 class="text-primary">{{ $companyStats->total_companies ?? 0 }}</h4>
-                        <small class="text-muted">Total Companies</small>
+                        <small class="text-muted">{{ __('reports.total_companies') }}</small>
                     </div>
                     <div class="col-6">
                         <h4 class="text-success">{{ $companyStats->active_companies ?? 0 }}</h4>
-                        <small class="text-muted">Active Companies</small>
+                        <small class="text-muted">{{ __('reports.active_users') }}</small>
                     </div>
                 </div>
                 <hr>
@@ -161,7 +161,7 @@
                     </div>
                 </div>
                 <small class="text-muted">
-                    {{ $companyStats->total_companies > 0 ? round(($companyStats->active_companies / $companyStats->total_companies) * 100) : 0 }}% of companies are active
+                    {{ $companyStats->total_companies > 0 ? round(($companyStats->active_companies / $companyStats->total_companies) * 100) : 0 }}% {{ __('reports.of_companies_are_active') }}
                 </small>
             </div>
         </div>
@@ -172,7 +172,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-history me-2"></i>Recent User Activity
+                    <i class="fas fa-history me-2"></i>{{ __('reports.recent_user_activity') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -180,11 +180,11 @@
                     <table class="table table-sm">
                         <thead>
                             <tr>
-                                <th>User</th>
-                                <th>Role</th>
-                                <th>Company</th>
-                                <th>Status</th>
-                                <th>Joined</th>
+                                <th>{{ __('reports.user') }}</th>
+                                <th>{{ __('reports.role') }}</th>
+                                <th>{{ __('reports.company') }}</th>
+                                <th>{{ __('reports.status') }}</th>
+                                <th>{{ __('reports.joined') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -223,11 +223,11 @@
                                 </td>
                                 <td>
                                     @if($user->status === 'active')
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge bg-success">{{ __('reports.active') }}</span>
                                     @elseif($user->status === 'parked')
-                                        <span class="badge bg-warning">Pending</span>
+                                        <span class="badge bg-warning">{{ __('reports.pending') }}</span>
                                     @else
-                                        <span class="badge bg-secondary">Inactive</span>
+                                        <span class="badge bg-secondary">{{ __('reports.inactive') }}</span>
                                     @endif
                                 </td>
                                 <td>
@@ -238,7 +238,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted">No recent activity found</td>
+                                <td colspan="5" class="text-center text-muted">{{ __('reports.no_recent_activity_found') }}</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -255,7 +255,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-tools me-2"></i>Quick Actions
+                    <i class="fas fa-tools me-2"></i>{{ __('reports.quick_actions') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -263,7 +263,7 @@
                     <div class="col-md-3 mb-2">
                         <a href="{{ route('users.pending.approvals') }}" class="btn btn-outline-warning w-100">
                             <i class="fas fa-user-clock me-2"></i>
-                            Review Pending Users
+                            {{ __('reports.review_pending_users') }}
                             @if($stats['parked_users'] > 0)
                                 <span class="badge bg-warning ms-2">{{ $stats['parked_users'] }}</span>
                             @endif
@@ -271,17 +271,17 @@
                     </div>
                     <div class="col-md-3 mb-2">
                         <a href="{{ route('users.index') }}" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-users me-2"></i>Manage Users
+                            <i class="fas fa-users me-2"></i>{{ __('reports.manage_users') }}
                         </a>
                     </div>
                     <div class="col-md-3 mb-2">
                         <a href="{{ route('companies.index') }}" class="btn btn-outline-success w-100">
-                            <i class="fas fa-building me-2"></i>Manage Companies
+                            <i class="fas fa-building me-2"></i>{{ __('reports.manage_companies') }}
                         </a>
                     </div>
                     <div class="col-md-3 mb-2">
                         <a href="{{ route('roles.index') }}" class="btn btn-outline-info w-100">
-                            <i class="fas fa-user-shield me-2"></i>Manage Roles
+                            <i class="fas fa-user-shield me-2"></i>{{ __('reports.manage_roles') }}
                         </a>
                     </div>
                 </div>
@@ -301,10 +301,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const roleLabels = Object.keys(roleData).map(role => {
         switch(role) {
-            case 'sta_manager': return 'STA Manager';
-            case 'company_manager': return 'Company Manager';
-            case 'end_user': return 'End User';
-            case 'no_role': return 'No Role Assigned';
+            case 'sta_manager': return '{{ __('reports.sta_manager_js') }}';
+            case 'company_manager': return '{{ __('reports.company_manager_js') }}';
+            case 'end_user': return '{{ __('reports.end_user_js') }}';
+            case 'no_role': return '{{ __('reports.no_role_assigned_js') }}';
             default: return role.replace('_', ' ').replace(/\w\S*/g, (txt) =>
                 txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
             );
@@ -344,8 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const registrationCtx = document.getElementById('registrationChart').getContext('2d');
     const registrationData = @json($userRegistrationsByMonth);
 
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = @json(__('reports.months'));
 
     const labels = registrationData.map(item => `${months[item.month - 1]} ${item.year}`);
     const values = registrationData.map(item => item.count);
@@ -355,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'User Registrations',
+                label: '{{ __('reports.user_registrations') }}',
                 data: values,
                 borderColor: '#0d6efd',
                 backgroundColor: 'rgba(13, 110, 253, 0.1)',

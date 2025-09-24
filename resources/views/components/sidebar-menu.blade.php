@@ -4,21 +4,33 @@
     $userRoles = $user->roles->pluck('name')->toArray();
     $menuConfig = config('menu');
     $userMenu = [];
-    $addedRoutes = []; // Track added routes to avoid duplicates
+    $addedItems = []; // Track added items to avoid duplicates
 
-    // Get menu items for user's roles - collect from all matching roles
-    foreach ($userRoles as $role) {
-        if (isset($menuConfig[$role])) {
-            foreach ($menuConfig[$role] as $menuItem) {
-                // Use route as unique identifier, fallback to title if no route
-                $identifier = isset($menuItem['route']) ? $menuItem['route'] : $menuItem['title'];
+    // Determine primary role for menu selection
+    $primaryRole = null;
+    $rolePriority = ['sta_manager', 'company_manager', 'end_user'];
 
-                // Only add if not already added and user has permission
-                if (!in_array($identifier, $addedRoutes) &&
-                    (!isset($menuItem['permission']) || $user->can($menuItem['permission']))) {
-                    $userMenu[] = $menuItem;
-                    $addedRoutes[] = $identifier;
-                }
+    foreach ($rolePriority as $role) {
+        if (in_array($role, $userRoles)) {
+            $primaryRole = $role;
+            break;
+        }
+    }
+
+    // Use menu from primary role only to avoid conflicts
+    if ($primaryRole && isset($menuConfig[$primaryRole])) {
+        foreach ($menuConfig[$primaryRole] as $menuItem) {
+            // Create unique identifier including submenu structure
+            $identifier = isset($menuItem['route']) ? $menuItem['route'] : $menuItem['title'];
+            if (isset($menuItem['submenu'])) {
+                $identifier .= '_with_submenu';
+            }
+
+            // Only add if not already added and user has permission
+            if (!in_array($identifier, $addedItems) &&
+                (!isset($menuItem['permission']) || $user->can($menuItem['permission']))) {
+                $userMenu[] = $menuItem;
+                $addedItems[] = $identifier;
             }
         }
     }
@@ -29,7 +41,17 @@
             <!-- Menu with Submenu -->
             <div class="nav-section">
                 <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="toggleSubmenu('{{ Str::slug($menuItem['title']) }}Submenu', event)" data-tooltip="@php $tooltipTitle = __($menuItem['title']); echo is_array($tooltipTitle) ? $menuItem['title'] : $tooltipTitle; @endphp">
+                    @php
+                        $parentRouteUrl = '#';
+                        try {
+                            if (isset($menuItem['route'])) {
+                                $parentRouteUrl = route($menuItem['route']);
+                            }
+                        } catch (Exception $e) {
+                            // Route doesn't exist, keep # as fallback
+                        }
+                    @endphp
+                    <a href="{{ $parentRouteUrl }}" class="nav-link" onclick="toggleSubmenu('{{ Str::slug($menuItem['title']) }}Submenu', event)" data-tooltip="@php $tooltipTitle = __($menuItem['title']); echo is_array($tooltipTitle) ? $menuItem['title'] : $tooltipTitle; @endphp">
                         <div class="nav-icon">
                             <i class="{{ $menuItem['icon'] }}"></i>
                         </div>
@@ -43,8 +65,20 @@
                     </a>
                     <div class="nav-submenu" id="{{ Str::slug($menuItem['title']) }}Submenu">
                         @foreach ($menuItem['submenu'] as $subItem)
-                            @if (isset($subItem['permission']) && $user->can($subItem['permission']))
-                                <a href="{{ route($subItem['route']) }}" class="nav-link {{ request()->routeIs($subItem['route']) ? 'active' : '' }}">
+                            @if (!isset($subItem['permission']) || $user->can($subItem['permission']))
+                                @php
+                                    $routeUrl = '#';
+                                    $isActive = false;
+                                    try {
+                                        if (isset($subItem['route'])) {
+                                            $routeUrl = route($subItem['route']);
+                                            $isActive = request()->routeIs($subItem['route']);
+                                        }
+                                    } catch (Exception $e) {
+                                        // Route doesn't exist, use # as fallback
+                                    }
+                                @endphp
+                                <a href="{{ $routeUrl }}" class="nav-link {{ $isActive ? 'active' : '' }}">
                                     <div class="nav-icon">
                                         <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
                                     </div>
@@ -64,7 +98,19 @@
         <!-- Simple Menu Item -->
         <div class="nav-section">
             <div class="nav-item">
-                <a href="{{ route($menuItem['route']) }}" class="nav-link {{ request()->routeIs($menuItem['route']) ? 'active' : '' }}" data-tooltip="@php $tooltipMainTitle = __($menuItem['title']); echo is_array($tooltipMainTitle) ? $menuItem['title'] : $tooltipMainTitle; @endphp">
+                @php
+                    $mainRouteUrl = '#';
+                    $mainIsActive = false;
+                    try {
+                        if (isset($menuItem['route'])) {
+                            $mainRouteUrl = route($menuItem['route']);
+                            $mainIsActive = request()->routeIs($menuItem['route']);
+                        }
+                    } catch (Exception $e) {
+                        // Route doesn't exist, use # as fallback
+                    }
+                @endphp
+                <a href="{{ $mainRouteUrl }}" class="nav-link {{ $mainIsActive ? 'active' : '' }}" data-tooltip="@php $tooltipMainTitle = __($menuItem['title']); echo is_array($tooltipMainTitle) ? $menuItem['title'] : $tooltipMainTitle; @endphp">
                     <div class="nav-icon">
                         <i class="{{ $menuItem['icon'] }}"></i>
                     </div>

@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Setting;
+use App\Models\Certificate;
+use App\Policies\CertificatePolicy;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register policies
+        Gate::policy(Certificate::class, CertificatePolicy::class);
+
         // Set default locale from settings if available
         try {
             $defaultLocale = Setting::get('app.locale', config('app.locale', 'it'));

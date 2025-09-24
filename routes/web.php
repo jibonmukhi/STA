@@ -9,6 +9,7 @@ use App\Http\Controllers\STAManagerDashboardController;
 use App\Http\Controllers\CompanyManagerDashboardController;
 use App\Http\Controllers\EndUserDashboardController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\CertificateController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -59,6 +60,10 @@ Route::middleware('auth')->group(function () {
 
     // Public settings API
     Route::get('/api/settings/public', [SettingsController::class, 'getPublicSettings'])->name('settings.public');
+
+    // Certificate Management Routes (accessible to all authenticated users with role-based filtering)
+    Route::resource('certificates', CertificateController::class);
+    Route::get('/certificates/{certificate}/download/{type?}', [CertificateController::class, 'download'])->name('certificates.download');
 });
 
 // STA Manager Routes (Super Admin)
@@ -95,5 +100,8 @@ Route::middleware(['auth', 'role:company_manager'])->group(function () {
     // Company profile management
     Route::get('my-companies', [CompanyController::class, 'myCompanies'])->name('my-companies.index');
 });
+
+// Public certificate verification (no auth required)
+Route::get('/verify/{verificationCode}', [CertificateController::class, 'verify'])->name('certificates.verify');
 
 require __DIR__.'/auth.php';
