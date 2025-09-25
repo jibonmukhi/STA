@@ -141,6 +141,20 @@ return [
             ]
         ],
         [
+            'title' => 'navigation.course_management',
+            'icon' => 'fas fa-graduation-cap',
+            'submenu' => [
+                [
+                    'title' => 'navigation.all_courses',
+                    'route' => 'courses.index'
+                ],
+                [
+                    'title' => 'navigation.course_planning',
+                    'route' => 'courses.planning'
+                ]
+            ]
+        ],
+        [
             'title' => 'navigation.calendar',
             'route' => 'calendar',
             'icon' => 'fas fa-calendar',
@@ -172,20 +186,6 @@ return [
                     'title' => 'navigation.add_user',
                     'route' => 'company-users.create',
                     'permission' => 'create users'
-                ]
-            ]
-        ],
-        [
-            'title' => 'navigation.course_management',
-            'icon' => 'fas fa-graduation-cap',
-            'submenu' => [
-                [
-                    'title' => 'navigation.all_courses',
-                    'route' => 'courses.index'
-                ],
-                [
-                    'title' => 'navigation.course_planning',
-                    'route' => 'courses.planning'
                 ]
             ]
         ],

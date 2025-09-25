@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'My Companies')
+@section('page-title', trans('companies.my_companies'))
 
 @section('content')
 <div class="container-fluid">
@@ -11,11 +11,11 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="card-title mb-1">My Companies</h3>
-                            <p class="card-text opacity-75 mb-0">Manage and oversee your company affiliations</p>
+                            <h3 class="card-title mb-1">{{ trans('companies.my_companies') }}</h3>
+                            <p class="card-text opacity-75 mb-0">{{ trans('companies.manage_company_affiliations') }}</p>
                         </div>
                         <div class="text-end">
-                            <div class="text-white-50 small">Total Companies</div>
+                            <div class="text-white-50 small">{{ trans('companies.total_companies') }}</div>
                             <div class="h2 mb-0">{{ $companies->count() }}</div>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                                 <h6 class="card-title mb-0">{{ $company->name }}</h6>
                             </div>
                             @if($company->pivot->is_primary)
-                                <span class="badge bg-success">Primary</span>
+                                <span class="badge bg-success">{{ trans('companies.primary') }}</span>
                             @endif
                         </div>
 
@@ -48,20 +48,20 @@
                                     <div class="col-4">
                                         <div class="border-end">
                                             <div class="h5 mb-0 text-primary">{{ $company->users->count() }}</div>
-                                            <small class="text-muted">Users</small>
+                                            <small class="text-muted">{{ trans('companies.users') }}</small>
                                         </div>
                                     </div>
                                     <div class="col-4">
                                         <div class="border-end">
                                             <div class="h5 mb-0 text-success">{{ $company->pivot->percentage ?? 0 }}%</div>
-                                            <small class="text-muted">Ownership</small>
+                                            <small class="text-muted">{{ trans('companies.ownership') }}</small>
                                         </div>
                                     </div>
                                     <div class="col-4">
                                         <div class="h5 mb-0 text-info">
                                             <i class="fas fa-{{ $company->active ? 'check-circle' : 'times-circle' }}"></i>
                                         </div>
-                                        <small class="text-muted">{{ $company->active ? 'Active' : 'Inactive' }}</small>
+                                        <small class="text-muted">{{ $company->active ? trans('companies.active') : trans('companies.inactive') }}</small>
                                     </div>
                                 </div>
                             </div>
@@ -96,14 +96,14 @@
                                 @if($company->pivot->role_in_company)
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="fas fa-user-tag text-muted me-2" style="width: 16px;"></i>
-                                        <small class="text-muted">Role: <strong>{{ $company->pivot->role_in_company }}</strong></small>
+                                        <small class="text-muted">{{ trans('companies.role') }}: <strong>{{ $company->pivot->role_in_company }}</strong></small>
                                     </div>
                                 @endif
 
                                 @if($company->pivot->joined_at)
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="fas fa-calendar text-muted me-2" style="width: 16px;"></i>
-                                        <small class="text-muted">Joined: {{ \Carbon\Carbon::parse($company->pivot->joined_at)->format('M d, Y') }}</small>
+                                        <small class="text-muted">{{ trans('companies.joined') }}: {{ \Carbon\Carbon::parse($company->pivot->joined_at)->format('M d, Y') }}</small>
                                     </div>
                                 @endif
                             </div>
@@ -112,7 +112,7 @@
                             @if($company->pivot->percentage > 0)
                                 <div class="mt-3">
                                     <div class="d-flex justify-content-between mb-1">
-                                        <small class="text-muted">Ownership Percentage</small>
+                                        <small class="text-muted">{{ trans('companies.ownership_percentage') }}</small>
                                         <small class="fw-bold">{{ $company->pivot->percentage }}%</small>
                                     </div>
                                     <div class="progress" style="height: 6px;">
@@ -126,10 +126,10 @@
                         <div class="card-footer bg-transparent">
                             <div class="d-flex justify-content-between">
                                 <button class="btn btn-outline-primary btn-sm" onclick="viewCompanyDetails({{ $company->id }})">
-                                    <i class="fas fa-eye me-1"></i> View Details
+                                    <i class="fas fa-eye me-1"></i> {{ trans('companies.view_details') }}
                                 </button>
                                 <button class="btn btn-outline-info btn-sm" onclick="manageCompanyUsers({{ $company->id }})">
-                                    <i class="fas fa-users me-1"></i> Manage Users
+                                    <i class="fas fa-users me-1"></i> {{ trans('companies.manage_users') }}
                                 </button>
                             </div>
                         </div>
@@ -143,32 +143,32 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Company Overview Summary</h5>
+                        <h5 class="card-title mb-0">{{ trans('companies.company_overview_summary') }}</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-3 col-md-6 mb-3">
                                 <div class="text-center">
                                     <div class="h3 text-primary mb-1">{{ $companies->count() }}</div>
-                                    <div class="text-muted">Total Companies</div>
+                                    <div class="text-muted">{{ trans('companies.total_companies') }}</div>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
                                 <div class="text-center">
                                     <div class="h3 text-success mb-1">{{ $companies->where('active', true)->count() }}</div>
-                                    <div class="text-muted">Active Companies</div>
+                                    <div class="text-muted">{{ trans('companies.active_companies') }}</div>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
                                 <div class="text-center">
                                     <div class="h3 text-info mb-1">{{ $companies->sum(function($c) { return $c->users->count(); }) }}</div>
-                                    <div class="text-muted">Total Users</div>
+                                    <div class="text-muted">{{ trans('companies.total_users') }}</div>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
                                 <div class="text-center">
                                     <div class="h3 text-warning mb-1">{{ $companies->sum('pivot.percentage') }}%</div>
-                                    <div class="text-muted">Total Ownership</div>
+                                    <div class="text-muted">{{ trans('companies.total_ownership') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -182,9 +182,9 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">All Company Users</h5>
+                        <h5 class="card-title mb-0">{{ trans('companies.all_company_users') }}</h5>
                         <a href="{{ route('company-users.index') }}" class="btn btn-primary">
-                            <i class="fas fa-users me-1"></i> Manage All Users
+                            <i class="fas fa-users me-1"></i> {{ trans('companies.manage_all_users') }}
                         </a>
                     </div>
                     <div class="card-body">
@@ -204,12 +204,12 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>User</th>
-                                            <th>Email</th>
-                                            <th>Company</th>
-                                            <th>Role</th>
-                                            <th>Status</th>
-                                            <th>Joined</th>
+                                            <th>{{ trans('companies.user') }}</th>
+                                            <th>{{ trans('companies.email') }}</th>
+                                            <th>{{ trans('companies.company') }}</th>
+                                            <th>{{ trans('companies.role') }}</th>
+                                            <th>{{ trans('companies.status') }}</th>
+                                            <th>{{ trans('companies.joined') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -228,7 +228,7 @@
                                             <td>{{ $user->company_name ?? 'N/A' }}</td>
                                             <td>
                                                 <span class="badge bg-primary">
-                                                    {{ $user->companies->first()->pivot->role_in_company ?? 'Member' }}
+                                                    {{ $user->companies->first()->pivot->role_in_company ?? trans('companies.member') }}
                                                 </span>
                                             </td>
                                             <td>
@@ -246,15 +246,15 @@
                             @if($allUsers->count() > 10)
                                 <div class="text-center mt-3">
                                     <a href="{{ route('company-users.index') }}" class="btn btn-outline-primary">
-                                        View All {{ $allUsers->count() }} Users
+                                        {{ trans('companies.view_all_users', ['count' => $allUsers->count()]) }}
                                     </a>
                                 </div>
                             @endif
                         @else
                             <div class="text-center py-4">
                                 <i class="fas fa-users text-muted" style="font-size: 3rem;"></i>
-                                <h6 class="mt-3 text-muted">No Users Found</h6>
-                                <p class="text-muted">No users are assigned to your companies yet.</p>
+                                <h6 class="mt-3 text-muted">{{ trans('companies.no_users_found') }}</h6>
+                                <p class="text-muted">{{ trans('companies.no_users_assigned_companies') }}</p>
                             </div>
                         @endif
                     </div>
@@ -269,10 +269,10 @@
                 <div class="card">
                     <div class="card-body text-center py-5">
                         <i class="fas fa-building text-muted" style="font-size: 4rem;"></i>
-                        <h4 class="mt-4 text-muted">No Companies Assigned</h4>
-                        <p class="text-muted mb-4">You are not currently assigned to any companies. Contact your system administrator to get access to companies.</p>
+                        <h4 class="mt-4 text-muted">{{ trans('companies.no_companies_assigned') }}</h4>
+                        <p class="text-muted mb-4">{{ trans('companies.not_assigned_companies_message') }}</p>
                         <a href="{{ route('company.dashboard') }}" class="btn btn-primary">
-                            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                            <i class="fas fa-arrow-left me-1"></i> {{ trans('companies.back_to_dashboard') }}
                         </a>
                     </div>
                 </div>
