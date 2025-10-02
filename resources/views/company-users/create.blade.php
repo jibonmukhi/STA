@@ -108,13 +108,16 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="country" class="form-label">Country</label>
-                                <input type="text" class="form-control @error('country') is-invalid @enderror"
-                                       id="country" name="country" value="{{ old('country') }}" maxlength="2"
-                                       placeholder="US, IT, FR...">
+                                <select class="form-select @error('country') is-invalid @enderror" id="country" name="country">
+                                    @foreach(dataVaultItems('country') as $item)
+                                        <option value="{{ $item['code'] }}" {{ old('country', 'IT') === $item['code'] ? 'selected' : '' }}>
+                                            {{ $item['label'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 @error('country')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                                <div class="form-text">2-letter country code (e.g., US, IT, FR)</div>
                             </div>
 
                             <div class="col-md-6 mb-3">

@@ -226,9 +226,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <label for="search_status" class="form-label">{{ __('users.status') }}</label>
                             <select class="form-select" id="search_status" name="search_status">
                                 <option value="">{{ __('users.all_status') }}</option>
-                                <option value="active" {{ request('search_status') == 'active' ? 'selected' : '' }}>{{ __('users.active') }}</option>
-                                <option value="inactive" {{ request('search_status') == 'inactive' ? 'selected' : '' }}>{{ __('users.inactive') }}</option>
-                                <option value="parked" {{ request('search_status') == 'parked' ? 'selected' : '' }}>{{ __('users.parked') }}</option>
+                                @foreach(dataVaultItems('user_status') as $item)
+                                    <option value="{{ $item['code'] }}" {{ request('search_status') == $item['code'] ? 'selected' : '' }}>
+                                        {{ $item['label'] }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-3">

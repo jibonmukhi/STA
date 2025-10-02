@@ -102,13 +102,9 @@ class CourseEnrollment extends Model
 
     public function getStatusBadgeAttribute(): string
     {
-        return match($this->status) {
-            'enrolled' => '<span class="badge bg-info">Enrolled</span>',
-            'in_progress' => '<span class="badge bg-primary">In Progress</span>',
-            'completed' => '<span class="badge bg-success">Completed</span>',
-            'dropped' => '<span class="badge bg-warning">Dropped</span>',
-            'failed' => '<span class="badge bg-danger">Failed</span>',
-            default => '<span class="badge bg-secondary">Unknown</span>'
-        };
+        $label = dataVaultLabel('enrollment_status', $this->status) ?? 'Unknown';
+        $color = dataVaultColor('enrollment_status', $this->status) ?? 'secondary';
+
+        return '<span class="badge bg-' . $color . '">' . $label . '</span>';
     }
 }

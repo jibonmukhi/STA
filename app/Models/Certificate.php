@@ -148,50 +148,23 @@ class Certificate extends Model
 
     public function getStatusBadgeClassAttribute(): string
     {
-        return match ($this->status) {
-            'active' => 'bg-success',
-            'expired' => 'bg-danger',
-            'revoked' => 'bg-dark',
-            'pending' => 'bg-warning',
-            'suspended' => 'bg-secondary',
-            default => 'bg-light',
-        };
+        $color = dataVaultColor('certificate_status', $this->status);
+        return $color ? 'bg-' . $color : 'bg-light';
     }
 
     public function getFormattedStatusAttribute(): string
     {
-        return match ($this->status) {
-            'active' => __('certificates.status_active'),
-            'expired' => __('certificates.status_expired'),
-            'revoked' => __('certificates.status_revoked'),
-            'pending' => __('certificates.status_pending'),
-            'suspended' => __('certificates.status_suspended'),
-            default => ucfirst($this->status),
-        };
+        return dataVaultLabel('certificate_status', $this->status) ?? ucfirst($this->status);
     }
 
     public function getFormattedTypeAttribute(): string
     {
-        return match ($this->certificate_type) {
-            'training' => __('certificates.type_training'),
-            'qualification' => __('certificates.type_qualification'),
-            'compliance' => __('certificates.type_compliance'),
-            'professional' => __('certificates.type_professional'),
-            'academic' => __('certificates.type_academic'),
-            default => ucfirst($this->certificate_type),
-        };
+        return dataVaultLabel('certificate_type', $this->certificate_type) ?? ucfirst($this->certificate_type);
     }
 
     public function getFormattedLevelAttribute(): string
     {
-        return match ($this->level) {
-            'beginner' => __('certificates.level_beginner'),
-            'intermediate' => __('certificates.level_intermediate'),
-            'advanced' => __('certificates.level_advanced'),
-            'professional' => __('certificates.level_professional'),
-            'expert' => __('certificates.level_expert'),
-            default => $this->level ? ucfirst($this->level) : '-',
-        };
+        return dataVaultLabel('certificate_level', $this->level) ?? ($this->level ? ucfirst($this->level) : '-');
     }
 
     // Mutators
@@ -251,34 +224,16 @@ class Certificate extends Model
 
     public static function getCertificateTypes(): array
     {
-        return [
-            'training' => __('certificates.type_training'),
-            'qualification' => __('certificates.type_qualification'),
-            'compliance' => __('certificates.type_compliance'),
-            'professional' => __('certificates.type_professional'),
-            'academic' => __('certificates.type_academic'),
-        ];
+        return dataVaultArray('certificate_type');
     }
 
     public static function getCertificateLevels(): array
     {
-        return [
-            'beginner' => __('certificates.level_beginner'),
-            'intermediate' => __('certificates.level_intermediate'),
-            'advanced' => __('certificates.level_advanced'),
-            'professional' => __('certificates.level_professional'),
-            'expert' => __('certificates.level_expert'),
-        ];
+        return dataVaultArray('certificate_level');
     }
 
     public static function getCertificateStatuses(): array
     {
-        return [
-            'active' => __('certificates.status_active'),
-            'expired' => __('certificates.status_expired'),
-            'revoked' => __('certificates.status_revoked'),
-            'pending' => __('certificates.status_pending'),
-            'suspended' => __('certificates.status_suspended'),
-        ];
+        return dataVaultArray('certificate_status');
     }
 }

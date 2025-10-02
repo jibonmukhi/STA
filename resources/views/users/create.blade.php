@@ -133,12 +133,11 @@
                             <div class="mb-3">
                                 <label for="country" class="form-label">{{ __('users.country') }}</label>
                                 <select class="form-select @error('country') is-invalid @enderror" id="country" name="country">
-                                    <option value="IT" {{ old('country', 'IT') == 'IT' ? 'selected' : '' }}>{{ __('users.italy') }}</option>
-                                    <option value="US" {{ old('country') == 'US' ? 'selected' : '' }}>{{ __('users.united_states') }}</option>
-                                    <option value="GB" {{ old('country') == 'GB' ? 'selected' : '' }}>{{ __('users.united_kingdom') }}</option>
-                                    <option value="FR" {{ old('country') == 'FR' ? 'selected' : '' }}>{{ __('users.france') }}</option>
-                                    <option value="DE" {{ old('country') == 'DE' ? 'selected' : '' }}>{{ __('users.germany') }}</option>
-                                    <option value="ES" {{ old('country') == 'ES' ? 'selected' : '' }}>{{ __('users.spain') }}</option>
+                                    @foreach(dataVaultItems('country') as $item)
+                                        <option value="{{ $item['code'] }}" {{ old('country', 'IT') == $item['code'] ? 'selected' : '' }}>
+                                            {{ $item['label'] }}
+                                        </option>
+                                    @endforeach
                                 </select>
                                 @error('country')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -386,9 +385,11 @@
                             <div class="mb-3">
                                 <label for="status" class="form-label">{{ __('users.user_status') }}</label>
                                 <select class="form-select @error('status') is-invalid @enderror" id="status" name="status">
-                                    <option value="parked" {{ old('status', 'parked') == 'parked' ? 'selected' : '' }}>{{ __('users.parked') }}</option>
-                                    <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>{{ __('users.active') }}</option>
-                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>{{ __('users.inactive') }}</option>
+                                    @foreach(dataVaultItems('user_status') as $item)
+                                        <option value="{{ $item['code'] }}" {{ old('status', 'parked') == $item['code'] ? 'selected' : '' }}>
+                                            {{ $item['label'] }}
+                                        </option>
+                                    @endforeach
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>

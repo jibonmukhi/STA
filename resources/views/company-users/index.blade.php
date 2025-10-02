@@ -61,9 +61,11 @@
                                 <label for="status" class="form-label">Status</label>
                                 <select class="form-select" id="status" name="status">
                                     <option value="">All Status</option>
-                                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
-                                    <option value="parked" {{ request('status') == 'parked' ? 'selected' : '' }}>Pending</option>
-                                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                    @foreach(dataVaultItems('user_status') as $item)
+                                        <option value="{{ $item['code'] }}" {{ request('status') == $item['code'] ? 'selected' : '' }}>
+                                            {{ $item['label'] }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-2">

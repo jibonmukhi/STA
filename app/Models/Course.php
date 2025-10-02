@@ -58,36 +58,17 @@ class Course extends Model
 
     public static function getCategories(): array
     {
-        return [
-            'programming' => 'Programming',
-            'web_development' => 'Web Development',
-            'mobile_development' => 'Mobile Development',
-            'data_science' => 'Data Science',
-            'cybersecurity' => 'Cybersecurity',
-            'project_management' => 'Project Management',
-            'design' => 'Design',
-            'business' => 'Business',
-            'marketing' => 'Marketing',
-            'other' => 'Other'
-        ];
+        return dataVaultArray('course_category');
     }
 
     public static function getLevels(): array
     {
-        return [
-            'beginner' => 'Beginner',
-            'intermediate' => 'Intermediate',
-            'advanced' => 'Advanced'
-        ];
+        return dataVaultArray('course_level');
     }
 
     public static function getDeliveryMethods(): array
     {
-        return [
-            'online' => 'Online',
-            'offline' => 'Offline',
-            'hybrid' => 'Hybrid'
-        ];
+        return dataVaultArray('delivery_method');
     }
 
     public function courseEvents(): HasMany
