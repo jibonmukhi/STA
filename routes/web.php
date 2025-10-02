@@ -11,6 +11,7 @@ use App\Http\Controllers\EndUserDashboardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CoursesController;
+use App\Http\Controllers\AuditLogController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -117,6 +118,16 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
         Route::put('/{category}/items/{item}', [\App\Http\Controllers\DataVaultItemController::class, 'update'])->name('items.update');
         Route::delete('/{category}/items/{item}', [\App\Http\Controllers\DataVaultItemController::class, 'destroy'])->name('items.destroy');
         Route::post('/{category}/items/reorder', [\App\Http\Controllers\DataVaultItemController::class, 'reorder'])->name('items.reorder');
+    });
+
+    // Audit Log Management Routes (STA Manager only)
+    Route::prefix('audit-logs')->name('audit-logs.')->group(function () {
+        Route::get('/', [AuditLogController::class, 'index'])->name('index');
+        Route::get('/export', [AuditLogController::class, 'export'])->name('export');
+        Route::get('/statistics', [AuditLogController::class, 'statistics'])->name('statistics');
+        Route::get('/cleanup', [AuditLogController::class, 'cleanup'])->name('cleanup');
+        Route::post('/cleanup', [AuditLogController::class, 'cleanup'])->name('cleanup.perform');
+        Route::get('/{auditLog}', [AuditLogController::class, 'show'])->name('show');
     });
 });
 

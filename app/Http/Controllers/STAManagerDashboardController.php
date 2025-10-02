@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Company;
+use App\Services\AuditLogService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class STAManagerDashboardController extends Controller
 {
@@ -73,6 +75,21 @@ class STAManagerDashboardController extends Controller
 
             $user->update(['status' => 'active']);
 
+            // Log user approval
+            AuditLogService::logCustom(
+                'user_approved',
+                "User {$user->full_name} (ID: {$user->id}) was approved by " . Auth::user()->name,
+                'users',
+                'info',
+                [
+                    'user_id' => $user->id,
+                    'user_email' => $user->email,
+                    'approved_by' => Auth::id(),
+                    'old_status' => 'parked',
+                    'new_status' => 'active'
+                ]
+            );
+
             return redirect()->back()
                 ->with('success', "User {$user->full_name} has been approved successfully.");
 
@@ -91,6 +108,23 @@ class STAManagerDashboardController extends Controller
             }
 
             $userName = $user->full_name;
+            $userEmail = $user->email;
+            $userId = $user->id;
+
+            // Log user rejection (before deletion)
+            AuditLogService::logCustom(
+                'user_rejected',
+                "User {$userName} (ID: {$userId}, Email: {$userEmail}) was rejected and deleted by " . Auth::user()->name,
+                'users',
+                'warning',
+                [
+                    'user_id' => $userId,
+                    'user_email' => $userEmail,
+                    'user_name' => $userName,
+                    'rejected_by' => Auth::id(),
+                    'status_before_deletion' => 'parked'
+                ]
+            );
 
             // Delete user photos if they exist
             if ($user->photo) {

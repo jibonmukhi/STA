@@ -72,6 +72,12 @@ return [
             'permission' => 'manage settings'
         ],
         [
+            'title' => 'navigation.audit_logs',
+            'route' => 'audit-logs.index',
+            'icon' => 'fas fa-history',
+            'permission' => 'manage settings'
+        ],
+        [
             'title' => 'navigation.certificate_management',
             'route' => 'certificates.index',
             'icon' => 'fas fa-certificate',

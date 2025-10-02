@@ -53,4 +53,7 @@ return [
 
     // Data Vault
     'data_vault' => 'Data Vault',
+
+    // Audit Logs
+    'audit_logs' => 'Audit Logs',
 ];

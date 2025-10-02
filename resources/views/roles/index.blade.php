@@ -315,8 +315,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                         @endcan
                                         
                                         @can('delete roles')
-                                        <form method="POST" action="{{ route('roles.destroy', $role) }}" style="display: inline;" 
-                                              onsubmit="return confirm('{{ __('roles.delete_role_confirmation') }}')"
+                                        <form method="POST" action="{{ route('roles.destroy', $role) }}" style="display: inline;"
+                                              onsubmit="return confirm('{{ __('roles.delete_role_confirmation') }}')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('roles.delete') }}">

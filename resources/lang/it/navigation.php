@@ -53,4 +53,7 @@ return [
 
     // Data Vault
     'data_vault' => 'Banca Dati',
+
+    // Audit Logs
+    'audit_logs' => 'Registri di Controllo',
 ];

@@ -6,6 +6,7 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use App\Services\AuditLogService;
 
 class CoursesController extends Controller
 {
@@ -129,6 +130,24 @@ class CoursesController extends Controller
             'available_until' => 'nullable|date|after_or_equal:available_from',
         ]);
 
+        // Log course status change if applicable
+        if (isset($validated['is_active']) && $course->is_active !== $validated['is_active']) {
+            $statusText = $validated['is_active'] ? 'activated' : 'deactivated';
+            AuditLogService::logCustom(
+                'course_status_changed',
+                "Course '{$course->title}' was {$statusText}",
+                'courses',
+                'info',
+                [
+                    'course_id' => $course->id,
+                    'course_title' => $course->title,
+                    'old_status' => $course->is_active,
+                    'new_status' => $validated['is_active'],
+                    'changed_by' => auth()->id()
+                ]
+            );
+        }
+
         $course->update($validated);
 
         return redirect()->route('courses.show', $course)
@@ -138,6 +157,21 @@ class CoursesController extends Controller
     public function destroy(Course $course): RedirectResponse
     {
         $this->authorize('delete', $course);
+
+        // Log course deletion (before actual deletion)
+        AuditLogService::logCustom(
+            'course_deleted',
+            "Course '{$course->title}' (Code: {$course->course_code}) was deleted",
+            'courses',
+            'warning',
+            [
+                'course_id' => $course->id,
+                'course_title' => $course->title,
+                'course_code' => $course->course_code,
+                'had_enrollments' => $course->enrollments()->count(),
+                'deleted_by' => auth()->id()
+            ]
+        );
 
         $course->delete();
 

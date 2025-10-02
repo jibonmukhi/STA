@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Services\AuditLogService;
 
 class CertificateController extends Controller
 {
@@ -319,6 +320,24 @@ class CertificateController extends Controller
             $validated['next_renewal_date'] = $expirationDate->subMonths($validated['renewal_period_months']);
         }
 
+        // Log status change if applicable
+        if ($certificate->status !== $validated['status']) {
+            AuditLogService::logCustom(
+                'certificate_status_changed',
+                "Certificate '{$certificate->name}' status changed from {$certificate->status} to {$validated['status']}",
+                'certificates',
+                'info',
+                [
+                    'certificate_id' => $certificate->id,
+                    'certificate_name' => $certificate->name,
+                    'old_status' => $certificate->status,
+                    'new_status' => $validated['status'],
+                    'user_id' => $certificate->user_id,
+                    'changed_by' => auth()->id()
+                ]
+            );
+        }
+
         $certificate->update($validated);
 
         return redirect()->route('certificates.show', $certificate)
@@ -331,6 +350,22 @@ class CertificateController extends Controller
     public function destroy(Certificate $certificate)
     {
         $this->authorize('delete', $certificate);
+
+        // Log certificate deletion (before actual deletion)
+        AuditLogService::logCustom(
+            'certificate_deleted',
+            "Certificate '{$certificate->name}' (Number: {$certificate->certificate_number}) was deleted",
+            'certificates',
+            'warning',
+            [
+                'certificate_id' => $certificate->id,
+                'certificate_name' => $certificate->name,
+                'certificate_number' => $certificate->certificate_number,
+                'user_id' => $certificate->user_id,
+                'company_id' => $certificate->company_id,
+                'deleted_by' => auth()->id()
+            ]
+        );
 
         // Delete associated files
         if ($certificate->certificate_file_path) {

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Services\AuditLogService;
 
 class UserController extends Controller
 {
@@ -168,6 +169,19 @@ class UserController extends Controller
             // Assign roles
             if (isset($validated['roles'])) {
                 $user->assignRole($validated['roles']);
+
+                // Log role assignment
+                AuditLogService::logCustom(
+                    'roles_assigned',
+                    "Assigned roles to user {$user->full_name}: " . implode(', ', (array)$validated['roles']),
+                    'users',
+                    'info',
+                    [
+                        'user_id' => $user->id,
+                        'roles' => $validated['roles'],
+                        'assigned_by' => auth()->id()
+                    ]
+                );
             }
 
             // Assign companies with percentages
@@ -293,7 +307,25 @@ class UserController extends Controller
             }
 
             // Update roles
-            $user->syncRoles($validated['roles'] ?? []);
+            $oldRoles = $user->getRoleNames()->toArray();
+            $newRoles = $validated['roles'] ?? [];
+            $user->syncRoles($newRoles);
+
+            // Log role changes if any
+            if ($oldRoles != $newRoles) {
+                AuditLogService::logCustom(
+                    'roles_updated',
+                    "Updated roles for user {$user->full_name}. Old: [" . implode(', ', $oldRoles) . "], New: [" . implode(', ', $newRoles) . "]",
+                    'users',
+                    'info',
+                    [
+                        'user_id' => $user->id,
+                        'old_roles' => $oldRoles,
+                        'new_roles' => $newRoles,
+                        'updated_by' => auth()->id()
+                    ]
+                );
+            }
 
             // Update companies with percentages
             if (isset($validated['companies'])) {
@@ -344,11 +376,27 @@ class UserController extends Controller
                 }
             }
 
+            // Log user deletion (before actual deletion)
+            AuditLogService::logCustom(
+                'user_deleted',
+                "User {$userName} (ID: {$user->id}, Email: {$user->email}) was deleted",
+                'users',
+                'warning',
+                [
+                    'user_id' => $user->id,
+                    'user_email' => $user->email,
+                    'user_name' => $userName,
+                    'deleted_by' => auth()->id(),
+                    'had_roles' => $user->getRoleNames()->toArray(),
+                    'had_companies' => $user->companies->pluck('name')->toArray()
+                ]
+            );
+
             // Detach companies
             $user->companies()->detach();
-            
+
             $user->delete();
-            
+
             return redirect()->route('users.index')
                 ->with('success', "User '{$userName}' has been deleted successfully.");
 
@@ -423,11 +471,22 @@ class UserController extends Controller
             ]);
 
             // Assign role
-            if ($request->role) {
-                $user->assignRole($request->role);
-            } else {
-                $user->assignRole('end_user');
-            }
+            $roleToAssign = $request->role ?? 'end_user';
+            $user->assignRole($roleToAssign);
+
+            // Log role assignment
+            AuditLogService::logCustom(
+                'roles_assigned',
+                "Assigned role '{$roleToAssign}' to company user {$user->full_name}",
+                'users',
+                'info',
+                [
+                    'user_id' => $user->id,
+                    'role' => $roleToAssign,
+                    'assigned_by' => auth()->id(),
+                    'created_via' => 'company_manager'
+                ]
+            );
 
             // Attach to selected companies
             if ($request->companies) {

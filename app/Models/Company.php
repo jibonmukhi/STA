@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use App\Traits\HasAuditLog;
 
 class Company extends Model
 {
+    use HasAuditLog;
     protected $fillable = [
         'ateco_code',
         'name',

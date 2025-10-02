@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\AuditLogService;
 
 class CompanyController extends Controller
 {
@@ -221,7 +222,26 @@ class CompanyController extends Controller
                 }
             }
 
+            $oldStatus = $company->active;
             $validated['active'] = (bool) $request->input('active', 0);
+
+            // Log status change if it changed
+            if ($oldStatus !== $validated['active']) {
+                $statusText = $validated['active'] ? 'activated' : 'deactivated';
+                AuditLogService::logCustom(
+                    'company_status_changed',
+                    "Company {$company->name} was {$statusText}",
+                    'companies',
+                    'info',
+                    [
+                        'company_id' => $company->id,
+                        'company_name' => $company->name,
+                        'old_status' => $oldStatus,
+                        'new_status' => $validated['active'],
+                        'changed_by' => auth()->id()
+                    ]
+                );
+            }
 
             $company->update($validated);
 
@@ -242,7 +262,21 @@ class CompanyController extends Controller
     {
         try {
             $companyName = $company->name;
-            
+
+            // Log company deletion (before actual deletion)
+            AuditLogService::logCustom(
+                'company_deleted',
+                "Company {$companyName} (ID: {$company->id}) was deleted",
+                'companies',
+                'warning',
+                [
+                    'company_id' => $company->id,
+                    'company_name' => $companyName,
+                    'had_users' => $company->users->count(),
+                    'deleted_by' => auth()->id()
+                ]
+            );
+
             // Delete logo file
             if ($company->logo && Storage::disk('public')->exists($company->logo)) {
                 Storage::disk('public')->delete($company->logo);

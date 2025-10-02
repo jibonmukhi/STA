@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\AuditLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,6 +32,9 @@ class AuthenticatedSessionController extends Controller
         // Role-based redirect
         $user = Auth::user();
 
+        // Log successful login
+        AuditLogService::logLogin($user);
+
         if ($user->hasRole('sta_manager')) {
             return redirect()->intended(route('sta.dashboard', absolute: false));
         } elseif ($user->hasRole('company_manager')) {
@@ -50,6 +54,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Log logout before destroying session
+        $user = Auth::user();
+        if ($user) {
+            AuditLogService::logLogout($user);
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

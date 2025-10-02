@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\HasAuditLog;
 
 class CourseEnrollment extends Model
 {
+    use HasAuditLog;
     protected $fillable = [
         'course_id',
         'user_id',
