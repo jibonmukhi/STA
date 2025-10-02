@@ -50,4 +50,7 @@ return [
     'schedule' => 'Calendario',
     'certificates' => 'Certificati',
     'teacher' => 'Insegnante',
+
+    // Data Vault
+    'data_vault' => 'Banca Dati',
 ];

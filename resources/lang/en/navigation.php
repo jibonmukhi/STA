@@ -50,4 +50,7 @@ return [
     'schedule' => 'Schedule',
     'certificates' => 'Certificates',
     'teacher' => 'Teacher',
+
+    // Data Vault
+    'data_vault' => 'Data Vault',
 ];

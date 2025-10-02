@@ -66,6 +66,12 @@ return [
             'permission' => 'manage settings'
         ],
         [
+            'title' => 'navigation.data_vault',
+            'route' => 'data-vault.index',
+            'icon' => 'fas fa-database',
+            'permission' => 'manage settings'
+        ],
+        [
             'title' => 'navigation.certificate_management',
             'route' => 'certificates.index',
             'icon' => 'fas fa-certificate',

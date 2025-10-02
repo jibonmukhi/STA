@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\DataVaultCategory;
+use App\Services\DataVaultService;
+
+class DataVaultController extends Controller
+{
+    public function index()
+    {
+        $categories = DataVaultCategory::withCount('items')
+            ->ordered()
+            ->get();
+
+        return view('data-vault.index', compact('categories'));
+    }
+
+    public function create()
+    {
+        return view('data-vault.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:100|unique:data_vault_categories,code',
+            'name_en' => 'required|string|max:255',
+            'name_it' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'boolean',
+        ]);
+
+        $category = DataVaultCategory::create($validated);
+
+        DataVaultService::clearCache($category->code);
+
+        return redirect()->route('data-vault.index')
+            ->with('success', __('data_vault.category_created_successfully'));
+    }
+
+    public function edit(DataVaultCategory $category)
+    {
+        return view('data-vault.edit', compact('category'));
+    }
+
+    public function update(Request $request, DataVaultCategory $category)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:100|unique:data_vault_categories,code,' . $category->id,
+            'name_en' => 'required|string|max:255',
+            'name_it' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'boolean',
+        ]);
+
+        $category->update($validated);
+
+        DataVaultService::clearCache($category->code);
+
+        return redirect()->route('data-vault.index')
+            ->with('success', __('data_vault.category_updated_successfully'));
+    }
+
+    public function destroy(DataVaultCategory $category)
+    {
+        if ($category->is_system) {
+            return redirect()->route('data-vault.index')
+                ->with('error', __('data_vault.cannot_delete_system_category'));
+        }
+
+        DataVaultService::clearCache($category->code);
+
+        $category->delete();
+
+        return redirect()->route('data-vault.index')
+            ->with('success', __('data_vault.category_deleted_successfully'));
+    }
+}

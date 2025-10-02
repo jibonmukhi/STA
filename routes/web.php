@@ -101,6 +101,23 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
     // Settings Management Routes (STA Manager only)
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingsController::class, 'store'])->name('settings.store');
+
+    // Data Vault Management Routes (STA Manager only)
+    Route::prefix('data-vault')->name('data-vault.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\DataVaultController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\DataVaultController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\DataVaultController::class, 'store'])->name('store');
+        Route::get('/{category}/edit', [\App\Http\Controllers\DataVaultController::class, 'edit'])->name('edit');
+        Route::put('/{category}', [\App\Http\Controllers\DataVaultController::class, 'update'])->name('update');
+        Route::delete('/{category}', [\App\Http\Controllers\DataVaultController::class, 'destroy'])->name('destroy');
+
+        // Items management
+        Route::get('/{category}/items', [\App\Http\Controllers\DataVaultItemController::class, 'index'])->name('items.index');
+        Route::post('/{category}/items', [\App\Http\Controllers\DataVaultItemController::class, 'store'])->name('items.store');
+        Route::put('/{category}/items/{item}', [\App\Http\Controllers\DataVaultItemController::class, 'update'])->name('items.update');
+        Route::delete('/{category}/items/{item}', [\App\Http\Controllers\DataVaultItemController::class, 'destroy'])->name('items.destroy');
+        Route::post('/{category}/items/reorder', [\App\Http\Controllers\DataVaultItemController::class, 'reorder'])->name('items.reorder');
+    });
 });
 
 // Company Manager Routes
