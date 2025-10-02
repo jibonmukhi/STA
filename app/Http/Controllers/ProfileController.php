@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Services\AuditLogService;
 
 class ProfileController extends Controller
 {
@@ -61,13 +62,43 @@ class ProfileController extends Controller
                 }
             }
 
+            // Store old values for audit log
+            $oldValues = $user->only(['name', 'surname', 'email', 'phone', 'mobile', 'date_of_birth', 'place_of_birth', 'cf', 'address', 'gender']);
+            $changedFields = [];
+
             $user->fill($validated);
+
+            // Track which fields changed
+            foreach ($oldValues as $field => $oldValue) {
+                if ($user->isDirty($field)) {
+                    $changedFields[$field] = [
+                        'old' => $oldValue,
+                        'new' => $user->$field
+                    ];
+                }
+            }
 
             if ($user->isDirty('email')) {
                 $user->email_verified_at = null;
             }
 
             $user->save();
+
+            // Log profile update if there were changes
+            if (!empty($changedFields)) {
+                AuditLogService::logCustom(
+                    'profile_updated',
+                    'User updated their profile',
+                    'users',
+                    'info',
+                    [
+                        'user_id' => $user->id,
+                        'changed_fields' => array_keys($changedFields),
+                        'changes' => $changedFields,
+                        'updated_by' => $user->id
+                    ]
+                );
+            }
 
             return Redirect::route('profile.edit')->with('status', 'profile-updated');
 
@@ -88,6 +119,24 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+        $userId = $user->id;
+        $userEmail = $user->email;
+        $userName = $user->full_name;
+
+        // Log account deletion
+        AuditLogService::logCustom(
+            'account_deleted',
+            "User {$userName} deleted their own account",
+            'users',
+            'critical',
+            [
+                'user_id' => $userId,
+                'user_email' => $userEmail,
+                'user_name' => $userName,
+                'deleted_by' => $userId,
+                'self_deletion' => true
+            ]
+        );
 
         Auth::logout();
 

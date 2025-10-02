@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Services\AuditLogService;
 
 class RegisteredUserController extends Controller
 {
@@ -40,6 +41,22 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        // Log user registration
+        AuditLogService::logCustom(
+            'user_registered',
+            "New user registered: {$user->name} ({$user->email})",
+            'users',
+            'info',
+            [
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'user_email' => $user->email,
+                'registration_method' => 'self_registration',
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]
+        );
 
         event(new Registered($user));
 

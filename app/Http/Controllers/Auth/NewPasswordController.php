@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Services\AuditLogService;
 
 class NewPasswordController extends Controller
 {
@@ -46,6 +47,20 @@ class NewPasswordController extends Controller
                     'password' => Hash::make($request->password),
                     'remember_token' => Str::random(60),
                 ])->save();
+
+                // Log password reset
+                AuditLogService::logCustom(
+                    'password_reset',
+                    "User {$user->full_name} reset their password via email link",
+                    'users',
+                    'info',
+                    [
+                        'user_id' => $user->id,
+                        'user_email' => $user->email,
+                        'reset_method' => 'email_link',
+                        'ip_address' => $request->ip()
+                    ]
+                );
 
                 event(new PasswordReset($user));
             }

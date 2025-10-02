@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Services\AuditLogService;
 
 class RoleController extends Controller
 {
@@ -95,6 +96,20 @@ class RoleController extends Controller
             $role->givePermissionTo($request->permissions);
         }
 
+        // Log role creation
+        AuditLogService::logCustom(
+            'role_created',
+            "Created new role: {$role->name}",
+            'roles',
+            'info',
+            [
+                'role_id' => $role->id,
+                'role_name' => $role->name,
+                'permissions' => $request->permissions ?? [],
+                'created_by' => auth()->id()
+            ]
+        );
+
         return redirect()->route('roles.index')->with('success', 'Role created successfully.');
     }
 
@@ -125,8 +140,28 @@ class RoleController extends Controller
             'permissions' => 'array'
         ]);
 
+        $oldName = $role->name;
+        $oldPermissions = $role->permissions->pluck('name')->toArray();
+        $newPermissions = $request->permissions ?? [];
+
         $role->update(['name' => $request->name]);
-        $role->syncPermissions($request->permissions ?? []);
+        $role->syncPermissions($newPermissions);
+
+        // Log role update
+        AuditLogService::logCustom(
+            'role_updated',
+            "Updated role: {$role->name}",
+            'roles',
+            'info',
+            [
+                'role_id' => $role->id,
+                'old_name' => $oldName,
+                'new_name' => $request->name,
+                'old_permissions' => $oldPermissions,
+                'new_permissions' => $newPermissions,
+                'updated_by' => auth()->id()
+            ]
+        );
 
         return redirect()->route('roles.index')->with('success', 'Role updated successfully.');
     }
@@ -139,6 +174,23 @@ class RoleController extends Controller
         if ($role->users()->count() > 0) {
             return redirect()->route('roles.index')->with('error', 'Cannot delete role that is assigned to users.');
         }
+
+        $roleName = $role->name;
+        $permissions = $role->permissions->pluck('name')->toArray();
+
+        // Log role deletion
+        AuditLogService::logCustom(
+            'role_deleted',
+            "Deleted role: {$roleName}",
+            'roles',
+            'warning',
+            [
+                'role_id' => $role->id,
+                'role_name' => $roleName,
+                'had_permissions' => $permissions,
+                'deleted_by' => auth()->id()
+            ]
+        );
 
         $role->delete();
         return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');

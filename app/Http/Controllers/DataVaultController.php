@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\DataVaultCategory;
 use App\Services\DataVaultService;
+use App\Services\AuditLogService;
 
 class DataVaultController extends Controller
 {
@@ -37,6 +38,20 @@ class DataVaultController extends Controller
 
         DataVaultService::clearCache($category->code);
 
+        // Log category creation
+        AuditLogService::logCustom(
+            'data_vault_category_created',
+            "Created Data Vault category: {$category->name_en}",
+            'data_vault',
+            'info',
+            [
+                'category_id' => $category->id,
+                'category_code' => $category->code,
+                'category_name' => $category->name_en,
+                'created_by' => auth()->id()
+            ]
+        );
+
         return redirect()->route('data-vault.index')
             ->with('success', __('data_vault.category_created_successfully'));
     }
@@ -57,9 +72,26 @@ class DataVaultController extends Controller
             'is_active' => 'boolean',
         ]);
 
+        // Store old values for audit log
+        $oldValues = $category->only(['code', 'name_en', 'name_it', 'is_active']);
+
         $category->update($validated);
 
         DataVaultService::clearCache($category->code);
+
+        // Log category update
+        AuditLogService::logCustom(
+            'data_vault_category_updated',
+            "Updated Data Vault category: {$category->name_en}",
+            'data_vault',
+            'info',
+            [
+                'category_id' => $category->id,
+                'old_values' => $oldValues,
+                'new_values' => $validated,
+                'updated_by' => auth()->id()
+            ]
+        );
 
         return redirect()->route('data-vault.index')
             ->with('success', __('data_vault.category_updated_successfully'));
@@ -72,7 +104,26 @@ class DataVaultController extends Controller
                 ->with('error', __('data_vault.cannot_delete_system_category'));
         }
 
+        $categoryName = $category->name_en;
+        $categoryCode = $category->code;
+        $itemCount = $category->items()->count();
+
         DataVaultService::clearCache($category->code);
+
+        // Log category deletion
+        AuditLogService::logCustom(
+            'data_vault_category_deleted',
+            "Deleted Data Vault category: {$categoryName}",
+            'data_vault',
+            'warning',
+            [
+                'category_id' => $category->id,
+                'category_code' => $categoryCode,
+                'category_name' => $categoryName,
+                'had_items' => $itemCount,
+                'deleted_by' => auth()->id()
+            ]
+        );
 
         $category->delete();
 
