@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Course extends Model
 {
@@ -21,6 +22,7 @@ class Course extends Model
         'credits',
         'price',
         'instructor',
+        'teacher_id',
         'prerequisites',
         'delivery_method',
         'max_participants',
@@ -91,5 +93,37 @@ class Course extends Model
     public function courseEvents(): HasMany
     {
         return $this->hasMany(CourseEvent::class);
+    }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(CourseEnrollment::class);
+    }
+
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'course_enrollments')
+                    ->withPivot(['status', 'enrolled_at', 'completed_at', 'progress_percentage', 'final_score', 'grade', 'notes'])
+                    ->withTimestamps();
+    }
+
+    public function scopeByTeacher($query, int $teacherId)
+    {
+        return $query->where('teacher_id', $teacherId);
+    }
+
+    public function getEnrolledStudentsCountAttribute(): int
+    {
+        return $this->enrollments()->whereIn('status', ['enrolled', 'in_progress'])->count();
+    }
+
+    public function getCompletedStudentsCountAttribute(): int
+    {
+        return $this->enrollments()->completed()->count();
     }
 }

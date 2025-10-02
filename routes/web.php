@@ -33,6 +33,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:company_manager')
         ->name('company.dashboard');
 
+    // Teacher Dashboard
+    Route::get('/teacher/dashboard', [\App\Http\Controllers\TeacherDashboardController::class, 'index'])
+        ->middleware('role:teacher')
+        ->name('teacher.dashboard');
+
     // End User Dashboard
     Route::get('/user/dashboard', [EndUserDashboardController::class, 'index'])
         ->middleware('role:end_user')
@@ -107,6 +112,19 @@ Route::middleware(['auth', 'role:company_manager'])->group(function () {
 
     // Company profile management
     Route::get('my-companies', [CompanyController::class, 'myCompanies'])->name('my-companies.index');
+});
+
+// Teacher Routes
+Route::middleware(['auth', 'role:teacher'])->group(function () {
+    // Teacher's courses management
+    Route::get('/teacher/my-courses', [\App\Http\Controllers\TeacherDashboardController::class, 'myCourses'])->name('teacher.my-courses');
+    Route::get('/teacher/courses/{course}/students', [\App\Http\Controllers\TeacherDashboardController::class, 'courseStudents'])->name('teacher.course-students');
+
+    // Teacher's schedule
+    Route::get('/teacher/schedule', [\App\Http\Controllers\TeacherDashboardController::class, 'schedule'])->name('teacher.schedule');
+
+    // Teacher's certificates
+    Route::get('/teacher/certificates', [\App\Http\Controllers\TeacherDashboardController::class, 'certificates'])->name('teacher.certificates');
 });
 
 // Public certificate verification (no auth required)

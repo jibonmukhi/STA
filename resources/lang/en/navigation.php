@@ -44,4 +44,10 @@ return [
     'all_courses' => 'All Courses',
     'add_course' => 'Add Course',
     'course_planning' => 'Course Planning',
+
+    // Teacher menu
+    'my_courses' => 'My Courses',
+    'schedule' => 'Schedule',
+    'certificates' => 'Certificates',
+    'teacher' => 'Teacher',
 ];

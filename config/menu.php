@@ -197,6 +197,33 @@ return [
         ]
     ],
 
+    'teacher' => [
+        [
+            'title' => 'navigation.dashboard',
+            'route' => 'teacher.dashboard',
+            'icon' => 'fas fa-home',
+            'permission' => 'view dashboard'
+        ],
+        [
+            'title' => 'navigation.my_courses',
+            'route' => 'teacher.my-courses',
+            'icon' => 'fas fa-book',
+            'permission' => 'manage own courses'
+        ],
+        [
+            'title' => 'navigation.schedule',
+            'route' => 'teacher.schedule',
+            'icon' => 'fas fa-calendar-alt',
+            'permission' => 'create course schedules'
+        ],
+        [
+            'title' => 'navigation.certificates',
+            'route' => 'teacher.certificates',
+            'icon' => 'fas fa-certificate',
+            'permission' => 'issue certificates'
+        ]
+    ],
+
     'end_user' => [
         [
             'title' => 'navigation.dashboard',

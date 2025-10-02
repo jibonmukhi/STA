@@ -44,4 +44,10 @@ return [
     'all_courses' => 'Tutti i Corsi',
     'add_course' => 'Aggiungi Corso',
     'course_planning' => 'Pianificazione Corsi',
+
+    // Teacher menu
+    'my_courses' => 'I Miei Corsi',
+    'schedule' => 'Calendario',
+    'certificates' => 'Certificati',
+    'teacher' => 'Insegnante',
 ];

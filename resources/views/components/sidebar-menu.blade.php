@@ -8,7 +8,7 @@
 
     // Determine primary role for menu selection
     $primaryRole = null;
-    $rolePriority = ['sta_manager', 'company_manager', 'end_user'];
+    $rolePriority = ['sta_manager', 'company_manager', 'teacher', 'end_user'];
 
     foreach ($rolePriority as $role) {
         if (in_array($role, $userRoles)) {

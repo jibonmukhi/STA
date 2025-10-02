@@ -33,6 +33,21 @@ class CertificatePolicy
             return $certificate->user_id === $user->id || in_array($certificate->company_id, $userCompanyIds);
         }
 
+        // Teachers can view certificates they issued or their own
+        if ($user->hasRole('teacher')) {
+            // Check if this certificate is for one of their students
+            $studentIds = $user->teacherCourses()
+                ->with('students')
+                ->get()
+                ->pluck('students')
+                ->flatten()
+                ->pluck('id')
+                ->unique()
+                ->toArray();
+
+            return $certificate->user_id === $user->id || in_array($certificate->user_id, $studentIds);
+        }
+
         // End users can only view their own certificates
         if ($user->hasRole('end_user')) {
             return $certificate->user_id === $user->id;
@@ -46,8 +61,8 @@ class CertificatePolicy
      */
     public function create(User $user): bool
     {
-        // Only STA managers and company managers can create certificates
-        return $user->hasRole(['sta_manager', 'company_manager']);
+        // Only STA managers, company managers, and teachers can create certificates
+        return $user->hasRole(['sta_manager', 'company_manager', 'teacher']);
     }
 
     /**
@@ -64,6 +79,20 @@ class CertificatePolicy
         if ($user->hasRole('company_manager')) {
             $userCompanyIds = $user->companies()->pluck('companies.id')->toArray();
             return $certificate->user_id === $user->id || in_array($certificate->company_id, $userCompanyIds);
+        }
+
+        // Teachers can update certificates for their students or their own
+        if ($user->hasRole('teacher')) {
+            $studentIds = $user->teacherCourses()
+                ->with('students')
+                ->get()
+                ->pluck('students')
+                ->flatten()
+                ->pluck('id')
+                ->unique()
+                ->toArray();
+
+            return $certificate->user_id === $user->id || in_array($certificate->user_id, $studentIds);
         }
 
         // End users cannot update certificates

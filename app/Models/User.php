@@ -153,7 +153,7 @@ class User extends Authenticatable
         return $query->where('status', 'active');
     }
 
-    public function scopeInactive($query) 
+    public function scopeInactive($query)
     {
         return $query->where('status', 'inactive');
     }
@@ -161,6 +161,25 @@ class User extends Authenticatable
     public function scopeParked($query)
     {
         return $query->where('status', 'parked');
+    }
+
+    // Teacher relationships
+    public function teacherCourses()
+    {
+        return $this->hasMany(Course::class, 'teacher_id');
+    }
+
+    // Student relationships
+    public function enrolledCourses()
+    {
+        return $this->belongsToMany(Course::class, 'course_enrollments')
+                    ->withPivot(['status', 'enrolled_at', 'completed_at', 'progress_percentage', 'final_score', 'grade', 'notes'])
+                    ->withTimestamps();
+    }
+
+    public function courseEnrollments()
+    {
+        return $this->hasMany(CourseEnrollment::class);
     }
 
     public function getFormattedRoleAttribute()
@@ -174,6 +193,7 @@ class User extends Authenticatable
                 'sta_manager' => 'STA Manager',
                 'company_manager' => 'Company Manager',
                 'end_user' => 'End User',
+                'teacher' => 'Teacher',
                 default => ucwords(str_replace('_', ' ', $role->name))
             };
         });
@@ -187,6 +207,7 @@ class User extends Authenticatable
             'sta_manager' => 'STA Manager',
             'company_manager' => 'Company Manager',
             'end_user' => 'End User',
+            'teacher' => 'Teacher',
             default => ucwords(str_replace('_', ' ', $roleName))
         };
     }
