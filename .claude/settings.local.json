@@ -10,7 +10,8 @@
       "Bash(git --version)",
       "Bash(where git)",
       "Bash(git config:*)",
-      "Bash(composer:*)"
+      "Bash(composer:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []
