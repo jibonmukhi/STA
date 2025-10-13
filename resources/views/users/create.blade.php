@@ -9,9 +9,14 @@
             <h4 class="mb-0">
                 <i class="fas fa-user-plus me-2"></i>{{ __('users.create_new_user') }}
             </h4>
-            <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>{{ __('users.back_to_users') }}
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('users.template.download') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-file-download me-2"></i>{{ __('users.bulk_upload_download_template') }}
+                </a>
+                <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>{{ __('users.back_to_users') }}
+                </a>
+            </div>
         </div>
     </div>
 </div>

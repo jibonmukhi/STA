@@ -32,6 +32,8 @@ return [
     'user_management' => 'Gestione Utenti',
     'all_users' => 'Tutti gli Utenti',
     'add_user' => 'Aggiungi Utente',
+    'bulk_user_upload' => 'Importazione Utenti in Blocco',
+    'download_user_template' => 'Scarica Template Utenti',
     'all_companies' => 'Tutte le Aziende',
     'add_company' => 'Aggiungi Azienda',
     'role_management' => 'Gestione Ruoli',

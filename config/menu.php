@@ -24,6 +24,16 @@ return [
                     'permission' => 'create users'
                 ],
                 [
+                    'title' => 'navigation.download_user_template',
+                    'route' => 'users.template.download',
+                    'permission' => 'create users'
+                ],
+                [
+                    'title' => 'navigation.bulk_user_upload',
+                    'route' => 'users.bulk-upload.form',
+                    'permission' => 'create users'
+                ],
+                [
                     'title' => 'navigation.pending_approvals',
                     'route' => 'users.pending.approvals',
                     'permission' => 'approve users'

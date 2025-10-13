@@ -32,6 +32,8 @@ return [
     'user_management' => 'User Management',
     'all_users' => 'All Users',
     'add_user' => 'Add User',
+    'bulk_user_upload' => 'Bulk User Upload',
+    'download_user_template' => 'Download User Template',
     'all_companies' => 'All Companies',
     'add_company' => 'Add Company',
     'role_management' => 'Role Management',

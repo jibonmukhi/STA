@@ -11,6 +11,11 @@ use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\AuditLogService;
+use App\Http\Requests\BulkUserUploadRequest;
+use App\Services\UserImportService;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UserController extends Controller
 {
@@ -104,6 +109,83 @@ class UserController extends Controller
         $companies = Company::active()->orderBy('name')->get();
         
         return view('users.index', compact('users', 'companies'));
+    }
+
+    /**
+     * Download the blank bulk user template.
+     */
+    public function downloadTemplate(): StreamedResponse
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        foreach (UserImportService::TEMPLATE_HEADERS as $index => $header) {
+            $column = $index + 1;
+            $label = strtoupper(str_replace('_', ' ', $header));
+
+            $sheet->setCellValueByColumnAndRow($column, 1, $label);
+            $sheet->getColumnDimensionByColumn($column)->setAutoSize(true);
+        }
+
+        $sampleRow = UserImportService::sampleRow();
+        foreach ($sampleRow as $index => $value) {
+            $sheet->setCellValueByColumnAndRow($index + 1, 2, $value);
+        }
+
+        $sheet->getStyle('1:1')->getFont()->setBold(true);
+        $sheet->freezePane('A2');
+
+        $fileName = 'user_import_template_' . now()->format('Ymd_His') . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+
+        return response()->streamDownload(
+            static function () use ($writer) {
+                $writer->save('php://output');
+            },
+            $fileName,
+            [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        );
+    }
+
+    /**
+     * Display the bulk upload form.
+     */
+    public function showBulkUploadForm()
+    {
+        return view('users.bulk-upload', [
+            'templateHeaders' => UserImportService::TEMPLATE_HEADERS,
+        ]);
+    }
+
+    /**
+     * Handle bulk user import.
+     */
+    public function bulkUpload(BulkUserUploadRequest $request, UserImportService $importService)
+    {
+        $result = $importService->import($request->file('file'), $request->user());
+
+        $redirect = redirect()
+            ->route('users.bulk-upload.form')
+            ->with('importSummary', $result);
+
+        if ($result['success_count'] > 0) {
+            $redirect->with(
+                'success',
+                trans_choice('users.bulk_upload_success_count', $result['success_count'], ['count' => $result['success_count']])
+            );
+        }
+
+        $errorCount = count($result['errors']);
+        if ($errorCount > 0) {
+            $redirect->with(
+                'warning',
+                trans_choice('users.bulk_upload_error_count', $errorCount, ['count' => $errorCount])
+            );
+        }
+
+        return $redirect;
     }
 
     /**
