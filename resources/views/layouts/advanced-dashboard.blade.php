@@ -1006,20 +1006,7 @@
                     </button>
                     
                     <!-- Notification -->
-                    <div class="dropdown me-3">
-                        <button class="btn btn-link p-2" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-bell"></i>
-                            <span class="badge bg-danger badge-sm position-absolute">3</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header"><i class="fas fa-bell me-2"></i>Notifications</h6></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus"></i>New user registered</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user-shield"></i>Role updated</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-database"></i>System backup completed</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center" href="#"><i class="fas fa-eye me-2"></i>View all notifications</a></li>
-                        </ul>
-                    </div>
+                    <x-notification-dropdown />
                     
                     <!-- User Dropdown -->
                     <div class="dropdown">

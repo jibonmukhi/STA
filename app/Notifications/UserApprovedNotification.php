@@ -43,11 +43,11 @@ class UserApprovedNotification extends Notification implements ShouldQueue
         $userCount = $this->users->count();
 
         $message = (new MailMessage)
-            ->subject('User Approval Confirmation')
-            ->greeting('Hello ' . $notifiable->name . ',')
+            ->subject(__('notifications.mail.user_approved_subject'))
+            ->greeting(__('notifications.mail.greeting', ['name' => $notifiable->name]))
             ->line($userCount === 1
-                ? "Good news! The user you submitted has been approved by {$this->approvedBy->name}."
-                : "Good news! {$userCount} users you submitted have been approved by {$this->approvedBy->name}.");
+                ? __('notifications.mail.user_approved_single', ['approver' => $this->approvedBy->name])
+                : __('notifications.mail.user_approved_multiple', ['count' => $userCount, 'approver' => $this->approvedBy->name]));
 
         // Add user details
         foreach ($this->users->take(10) as $user) {
@@ -55,14 +55,14 @@ class UserApprovedNotification extends Notification implements ShouldQueue
         }
 
         if ($userCount > 10) {
-            $message->line("... and " . ($userCount - 10) . " more user(s)");
+            $message->line(__('notifications.mail.and_more', ['count' => ($userCount - 10)]));
         }
 
         $message->line($userCount === 1
-                ? 'The user account is now active and can log in to the system.'
-                : 'All user accounts are now active and can log in to the system.')
-                ->action('View Company Users', route('company-users.index'))
-                ->line('Thank you for using the STA system!');
+                ? __('notifications.mail.account_active_single')
+                : __('notifications.mail.account_active_multiple'))
+                ->action(__('notifications.mail.view_company_users'), route('company-users.index'))
+                ->line(__('notifications.mail.thank_you_general'));
 
         return $message;
     }
@@ -78,10 +78,12 @@ class UserApprovedNotification extends Notification implements ShouldQueue
 
         return [
             'type' => 'user_approved',
-            'title' => $userCount === 1 ? 'User Approved' : 'Users Approved',
+            'title' => $userCount === 1
+                ? __('notifications.user_approval.approved_title_single')
+                : __('notifications.user_approval.approved_title_multiple'),
             'message' => $userCount === 1
-                ? "User {$this->users->first()->full_name} has been approved"
-                : "{$userCount} users have been approved",
+                ? __('notifications.user_approval.approved_message_single', ['name' => $this->users->first()->full_name])
+                : __('notifications.user_approval.approved_message_multiple', ['count' => $userCount]),
             'user_count' => $userCount,
             'user_ids' => $this->users->pluck('id')->toArray(),
             'approved_by' => $this->approvedBy->id,

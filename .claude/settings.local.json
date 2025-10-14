@@ -17,7 +17,12 @@
       "Bash(else mkdir -p resources/views/emails)",
       "Bash(fi)",
       "Bash(dir:*)",
-      "Bash(del .\\NUL)"
+      "Bash(del .\\NUL)",
+      "Bash(if [ -f \"resources/views/components/notification-dropdown.blade.php\" ])",
+      "Bash(then echo \"notification-dropdown component exists\")",
+      "Bash(else echo \"File not found\")",
+      "Bash(if [ -f \"resources/views/notifications/index.blade.php\" ])",
+      "Bash(then echo \"notifications index view exists\")"
     ],
     "deny": [],
     "ask": []

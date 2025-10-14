@@ -41,14 +41,14 @@ class UserApprovalRequestNotification extends Notification implements ShouldQueu
     public function toMail(object $notifiable): MailMessage
     {
         $userCount = $this->users->count();
-        $companyName = $this->requestedBy->primary_company->name ?? 'a company';
+        $companyName = $this->requestedBy->primary_company->name ?? __('notifications.user_approval.unknown_company');
 
         $message = (new MailMessage)
-            ->subject('New User Approval Request')
-            ->greeting('Hello ' . $notifiable->name . ',')
+            ->subject(__('notifications.mail.approval_request_subject'))
+            ->greeting(__('notifications.mail.greeting', ['name' => $notifiable->name]))
             ->line($userCount === 1
-                ? "A new user has been submitted for approval by {$companyName}."
-                : "{$userCount} new users have been submitted for approval by {$companyName}.");
+                ? __('notifications.mail.approval_request_single', ['company' => $companyName])
+                : __('notifications.mail.approval_request_multiple', ['count' => $userCount, 'company' => $companyName]));
 
         // Add user details
         foreach ($this->users->take(5) as $user) {
@@ -56,12 +56,12 @@ class UserApprovalRequestNotification extends Notification implements ShouldQueu
         }
 
         if ($userCount > 5) {
-            $message->line("... and " . ($userCount - 5) . " more user(s)");
+            $message->line(__('notifications.mail.and_more', ['count' => ($userCount - 5)]));
         }
 
-        $message->line('Please review and approve or reject the user registration(s).')
-                ->action('Review Pending Approvals', route('users.pending.approvals'))
-                ->line('Thank you for managing the STA system!');
+        $message->line(__('notifications.user_approval.please_review'))
+                ->action(__('notifications.user_approval.review_pending'), route('users.pending.approvals'))
+                ->line(__('notifications.mail.thank_you'));
 
         return $message;
     }
@@ -74,14 +74,16 @@ class UserApprovalRequestNotification extends Notification implements ShouldQueu
     public function toArray(object $notifiable): array
     {
         $userCount = $this->users->count();
-        $companyName = $this->requestedBy->primary_company->name ?? 'Unknown Company';
+        $companyName = $this->requestedBy->primary_company->name ?? __('notifications.user_approval.unknown_company');
 
         return [
             'type' => 'user_approval_request',
-            'title' => $userCount === 1 ? 'New User Approval Request' : 'New Bulk User Approval Request',
+            'title' => $userCount === 1
+                ? __('notifications.user_approval.new_request')
+                : __('notifications.user_approval.bulk_request'),
             'message' => $userCount === 1
-                ? "New user {$this->users->first()->full_name} submitted for approval by {$companyName}"
-                : "{$userCount} users submitted for approval by {$companyName}",
+                ? __('notifications.user_approval.single_user_message', ['name' => $this->users->first()->full_name, 'company' => $companyName])
+                : __('notifications.user_approval.multiple_users_message', ['count' => $userCount, 'company' => $companyName]),
             'user_count' => $userCount,
             'user_ids' => $this->users->pluck('id')->toArray(),
             'requested_by' => $this->requestedBy->id,

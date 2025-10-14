@@ -12,6 +12,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -68,6 +69,16 @@ Route::middleware('auth')->group(function () {
 
     // Public settings API
     Route::get('/api/settings/public', [SettingsController::class, 'getPublicSettings'])->name('settings.public');
+
+    // Notification Routes (available to all authenticated users)
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/recent', [NotificationController::class, 'getRecent'])->name('recent');
+        Route::get('/count', [NotificationController::class, 'getUnreadCount'])->name('count');
+        Route::post('/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+    });
 
     // Certificate Management Routes (accessible to all authenticated users with role-based filtering)
     Route::resource('certificates', CertificateController::class);
