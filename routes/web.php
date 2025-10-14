@@ -100,6 +100,14 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
     // Role Management Routes
     Route::resource('roles', RoleController::class);
 
+    // Company Invitation Routes (Must be BEFORE resource route to avoid conflicts)
+    Route::get('/companies/invitations', [CompanyController::class, 'invitationsList'])->name('companies.invitations.index');
+    Route::get('/companies/invitations/{id}/details', [CompanyController::class, 'showInvitationDetails'])->name('companies.invitations.details');
+    Route::get('/companies/invite/form', [CompanyController::class, 'showInviteForm'])->name('companies.invite.form');
+    Route::post('/companies/invite/send', [CompanyController::class, 'sendInvite'])->name('companies.invite.send');
+    Route::post('/companies/invitations/{id}/resend', [CompanyController::class, 'resendInvitation'])->name('companies.invitations.resend');
+    Route::delete('/companies/invitations/{id}', [CompanyController::class, 'destroyInvitation'])->name('companies.invitations.destroy');
+
     // Company Management Routes
     Route::resource('companies', CompanyController::class);
 
@@ -161,5 +169,9 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
 
 // Public certificate verification (no auth required)
 Route::get('/verify/{verificationCode}', [CertificateController::class, 'verify'])->name('certificates.verify');
+
+// Company Invitation Acceptance Routes (Public - no auth required)
+Route::get('/invitation/accept/{token}', [CompanyController::class, 'showAcceptInvitation'])->name('invitation.accept');
+Route::post('/invitation/accept/{token}', [CompanyController::class, 'acceptInvitation'])->name('invitation.accept.process');
 
 require __DIR__.'/auth.php';

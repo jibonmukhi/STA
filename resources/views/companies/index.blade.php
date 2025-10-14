@@ -252,9 +252,17 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             
             @can('create companies')
-            <a href="{{ route('companies.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>{{ __('companies.add_new_company') }}
-            </a>
+            <div class="btn-group">
+                <a href="{{ route('companies.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>{{ __('companies.add_new_company') }}
+                </a>
+                <a href="{{ route('companies.invite.form') }}" class="btn btn-success">
+                    <i class="fas fa-envelope me-2"></i>Invite Company Manager
+                </a>
+                <a href="{{ route('companies.invitations.index') }}" class="btn btn-info">
+                    <i class="fas fa-list me-2"></i>View Invitations
+                </a>
+            </div>
             @endcan
         </div>
     </div>

@@ -36,6 +36,8 @@ return [
     'download_user_template' => 'Scarica Template Utenti',
     'all_companies' => 'Tutte le Aziende',
     'add_company' => 'Aggiungi Azienda',
+    'invite_company_manager' => 'Invita Manager Azienda',
+    'company_invitations' => 'Inviti Aziendali',
     'role_management' => 'Gestione Ruoli',
     'my_reports' => 'I Miei Report',
     'company_reports' => 'Report Azienda',

@@ -36,6 +36,8 @@ return [
     'download_user_template' => 'Download User Template',
     'all_companies' => 'All Companies',
     'add_company' => 'Add Company',
+    'invite_company_manager' => 'Invite Company Manager',
+    'company_invitations' => 'Company Invitations',
     'role_management' => 'Role Management',
     'my_reports' => 'My Reports',
     'company_reports' => 'Company Reports',

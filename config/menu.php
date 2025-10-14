@@ -54,6 +54,16 @@ return [
                     'title' => 'navigation.add_company',
                     'route' => 'companies.create',
                     'permission' => 'create companies'
+                ],
+                [
+                    'title' => 'navigation.invite_company_manager',
+                    'route' => 'companies.invite.form',
+                    'permission' => 'create companies'
+                ],
+                [
+                    'title' => 'navigation.company_invitations',
+                    'route' => 'companies.invitations.index',
+                    'permission' => 'view companies'
                 ]
             ]
         ],

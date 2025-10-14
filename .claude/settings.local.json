@@ -11,7 +11,11 @@
       "Bash(where git)",
       "Bash(git config:*)",
       "Bash(composer:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(if [ -d \"resources/views/emails\" ])",
+      "Bash(then echo \"Directory exists\")",
+      "Bash(else mkdir -p resources/views/emails)",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []
