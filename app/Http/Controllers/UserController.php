@@ -578,7 +578,24 @@ class UserController extends Controller
             $query->where('email', 'like', '%' . $request->get('search_email') . '%');
         }
 
-        $users = $query->paginate(15);
+        if ($request->filled('company')) {
+            $query->whereHas('companies', function($q) use ($request) {
+                $q->where('companies.id', $request->get('company'));
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->get('status'));
+        }
+
+        // Handle per page validation
+        $perPage = $request->get('per_page', 10);
+        if (!in_array($perPage, [5, 10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $users = $query->paginate($perPage)
+                      ->withQueryString();
 
         return view('company-users.index', compact('users', 'userCompanies'));
     }
@@ -609,7 +626,7 @@ class UserController extends Controller
                 'phone' => $request->phone,
                 'date_of_birth' => $request->date_of_birth,
                 'place_of_birth' => $request->place_of_birth,
-                'country' => $request->country,
+                'country' => $request->country ?? 'IT', // Default to Italy
                 'gender' => $request->gender,
                 'cf' => $request->cf,
                 'address' => $request->address,
@@ -662,11 +679,11 @@ class UserController extends Controller
             );
 
             return redirect()->route('company-users.index')
-                ->with('success', 'User created successfully. User is in pending status. Select users and send for approval when ready. Default password is: password123');
+                ->with('success', __('users.company_user_created_success'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Failed to create user: ' . $e->getMessage())
+                ->with('error', __('users.company_user_create_failed', ['message' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -689,7 +706,7 @@ class UserController extends Controller
 
             if ($users->isEmpty()) {
                 return redirect()->back()
-                    ->with('warning', 'No users found with pending status.');
+                    ->with('warning', __('users.no_pending_users'));
             }
 
             // Verify these users belong to company manager's companies
@@ -700,13 +717,36 @@ class UserController extends Controller
 
                 if (!$hasCommonCompany) {
                     return redirect()->back()
-                        ->with('error', 'You can only send users from your companies for approval.');
+                        ->with('error', __('users.unauthorized_company_users'));
                 }
             }
 
             // Send notification to all STA Managers
             $staManagers = User::role('sta_manager')->get();
+
+            if ($staManagers->isEmpty()) {
+                \Log::warning('No STA Managers found to send approval notifications');
+                return redirect()->back()
+                    ->with('warning', 'No STA Managers available to process approval requests. Please contact support.');
+            }
+
+            // Send both email and database notifications
+            \Log::info('Sending approval notifications to STA Managers', [
+                'sta_manager_count' => $staManagers->count(),
+                'sta_managers' => $staManagers->pluck('email')->toArray(),
+                'user_count' => $users->count(),
+                'users' => $users->pluck('email')->toArray(),
+                'requested_by' => auth()->user()->email
+            ]);
+
+            // Change status from 'parked' to 'pending_approval'
+            foreach ($users as $user) {
+                $user->update(['status' => 'pending_approval']);
+            }
+
             Notification::send($staManagers, new UserApprovalRequestNotification($users, auth()->user()));
+
+            \Log::info('Approval notifications sent successfully');
 
             // Log the approval request
             AuditLogService::logCustom(
@@ -721,15 +761,183 @@ class UserController extends Controller
                 ]
             );
 
-            $message = count($users) === 1
-                ? "1 user has been sent for approval. STA Managers have been notified."
-                : count($users) . " users have been sent for approval. STA Managers have been notified.";
+            $message = trans_choice('users.users_sent_for_approval', count($users), ['count' => count($users)]);
 
             return redirect()->back()->with('success', $message);
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Failed to send users for approval: ' . $e->getMessage());
+                ->with('error', __('users.send_for_approval_failed', ['message' => $e->getMessage()]));
+        }
+    }
+
+    /**
+     * Display the specified company user (for company managers)
+     */
+    public function showCompanyUser(User $user)
+    {
+        // Verify the user belongs to one of the company manager's companies
+        $managerCompanyIds = auth()->user()->companies->pluck('id');
+        $userCompanyIds = $user->companies->pluck('id');
+
+        if ($managerCompanyIds->intersect($userCompanyIds)->isEmpty()) {
+            abort(403, 'Unauthorized access to this user.');
+        }
+
+        $user->load(['roles', 'companies']);
+        return view('users.show', compact('user'));
+    }
+
+    /**
+     * Show the form for editing company user (for company managers)
+     */
+    public function editCompanyUser(User $user)
+    {
+        // Verify the user belongs to one of the company manager's companies
+        $managerCompanyIds = auth()->user()->companies->pluck('id');
+        $userCompanyIds = $user->companies->pluck('id');
+
+        if ($managerCompanyIds->intersect($userCompanyIds)->isEmpty()) {
+            abort(403, 'Unauthorized access to this user.');
+        }
+
+        $user->load(['roles', 'companies']);
+        $companies = auth()->user()->companies; // Only show manager's companies
+        $roles = Role::whereNotIn('name', ['sta_manager', 'teacher'])->get();
+
+        // Prepare existing companies data for JavaScript
+        $existingCompanies = $user->companies->map(function($company) {
+            return [
+                'id' => $company->id,
+                'name' => $company->name,
+                'email' => $company->email,
+                'percentage' => $company->pivot->percentage,
+                'is_primary' => $company->pivot->is_primary
+            ];
+        })->values();
+
+        return view('users.edit', compact('user', 'roles', 'companies', 'existingCompanies'));
+    }
+
+    /**
+     * Update company user (for company managers)
+     */
+    public function updateCompanyUser(UpdateUserRequest $request, User $user)
+    {
+        // Verify the user belongs to one of the company manager's companies
+        $managerCompanyIds = auth()->user()->companies->pluck('id');
+        $userCompanyIds = $user->companies->pluck('id');
+
+        if ($managerCompanyIds->intersect($userCompanyIds)->isEmpty()) {
+            abort(403, 'Unauthorized access to this user.');
+        }
+
+        try {
+            $validated = $request->validated();
+
+            $userData = [
+                'name' => $validated['name'],
+                'surname' => $validated['surname'] ?? null,
+                'date_of_birth' => $validated['date_of_birth'] ?? null,
+                'place_of_birth' => $validated['place_of_birth'] ?? null,
+                'country' => $validated['country'] ?? 'IT',
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'mobile' => $validated['mobile'] ?? null,
+                'gender' => $validated['gender'] ?? null,
+                'cf' => $validated['cf'] ?? null,
+                'address' => $validated['address'] ?? null,
+            ];
+
+            $user->update($userData);
+
+            if (isset($validated['password']) && !empty($validated['password'])) {
+                $user->update(['password' => Hash::make($validated['password'])]);
+            }
+
+            // Update roles (company managers can't assign sta_manager or teacher roles)
+            if (isset($validated['roles'])) {
+                $allowedRoles = Role::whereNotIn('name', ['sta_manager', 'teacher'])->pluck('name')->toArray();
+                $rolesToAssign = array_intersect($validated['roles'], $allowedRoles);
+                $user->syncRoles($rolesToAssign);
+            }
+
+            // Update companies (only within manager's companies)
+            if (isset($validated['companies'])) {
+                $companyData = [];
+                $percentages = $validated['company_percentages'] ?? [];
+
+                // Filter to only include companies the manager has access to
+                $allowedCompanyIds = $managerCompanyIds->toArray();
+                $validCompanies = array_intersect($validated['companies'], $allowedCompanyIds);
+
+                foreach ($validCompanies as $companyId) {
+                    $percentage = isset($percentages[$companyId]) ? (float) $percentages[$companyId] : 0;
+                    $companyData[$companyId] = [
+                        'is_primary' => isset($validated['primary_company']) && $validated['primary_company'] == $companyId,
+                        'percentage' => $percentage,
+                        'joined_at' => $user->companies->where('id', $companyId)->first()->pivot->joined_at ?? now(),
+                    ];
+                }
+                $user->companies()->sync($companyData);
+            }
+
+            return redirect()->route('company-users.index')
+                ->with('success', __('users.user_updated'));
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => __('users.update_failed') . ': ' . $e->getMessage()])
+                ->withInput();
+        }
+    }
+
+    /**
+     * Cancel approval request - revert status from pending_approval to parked (for company managers)
+     */
+    public function cancelApprovalRequest(User $user)
+    {
+        try {
+            // Verify the user belongs to one of the company manager's companies
+            $managerCompanyIds = auth()->user()->companies->pluck('id');
+            $userCompanyIds = $user->companies->pluck('id');
+
+            if ($managerCompanyIds->intersect($userCompanyIds)->isEmpty()) {
+                abort(403, 'Unauthorized access to this user.');
+            }
+
+            // Only allow cancellation of pending_approval users
+            if ($user->status !== 'pending_approval') {
+                return redirect()->back()
+                    ->with('error', __('users.can_only_cancel_pending'));
+            }
+
+            $userName = $user->full_name;
+
+            // Revert status back to parked
+            $user->update(['status' => 'parked']);
+
+            // Log the cancellation
+            AuditLogService::logCustom(
+                'approval_request_cancelled',
+                "Approval request cancelled for user {$userName} by " . auth()->user()->name,
+                'users',
+                'info',
+                [
+                    'user_id' => $user->id,
+                    'user_email' => $user->email,
+                    'user_name' => $userName,
+                    'cancelled_by' => auth()->id(),
+                    'reverted_to_status' => 'parked'
+                ]
+            );
+
+            return redirect()->route('company-users.index')
+                ->with('success', __('users.approval_request_cancelled', ['name' => $userName]));
+
+        } catch (\Exception $e) {
+            return redirect()->route('company-users.index')
+                ->with('error', __('users.cancel_failed', ['message' => $e->getMessage()]));
         }
     }
 }

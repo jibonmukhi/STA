@@ -1,9 +1,53 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'Company Users')
+@section('page-title', __('users.company_users_management'))
 
 @section('content')
+<style>
+    /* Fix dropdown menu display issues */
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 200px; /* Space for dropdowns */
+        margin-bottom: -200px; /* Collapse the extra space */
+    }
+
+    /* Dropdown menu styling */
+    .table-wrapper .dropdown-menu {
+        min-width: 180px;
+        max-width: 200px;
+        white-space: nowrap;
+        z-index: 1060 !important;
+    }
+
+    .table-wrapper .dropdown-menu .dropdown-item {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        white-space: nowrap;
+    }
+
+    /* Prevent scrollbars from appearing */
+    .card-body {
+        overflow: visible !important;
+    }
+
+    .card {
+        overflow: visible !important;
+    }
+
+    /* Make table responsive on mobile */
+    @media (max-width: 768px) {
+        .table-wrapper {
+            overflow-x: auto;
+        }
+    }
+</style>
+
 <div class="container-fluid">
+    @include('components.flash-messages')
+
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -11,15 +55,15 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="card-title mb-1">Company Users Management</h3>
-                            <p class="card-text opacity-75 mb-0">Manage users across all your companies</p>
+                            <h3 class="card-title mb-1">{{ __('users.company_users_management') }}</h3>
+                            <p class="card-text opacity-75 mb-0">{{ __('users.company_users_subtitle') }}</p>
                         </div>
                         <div class="d-flex gap-2">
                             <a href="{{ route('company-users.create') }}" class="btn btn-light">
-                                <i class="fas fa-user-plus me-1"></i> Add User
+                                <i class="fas fa-user-plus me-1"></i> {{ __('users.add_user') }}
                             </a>
                             <a href="{{ route('my-companies.index') }}" class="btn btn-outline-light">
-                                <i class="fas fa-building me-1"></i> My Companies
+                                <i class="fas fa-building me-1"></i> {{ __('users.my_companies') }}
                             </a>
                         </div>
                     </div>
@@ -36,19 +80,19 @@
                     <form method="GET" action="{{ route('company-users.index') }}">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-3">
-                                <label for="search_name" class="form-label">Name</label>
+                                <label for="search_name" class="form-label">{{ __('users.name') }}</label>
                                 <input type="text" class="form-control" id="search_name" name="search_name"
-                                       value="{{ request('search_name') }}" placeholder="Search by name...">
+                                       value="{{ request('search_name') }}" placeholder="{{ __('users.search_by_name') }}">
                             </div>
                             <div class="col-md-3">
-                                <label for="search_email" class="form-label">Email</label>
+                                <label for="search_email" class="form-label">{{ __('users.email') }}</label>
                                 <input type="email" class="form-control" id="search_email" name="search_email"
-                                       value="{{ request('search_email') }}" placeholder="Search by email...">
+                                       value="{{ request('search_email') }}" placeholder="{{ __('users.search_by_email') }}">
                             </div>
                             <div class="col-md-2">
-                                <label for="company" class="form-label">Company</label>
+                                <label for="company" class="form-label">{{ __('users.company') }}</label>
                                 <select class="form-select" id="company" name="company">
-                                    <option value="">All Companies</option>
+                                    <option value="">{{ __('users.all_companies') }}</option>
                                     @foreach($userCompanies as $company)
                                         <option value="{{ $company->id }}"
                                                 {{ request('company') == $company->id ? 'selected' : '' }}>
@@ -58,9 +102,9 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label for="status" class="form-label">Status</label>
+                                <label for="status" class="form-label">{{ __('users.status') }}</label>
                                 <select class="form-select" id="status" name="status">
-                                    <option value="">All Status</option>
+                                    <option value="">{{ __('users.all_status') }}</option>
                                     @foreach(dataVaultItems('user_status') as $item)
                                         <option value="{{ $item['code'] }}" {{ request('status') == $item['code'] ? 'selected' : '' }}>
                                             {{ $item['label'] }}
@@ -71,7 +115,7 @@
                             <div class="col-md-2">
                                 <div class="d-flex gap-1">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-search"></i> Search
+                                        <i class="fas fa-search"></i> {{ __('common.search') }}
                                     </button>
                                     <a href="{{ route('company-users.index') }}" class="btn btn-outline-secondary">
                                         <i class="fas fa-times"></i>
@@ -97,7 +141,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Total Users</h6>
+                            <h6 class="mb-0">{{ __('users.total_users') }}</h6>
                             <h4 class="mb-0 text-primary">{{ $users->total() }}</h4>
                         </div>
                     </div>
@@ -115,7 +159,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Active Users</h6>
+                            <h6 class="mb-0">{{ __('users.active_users') }}</h6>
                             <h4 class="mb-0 text-success">{{ $users->where('status', 'active')->count() }}</h4>
                         </div>
                     </div>
@@ -133,7 +177,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Pending</h6>
+                            <h6 class="mb-0">{{ __('users.pending') }}</h6>
                             <h4 class="mb-0 text-warning">{{ $users->where('status', 'parked')->count() }}</h4>
                         </div>
                     </div>
@@ -151,7 +195,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Companies</h6>
+                            <h6 class="mb-0">{{ __('users.companies') }}</h6>
                             <h4 class="mb-0 text-info">{{ $userCompanies->count() }}</h4>
                         </div>
                     </div>
@@ -166,25 +210,25 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">
-                        Users List
+                        {{ __('users.users_list') }}
                         @if(request()->filled('company'))
                             <span class="badge bg-info ms-2">
                                 {{ $userCompanies->find(request('company'))->name ?? 'Unknown Company' }}
                             </span>
                         @endif
                         <span class="badge bg-warning ms-2" id="selectedCount" style="display: none;">
-                            <span id="selectedCountText">0</span> selected
+                            <span id="selectedCountText">0</span> {{ __('users.selected') }}
                         </span>
                     </h5>
                     <div class="d-flex gap-2">
                         @if($users->where('status', 'parked')->count() > 0)
                             <button type="button" class="btn btn-success" id="sendForApprovalBtn" onclick="sendForApproval()" disabled>
-                                <i class="fas fa-paper-plane me-1"></i> Send for Approval
+                                <i class="fas fa-paper-plane me-1"></i> {{ __('users.send_for_approval') }}
                             </button>
                         @endif
                         <div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-download me-1"></i> Export
+                                <i class="fas fa-download me-1"></i> {{ __('users.export') }}
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="#" onclick="exportUsers('pdf')">
@@ -202,7 +246,7 @@
                 </div>
                 <div class="card-body">
                     @if($users->count() > 0)
-                        <div class="table-responsive">
+                        <div class="table-wrapper">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -211,14 +255,14 @@
                                                 <input class="form-check-input" type="checkbox" id="selectAll">
                                             </div>
                                         </th>
-                                        <th>User</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
-                                        <th>Companies</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th>Joined</th>
-                                        <th>Actions</th>
+                                        <th>{{ __('users.user') }}</th>
+                                        <th>{{ __('users.email') }}</th>
+                                        <th>{{ __('users.phone') }}</th>
+                                        <th>{{ __('users.companies') }}</th>
+                                        <th>{{ __('users.role') }}</th>
+                                        <th>{{ __('users.status') }}</th>
+                                        <th>{{ __('users.joined') }}</th>
+                                        <th width="80" class="text-center">{{ __('users.actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -255,7 +299,7 @@
                                                     {{ $user->phone }}
                                                 </a>
                                             @else
-                                                <span class="text-muted">N/A</span>
+                                                <span class="text-muted">{{ __('users.na') }}</span>
                                             @endif
                                         </td>
                                         <td>
@@ -274,36 +318,36 @@
                                             @if($user->roles->isNotEmpty())
                                                 <span class="badge bg-info">{{ $user->formatted_role }}</span>
                                             @else
-                                                <span class="text-muted">No Role</span>
+                                                <span class="text-muted">{{ __('users.no_role') }}</span>
                                             @endif
                                         </td>
                                         <td>
-                                            <span class="badge bg-{{ $user->status === 'active' ? 'success' : ($user->status === 'parked' ? 'warning' : 'secondary') }}">
-                                                {{ ucfirst($user->status) }}
+                                            <span class="badge bg-{{ $user->status === 'active' ? 'success' : ($user->status === 'parked' ? 'warning' : ($user->status === 'pending_approval' ? 'info' : 'secondary')) }}">
+                                                {{ __('users.' . $user->status) }}
                                             </span>
                                         </td>
                                         <td>{{ $user->created_at->format('M d, Y') }}</td>
-                                        <td>
+                                        <td class="text-center">
                                             <div class="dropdown">
-                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                    Actions
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
                                                 </button>
-                                                <ul class="dropdown-menu">
+                                                <ul class="dropdown-menu dropdown-menu-end">
                                                     <li><a class="dropdown-item" href="#" onclick="viewUser({{ $user->id }})">
-                                                        <i class="fas fa-eye me-2"></i>View Details
+                                                        <i class="fas fa-eye me-2"></i>{{ __('users.view_details') }}
                                                     </a></li>
                                                     <li><a class="dropdown-item" href="#" onclick="editUser({{ $user->id }})">
-                                                        <i class="fas fa-edit me-2"></i>Edit User
+                                                        <i class="fas fa-edit me-2"></i>{{ __('common.edit') }}
                                                     </a></li>
-                                                    @if($user->status === 'parked')
+                                                    @if($user->status === 'pending_approval')
                                                         <li><hr class="dropdown-divider"></li>
-                                                        <li><a class="dropdown-item text-success" href="#" onclick="approveUser({{ $user->id }})">
-                                                            <i class="fas fa-check me-2"></i>Approve User
+                                                        <li><a class="dropdown-item text-danger" href="#" onclick="cancelRequest({{ $user->id }}, '{{ addslashes($user->full_name) }}')">
+                                                            <i class="fas fa-times-circle me-2"></i>{{ __('users.cancel_request') }}
                                                         </a></li>
                                                     @endif
                                                     <li><hr class="dropdown-divider"></li>
                                                     <li><a class="dropdown-item text-info" href="#" onclick="sendMessage({{ $user->id }})">
-                                                        <i class="fas fa-envelope me-2"></i>Send Message
+                                                        <i class="fas fa-envelope me-2"></i>{{ __('users.send_message') }}
                                                     </a></li>
                                                 </ul>
                                             </div>
@@ -314,32 +358,56 @@
                             </table>
                         </div>
 
-                        <!-- Pagination -->
+                        <!-- Pagination and Per Page -->
                         <div class="d-flex justify-content-between align-items-center mt-4">
-                            <div class="text-muted">
-                                Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} results
+                            <div class="d-flex align-items-center gap-2">
+                                <form method="GET" action="{{ route('company-users.index') }}" class="d-flex align-items-center">
+                                    @if(request('search_name'))
+                                        <input type="hidden" name="search_name" value="{{ request('search_name') }}">
+                                    @endif
+                                    @if(request('search_email'))
+                                        <input type="hidden" name="search_email" value="{{ request('search_email') }}">
+                                    @endif
+                                    @if(request('company'))
+                                        <input type="hidden" name="company" value="{{ request('company') }}">
+                                    @endif
+                                    @if(request('status'))
+                                        <input type="hidden" name="status" value="{{ request('status') }}">
+                                    @endif
+                                    <select name="per_page" class="form-select form-select-sm me-2" onchange="this.form.submit()" style="width: auto;">
+                                        <option value="5" {{ request('per_page') == 5 ? 'selected' : '' }}>5</option>
+                                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                                    </select>
+                                    <span class="text-muted small">{{ __('users.entries_per_page') }}</span>
+                                </form>
+                                <div class="text-muted ms-3">
+                                    {{ __('users.showing') }} {{ $users->firstItem() }} {{ __('users.to') }} {{ $users->lastItem() }} {{ __('users.of') }} {{ $users->total() }} {{ __('users.results') }}
+                                </div>
                             </div>
                             {{ $users->links() }}
                         </div>
                     @else
                         <div class="text-center py-5">
                             <i class="fas fa-users text-muted" style="font-size: 4rem;"></i>
-                            <h5 class="mt-3 text-muted">No Users Found</h5>
+                            <h5 class="mt-3 text-muted">{{ __('users.no_users_found_title') }}</h5>
                             <p class="text-muted mb-4">
                                 @if(request()->hasAny(['search_name', 'search_email', 'company', 'status']))
-                                    No users match your current search criteria.
+                                    {{ __('users.no_users_match_criteria') }}
                                 @else
-                                    No users are assigned to your companies yet.
+                                    {{ __('users.no_users_in_companies') }}
                                 @endif
                             </p>
                             <div class="d-flex justify-content-center gap-2">
                                 @if(request()->hasAny(['search_name', 'search_email', 'company', 'status']))
                                     <a href="{{ route('company-users.index') }}" class="btn btn-outline-primary">
-                                        <i class="fas fa-times me-1"></i> Clear Filters
+                                        <i class="fas fa-times me-1"></i> {{ __('users.clear_filters') }}
                                     </a>
                                 @endif
                                 <a href="{{ route('company-users.create') }}" class="btn btn-primary">
-                                    <i class="fas fa-user-plus me-1"></i> Add First User
+                                    <i class="fas fa-user-plus me-1"></i> {{ __('users.add_first_user') }}
                                 </a>
                             </div>
                         </div>
@@ -397,11 +465,12 @@
         const selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
 
         if (selectedUsers.length === 0) {
-            alert('Please select at least one user to send for approval.');
+            alert('{{ __('users.select_at_least_one_company') }}');
             return;
         }
 
-        if (confirm(`Are you sure you want to send ${selectedUsers.length} user(s) for approval?\n\nSTA Managers will be notified via email.`)) {
+        const confirmMsg = '{{ __('users.send_for_approval_confirm', ['count' => '__COUNT__']) }}'.replace('__COUNT__', selectedUsers.length);
+        if (confirm(confirmMsg)) {
             // Create and submit form
             const form = document.createElement('form');
             form.method = 'POST';
@@ -429,22 +498,41 @@
     }
 
     function viewUser(userId) {
-        alert(`Viewing details for user ID: ${userId}\nThis would show detailed user information.`);
+        window.location.href = `/company-users/${userId}`;
     }
 
     function editUser(userId) {
-        alert(`Editing user ID: ${userId}\nThis would open an edit form for the user.`);
-    }
-
-    function approveUser(userId) {
-        if (confirm('Are you sure you want to approve this user?')) {
-            alert(`Approving user ID: ${userId}\nThis would activate the user account.`);
-            // In a real implementation, this would make an AJAX call to approve the user
-        }
+        window.location.href = `/company-users/${userId}/edit`;
     }
 
     function sendMessage(userId) {
-        alert(`Sending message to user ID: ${userId}\nThis would open a messaging interface.`);
+        alert('{{ __('users.messaging_feature_coming_soon') }}');
+    }
+
+    function cancelRequest(userId, userName) {
+        if (confirm('{{ __('users.confirm_cancel_request') }}')) {
+            // Create and submit form for DELETE request
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/company-users/${userId}`;
+
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+
+            // Add method spoofing for DELETE
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(methodInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
     }
 
     function exportUsers(format) {

@@ -20,13 +20,13 @@ class STAManagerDashboardController extends Controller
         $stats = [
             'total_users' => User::count(),
             'active_users' => User::active()->count(),
-            'pending_users' => User::parked()->count(),
+            'pending_users' => User::where('status', 'pending_approval')->count(),
             'total_companies' => Company::count(),
             'active_companies' => Company::active()->count(),
         ];
 
         $recentUsers = User::latest()->limit(5)->get();
-        $pendingApprovals = User::parked()->latest()->limit(10)->get();
+        $pendingApprovals = User::where('status', 'pending_approval')->latest()->limit(10)->get();
 
         return view('dashboards.sta-manager', compact('stats', 'recentUsers', 'pendingApprovals'));
     }
@@ -34,7 +34,7 @@ class STAManagerDashboardController extends Controller
     public function pendingApprovals(Request $request): View
     {
         $query = User::with(['roles', 'companies'])
-            ->where('status', 'parked');
+            ->where('status', 'pending_approval');
 
         // Apply search filters
         if ($request->filled('search')) {
@@ -56,11 +56,11 @@ class STAManagerDashboardController extends Controller
         $companies = Company::orderBy('name')->get();
 
         $stats = [
-            'total_pending' => User::where('status', 'parked')->count(),
-            'pending_this_week' => User::where('status', 'parked')
+            'total_pending' => User::where('status', 'pending_approval')->count(),
+            'pending_this_week' => User::where('status', 'pending_approval')
                 ->where('created_at', '>=', now()->startOfWeek())
                 ->count(),
-            'pending_this_month' => User::where('status', 'parked')
+            'pending_this_month' => User::where('status', 'pending_approval')
                 ->where('created_at', '>=', now()->startOfMonth())
                 ->count(),
         ];
@@ -71,7 +71,7 @@ class STAManagerDashboardController extends Controller
     public function approveUser(User $user): RedirectResponse
     {
         try {
-            if ($user->status !== 'parked') {
+            if ($user->status !== 'pending_approval') {
                 return redirect()->back()
                     ->with('error', 'User is not in pending status.');
             }
@@ -88,7 +88,7 @@ class STAManagerDashboardController extends Controller
                     'user_id' => $user->id,
                     'user_email' => $user->email,
                     'approved_by' => Auth::id(),
-                    'old_status' => 'parked',
+                    'old_status' => 'pending_approval',
                     'new_status' => 'active'
                 ]
             );
@@ -116,7 +116,7 @@ class STAManagerDashboardController extends Controller
     public function rejectUser(User $user): RedirectResponse
     {
         try {
-            if ($user->status !== 'parked') {
+            if ($user->status !== 'pending_approval') {
                 return redirect()->back()
                     ->with('error', 'User is not in pending status.');
             }
@@ -151,7 +151,7 @@ class STAManagerDashboardController extends Controller
                     'user_email' => $userEmail,
                     'user_name' => $userName,
                     'rejected_by' => Auth::id(),
-                    'status_before_deletion' => 'parked'
+                    'status_before_deletion' => 'pending_approval'
                 ]
             );
 
@@ -188,7 +188,7 @@ class STAManagerDashboardController extends Controller
         $stats = [
             'total_users' => User::count(),
             'active_users' => User::active()->count(),
-            'parked_users' => User::parked()->count(),
+            'parked_users' => User::where('status', 'parked')->count(),
             'total_companies' => Company::count(),
             'active_companies' => Company::where('active', true)->count(),
         ];
@@ -238,7 +238,7 @@ class STAManagerDashboardController extends Controller
 
             $userIds = $request->input('user_ids');
             $users = User::whereIn('id', $userIds)
-                ->where('status', 'parked')
+                ->where('status', 'pending_approval')
                 ->get();
 
             if ($users->isEmpty()) {
@@ -250,7 +250,7 @@ class STAManagerDashboardController extends Controller
             $skipped = [];
 
             foreach ($users as $user) {
-                if ($user->status !== 'parked') {
+                if ($user->status !== 'pending_approval') {
                     $skipped[] = $user->full_name;
                     continue;
                 }
@@ -318,7 +318,7 @@ class STAManagerDashboardController extends Controller
 
             $userIds = $request->input('user_ids');
             $users = User::whereIn('id', $userIds)
-                ->where('status', 'parked')
+                ->where('status', 'pending_approval')
                 ->get();
 
             if ($users->isEmpty()) {
@@ -341,7 +341,7 @@ class STAManagerDashboardController extends Controller
                 ->get();
 
             foreach ($users as $user) {
-                if ($user->status !== 'parked') {
+                if ($user->status !== 'pending_approval') {
                     continue;
                 }
 

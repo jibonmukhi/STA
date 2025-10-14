@@ -26,7 +26,8 @@ class DataVaultSeeder extends Seeder
         $this->createCategory('user_status', 'User Status', 'Stato Utente', [
             ['code' => 'active', 'label_en' => 'Active', 'label_it' => 'Attivo', 'color' => 'success', 'is_default' => true],
             ['code' => 'inactive', 'label_en' => 'Inactive', 'label_it' => 'Inattivo', 'color' => 'secondary'],
-            ['code' => 'parked', 'label_en' => 'Parked (Pending Approval)', 'label_it' => 'In Attesa (Approvazione Richiesta)', 'color' => 'warning'],
+            ['code' => 'parked', 'label_en' => 'Parked', 'label_it' => 'Parcheggiato', 'color' => 'warning'],
+            ['code' => 'pending_approval', 'label_en' => 'Pending Approval', 'label_it' => 'In Attesa di Approvazione', 'color' => 'info'],
         ]);
 
         // 3. Course Category

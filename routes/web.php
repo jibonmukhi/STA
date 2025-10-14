@@ -162,6 +162,10 @@ Route::middleware(['auth', 'role:company_manager'])->group(function () {
     Route::get('company-users', [UserController::class, 'companyUsers'])->name('company-users.index');
     Route::get('company-users/create', [UserController::class, 'createCompanyUser'])->name('company-users.create');
     Route::post('company-users', [UserController::class, 'storeCompanyUser'])->name('company-users.store');
+    Route::get('company-users/{user}', [UserController::class, 'showCompanyUser'])->name('company-users.show');
+    Route::get('company-users/{user}/edit', [UserController::class, 'editCompanyUser'])->name('company-users.edit');
+    Route::put('company-users/{user}', [UserController::class, 'updateCompanyUser'])->name('company-users.update');
+    Route::delete('company-users/{user}', [UserController::class, 'cancelApprovalRequest'])->name('company-users.cancel');
     Route::post('company-users/send-for-approval', [UserController::class, 'sendForApproval'])->name('company-users.send-for-approval');
 
     // Company profile management

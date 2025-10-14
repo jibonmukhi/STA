@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'Add Company User')
+@section('page-title', __('users.add_company_user'))
 
 @section('content')
 <div class="container-fluid">
@@ -11,12 +11,12 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="card-title mb-1">Add Company User</h3>
-                            <p class="card-text opacity-75 mb-0">Create a new user and assign them to your companies</p>
+                            <h3 class="card-title mb-1">{{ __('users.add_company_user') }}</h3>
+                            <p class="card-text opacity-75 mb-0">{{ __('users.add_company_user_subtitle') }}</p>
                         </div>
                         <div>
                             <a href="{{ route('company-users.index') }}" class="btn btn-outline-light">
-                                <i class="fas fa-arrow-left me-1"></i> Back to Users
+                                <i class="fas fa-arrow-left me-1"></i> {{ __('users.back_to_users') }}
                             </a>
                         </div>
                     </div>
@@ -25,25 +25,12 @@
         </div>
     </div>
 
-    <!-- Flash Messages -->
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>{{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+    @include('components.flash-messages')
 
     @if($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>There were some errors with your submission:</strong>
+            <strong>{{ __('users.please_fix_errors') }}</strong>
             <ul class="mb-0 mt-2">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -62,13 +49,13 @@
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-user me-2"></i>Personal Information
+                            <i class="fas fa-user me-2"></i>{{ __('users.personal_information') }}
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <label for="name" class="form-label">{{ __('users.first_name') }} <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror"
                                        id="name" name="name" value="{{ old('name') }}" required>
                                 @error('name')
@@ -77,7 +64,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="surname" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <label for="surname" class="form-label">{{ __('users.surname') }} <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('surname') is-invalid @enderror"
                                        id="surname" name="surname" value="{{ old('surname') }}" required>
                                 @error('surname')
@@ -86,7 +73,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <label for="email" class="form-label">{{ __('users.email_address') }} <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror"
                                        id="email" name="email" value="{{ old('email') }}" required>
                                 @error('email')
@@ -95,7 +82,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Phone Number</label>
+                                <label for="phone" class="form-label">{{ __('users.phone_number') }}</label>
                                 <input type="tel" class="form-control @error('phone') is-invalid @enderror"
                                        id="phone" name="phone" value="{{ old('phone') }}">
                                 @error('phone')
@@ -104,7 +91,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                <label for="date_of_birth" class="form-label">{{ __('users.date_of_birth') }}</label>
                                 <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror"
                                        id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') }}">
                                 @error('date_of_birth')
@@ -113,12 +100,12 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Gender</label>
+                                <label for="gender" class="form-label">{{ __('users.gender') }}</label>
                                 <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender">
-                                    <option value="">Select Gender</option>
-                                    <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>Male</option>
-                                    <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Female</option>
-                                    <option value="other" {{ old('gender') === 'other' ? 'selected' : '' }}>Other</option>
+                                    <option value="">{{ __('users.select_gender') }}</option>
+                                    <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>{{ __('users.male') }}</option>
+                                    <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>{{ __('users.female') }}</option>
+                                    <option value="other" {{ old('gender') === 'other' ? 'selected' : '' }}>{{ __('users.other') }}</option>
                                 </select>
                                 @error('gender')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -126,7 +113,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="place_of_birth" class="form-label">Place of Birth</label>
+                                <label for="place_of_birth" class="form-label">{{ __('users.place_of_birth') }}</label>
                                 <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror"
                                        id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth') }}">
                                 @error('place_of_birth')
@@ -135,11 +122,11 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="country" class="form-label">Country</label>
+                                <label for="country" class="form-label">{{ __('users.country') }}</label>
                                 <select class="form-select @error('country') is-invalid @enderror" id="country" name="country">
-                                    <option value="">Select Country</option>
+                                    <option value="">{{ __('users.select_company') }}</option>
                                     @foreach(dataVaultItems('country') as $item)
-                                        <option value="{{ $item['code'] }}" {{ old('country') === $item['code'] ? 'selected' : '' }}>
+                                        <option value="{{ $item['code'] }}" {{ old('country', 'IT') === $item['code'] ? 'selected' : '' }}>
                                             {{ $item['label'] }}
                                         </option>
                                     @endforeach
@@ -150,7 +137,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="cf" class="form-label">Codice Fiscale</label>
+                                <label for="cf" class="form-label">{{ __('users.codice_fiscale') }}</label>
                                 <input type="text" class="form-control @error('cf') is-invalid @enderror"
                                        id="cf" name="cf" value="{{ old('cf') }}">
                                 @error('cf')
@@ -159,7 +146,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="address" class="form-label">Address</label>
+                                <label for="address" class="form-label">{{ __('users.address') }}</label>
                                 <textarea class="form-control @error('address') is-invalid @enderror"
                                           id="address" name="address" rows="2">{{ old('address') }}</textarea>
                                 @error('address')
@@ -174,15 +161,15 @@
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-user-shield me-2"></i>Role and Access
+                            <i class="fas fa-user-shield me-2"></i>{{ __('users.roles_permissions') }}
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="role" class="form-label">System Role</label>
+                                <label for="role" class="form-label">{{ __('users.system_role') }}</label>
                                 <select class="form-select @error('role') is-invalid @enderror" id="role" name="role">
-                                    <option value="">Select Role</option>
+                                    <option value="">{{ __('users.select_role') }}</option>
                                     @foreach($roles as $role)
                                         <option value="{{ $role->name }}" {{ old('role') === $role->name ? 'selected' : '' }}>
                                             {{ App\Models\User::formatRoleName($role->name) }}
@@ -192,17 +179,17 @@
                                 @error('role')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                                <div class="form-text">If no role is selected, user will be assigned as End User</div>
+                                <div class="form-text">{{ __('users.role_help_text') }}</div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="role_in_company" class="form-label">Role in Company</label>
+                                <label for="role_in_company" class="form-label">{{ __('users.role_in_company') }}</label>
                                 <input type="text" class="form-control @error('role_in_company') is-invalid @enderror"
                                        id="role_in_company" name="role_in_company" value="{{ old('role_in_company', 'Employee') }}">
                                 @error('role_in_company')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                                <div class="form-text">e.g., Manager, Employee, Consultant, etc.</div>
+                                <div class="form-text">{{ __('users.role_in_company_hint') }}</div>
                             </div>
                         </div>
                     </div>
@@ -212,14 +199,14 @@
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-building me-2"></i>Company Assignment
+                            <i class="fas fa-building me-2"></i>{{ __('users.company_associations') }}
                         </h5>
                     </div>
                     <div class="card-body">
                         @if($companies->count() > 0)
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Select Companies <span class="text-danger">*</span></label>
+                                    <label class="form-label">{{ __('users.select_companies') }} <span class="text-danger">*</span></label>
                                     @foreach($companies as $company)
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
@@ -244,7 +231,7 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label for="percentage" class="form-label">Ownership Percentage</label>
+                                    <label for="percentage" class="form-label">{{ __('users.ownership_percentage') }}</label>
                                     <div class="input-group">
                                         <input type="number" class="form-control @error('percentage') is-invalid @enderror"
                                                id="percentage" name="percentage" value="{{ old('percentage', 0) }}"
@@ -254,19 +241,19 @@
                                     @error('percentage')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <div class="form-text">Enter ownership percentage (0-100)</div>
+                                    <div class="form-text">{{ __('users.percentage_hint') }}</div>
                                 </div>
                             </div>
 
                             <div class="alert alert-info">
                                 <i class="fas fa-info-circle me-2"></i>
-                                <strong>Note:</strong> The user will be created with status "Parked" and will need approval from an STA Manager before becoming active.
-                                Default password will be <strong>password123</strong> - user should change it on first login.
+                                <strong>{{ __('common.info') }}:</strong> {{ __('users.parked_notice') }}
+                                {{ __('users.default_password_notice') }} <strong>password123</strong> - {{ __('users.user_should_change') }}
                             </div>
                         @else
                             <div class="alert alert-warning">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
-                                <strong>No Companies Available:</strong> You don't have access to any companies. Please contact your administrator.
+                                <strong>{{ __('users.no_companies_available') }}:</strong> {{ __('users.no_companies_message') }}
                             </div>
                         @endif
                     </div>
@@ -277,14 +264,14 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('company-users.index') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-times me-1"></i> Cancel
+                                <i class="fas fa-times me-1"></i> {{ __('users.cancel') }}
                             </a>
                             <div class="d-flex gap-2">
                                 <button type="reset" class="btn btn-outline-warning">
-                                    <i class="fas fa-redo me-1"></i> Reset Form
+                                    <i class="fas fa-redo me-1"></i> {{ __('users.reset_form') }}
                                 </button>
                                 <button type="submit" class="btn btn-primary" {{ $companies->count() === 0 ? 'disabled' : '' }}>
-                                    <i class="fas fa-user-plus me-1"></i> Create User
+                                    <i class="fas fa-user-plus me-1"></i> {{ __('users.create_user_btn') }}
                                 </button>
                             </div>
                         </div>
@@ -310,12 +297,12 @@
 
         if (selectedCompanies.length === 0) {
             e.preventDefault();
-            alert('Please select at least one company for the user.');
+            alert('{{ __('users.select_at_least_one_company') }}');
             return false;
         }
 
         // Confirm user creation
-        if (!confirm('Are you sure you want to create this user?\n\nThe user will be created with status "Parked" and default password "password123".')) {
+        if (!confirm('{{ __('users.confirm_user_creation') }}')) {
             e.preventDefault();
             return false;
         }

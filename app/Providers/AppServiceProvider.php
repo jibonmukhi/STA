@@ -10,7 +10,11 @@ use App\Policies\CoursePolicy;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Mail\Events\MessageSent;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +34,21 @@ class AppServiceProvider extends ServiceProvider
         // Register policies
         Gate::policy(Certificate::class, CertificatePolicy::class);
         Gate::policy(Course::class, CoursePolicy::class);
+
+        // Log all email sending attempts
+        Event::listen(MessageSending::class, function (MessageSending $event) {
+            Log::info('Mail Sending Event', [
+                'to' => collect($event->message->getTo())->keys()->toArray(),
+                'subject' => $event->message->getSubject(),
+            ]);
+        });
+
+        Event::listen(MessageSent::class, function (MessageSent $event) {
+            Log::info('Mail Sent Successfully', [
+                'to' => collect($event->message->getTo())->keys()->toArray(),
+                'subject' => $event->message->getSubject(),
+            ]);
+        });
 
         // Set default locale from settings if available
         try {
