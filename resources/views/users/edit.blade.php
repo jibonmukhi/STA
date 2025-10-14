@@ -372,7 +372,7 @@
                                     New Password
                                 </label>
                                 <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                       id="password" name="password">
+                                       id="password" name="password" autocomplete="new-password" value="">
                                 <div class="form-text">Leave empty to keep current password</div>
                                 @error('password')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -386,7 +386,7 @@
                                     Confirm New Password
                                 </label>
                                 <input type="password" class="form-control" 
-                                       id="password_confirmation" name="password_confirmation">
+                                       id="password_confirmation" name="password_confirmation" autocomplete="new-password" value="">
                             </div>
                         </div>
                     </div>

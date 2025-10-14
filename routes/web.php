@@ -86,6 +86,7 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
     Route::get('users/template/download', [UserController::class, 'downloadTemplate'])->name('users.template.download');
     Route::get('users/bulk-upload', [UserController::class, 'showBulkUploadForm'])->name('users.bulk-upload.form');
     Route::post('users/bulk-upload', [UserController::class, 'bulkUpload'])->name('users.bulk-upload.store');
+    Route::post('users/bulk-status', [UserController::class, 'bulkUpdateStatus'])->name('users.bulk-status');
     Route::resource('users', UserController::class);
 
     // User Approvals

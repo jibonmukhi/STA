@@ -12,6 +12,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\AuditLogService;
 use App\Http\Requests\BulkUserUploadRequest;
+use App\Http\Requests\BulkUserStatusRequest;
 use App\Services\UserImportService;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -186,6 +187,67 @@ class UserController extends Controller
         }
 
         return $redirect;
+    }
+
+    /**
+     * Bulk update status for selected users.
+     */
+    public function bulkUpdateStatus(BulkUserStatusRequest $request)
+    {
+        $status = $request->input('status');
+        $userIds = $request->input('user_ids');
+
+        $users = User::whereIn('id', $userIds)->get();
+        $updatedCount = 0;
+        $skipped = [];
+
+        foreach ($users as $user) {
+            $previousStatus = $user->status;
+
+            if ($previousStatus === $status) {
+                $skipped[] = $user->email;
+                continue;
+            }
+
+            $user->forceFill(['status' => $status])->saveQuietly();
+            $updatedCount++;
+
+            AuditLogService::logCustom(
+                'user_status_changed',
+                __('users.bulk_status_audit_log', [
+                    'name' => $user->full_name,
+                    'old' => $previousStatus,
+                    'new' => $status,
+                ]),
+                'users',
+                'info',
+                [
+                    'user_id' => $user->id,
+                    'old_status' => $previousStatus,
+                    'new_status' => $status,
+                    'updated_by' => $request->user()->id,
+                ]
+            );
+        }
+
+        if ($updatedCount > 0) {
+            session()->flash(
+                'success',
+                trans_choice('users.bulk_status_success', $updatedCount, [
+                    'count' => $updatedCount,
+                    'status' => __('users.' . $status),
+                ])
+            );
+        }
+
+        if (!empty($skipped)) {
+            session()->flash(
+                'warning',
+                __('users.bulk_status_skipped', ['emails' => implode(', ', $skipped)])
+            );
+        }
+
+        return redirect()->route('users.index');
     }
 
     /**

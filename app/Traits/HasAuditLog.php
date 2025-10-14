@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 trait HasAuditLog
 {
     /**
+     * Store original values during update events.
+     *
+     * @var array<int, array<string, mixed>>
+     */
+    protected static array $auditLogOriginals = [];
+
+    /**
      * Boot the trait
      */
     protected static function bootHasAuditLog()
@@ -22,14 +29,19 @@ trait HasAuditLog
         // Log when a model is updated
         static::updating(function (Model $model) {
             if (!$model->shouldSkipAuditLog()) {
-                $model->oldValues = $model->getOriginal();
+                static::$auditLogOriginals[spl_object_id($model)] = $model->getOriginal();
             }
         });
 
         static::updated(function (Model $model) {
-            if (!$model->shouldSkipAuditLog() && isset($model->oldValues)) {
-                AuditLogService::logUpdated($model, $model->oldValues);
-                unset($model->oldValues);
+            if (!$model->shouldSkipAuditLog()) {
+                $objectId = spl_object_id($model);
+                $oldValues = static::$auditLogOriginals[$objectId] ?? null;
+
+                if ($oldValues !== null) {
+                    AuditLogService::logUpdated($model, $oldValues);
+                    unset(static::$auditLogOriginals[$objectId]);
+                }
             }
         });
 

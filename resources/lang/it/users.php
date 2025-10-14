@@ -267,4 +267,18 @@ return [
     'bulk_upload_audit_log' => ':count utente/i importati da :file',
     'bulk_upload_summary_title' => 'Riepilogo',
     'bulk_upload_template_hint' => 'Intestazioni template: :headers',
+
+    // Bulk status updates
+    'bulk_status_update' => 'Cambia Stato',
+    'bulk_status_select_placeholder' => 'Seleziona uno stato...',
+    'bulk_status_apply' => 'Applica Stato',
+    'bulk_status_select_all' => 'Seleziona tutti gli utenti',
+    'bulk_status_none_selected' => 'Seleziona almeno un utente prima di cambiare stato.',
+    'bulk_status_select_status' => 'Seleziona lo stato da applicare.',
+    'bulk_status_user_required' => 'Seleziona almeno un utente.',
+    'bulk_status_status_required' => 'Seleziona uno stato.',
+    'bulk_status_status_invalid' => 'Stato selezionato non valido.',
+    'bulk_status_success' => '{1}Aggiornato lo stato di :count utente a :status.|[2,*]Aggiornato lo stato di :count utenti a :status.',
+    'bulk_status_skipped' => 'Utenti giA? con questo stato ignorati: :emails',
+    'bulk_status_audit_log' => 'Stato cambiato per :name da :old a :new',
 ];

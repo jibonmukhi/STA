@@ -108,6 +108,63 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    const bulkForm = document.getElementById('bulk-status-form');
+    if (bulkForm) {
+        const selectAllCheckbox = document.getElementById('select-all-users');
+        const userCheckboxes = Array.from(document.querySelectorAll('.user-select-checkbox'));
+        const statusSelect = document.getElementById('bulk-status-select');
+        const applyButton = document.getElementById('bulk-status-apply');
+        const noneSelectedMessage = '{{ __('users.bulk_status_none_selected') }}';
+        const noStatusMessage = '{{ __('users.bulk_status_select_status') }}';
+
+        const updateButtonState = () => {
+            if (!applyButton) {
+                return;
+            }
+
+            const selectedCount = userCheckboxes.filter(cb => cb.checked).length;
+            const hasStatus = !!statusSelect.value;
+            applyButton.disabled = !(selectedCount > 0 && hasStatus);
+        };
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', () => {
+                userCheckboxes.forEach(cb => {
+                    cb.checked = selectAllCheckbox.checked;
+                });
+                updateButtonState();
+            });
+        }
+
+        userCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                if (!cb.checked && selectAllCheckbox?.checked) {
+                    selectAllCheckbox.checked = false;
+                }
+                updateButtonState();
+            });
+        });
+
+        statusSelect?.addEventListener('change', updateButtonState);
+
+        bulkForm.addEventListener('submit', (event) => {
+            const selectedCount = userCheckboxes.filter(cb => cb.checked).length;
+            if (selectedCount === 0) {
+                event.preventDefault();
+                alert(noneSelectedMessage);
+                return;
+            }
+
+            if (!statusSelect.value) {
+                event.preventDefault();
+                alert(noStatusMessage);
+                return;
+            }
+        });
+
+        updateButtonState();
+    }
 });
 </script>
 @endpush
@@ -120,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
 @php
     $pendingUsers = $users->filter(fn($user) => $user->status === 'parked');
     $pendingCount = $pendingUsers->count();
+    $isStaManager = auth()->user()?->hasRole('sta_manager');
 @endphp
 
 @if($pendingCount > 0)
@@ -335,11 +393,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 </h5>
             </div>
             <div class="card-body">
+                @if($isStaManager)
+                <form method="POST" action="{{ route('users.bulk-status') }}" id="bulk-status-form" class="mb-3">
+                    @csrf
+                    <div class="row g-2 align-items-end">
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                            <label for="bulk-status-select" class="form-label fw-semibold mb-1">{{ __('users.bulk_status_update') }}</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text"><i class="fas fa-sync-alt"></i></span>
+                                <select class="form-select form-select-sm" id="bulk-status-select" name="status" required>
+                                    <option value="">{{ __('users.bulk_status_select_placeholder') }}</option>
+                                    <option value="active">{{ __('users.active') }}</option>
+                                    <option value="inactive">{{ __('users.inactive') }}</option>
+                                    <option value="parked">{{ __('users.parked') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 ms-auto d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary btn-sm mt-3 mt-sm-0" id="bulk-status-apply" disabled>
+                                <i class="fas fa-check me-2"></i>{{ __('users.bulk_status_apply') }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                @endif
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th width="5%">#</th>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    @if($isStaManager)
+                                    <th width="3%" class="text-center">
+                                        <input type="checkbox" id="select-all-users" class="form-check-input" title="{{ __('users.bulk_status_select_all') }}">
+                                    </th>
+                                    @endif
+                                    <th width="5%">#</th>
                                 <th width="20%">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'direction' => request('sort') === 'name' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
                                        class="text-decoration-none text-dark">
@@ -403,6 +490,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         <tbody>
                             @forelse($users as $user)
                             <tr class="{{ $user->status === 'parked' ? 'user-parked' : '' }}">
+                                @if($isStaManager)
+                                <td class="text-center">
+                                    <input type="checkbox" class="form-check-input user-select-checkbox" name="user_ids[]" value="{{ $user->id }}" form="bulk-status-form">
+                                </td>
+                                @endif
                                 <td>{{ $user->id }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -494,7 +586,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="9" class="text-center py-4">
+                                <td colspan="{{ $isStaManager ? 10 : 9 }}" class="text-center py-4">
                                     <i class="fas fa-users fa-3x text-muted mb-3"></i>
                                     <p class="text-muted">{{ __('users.no_users_found') }}</p>
                                 </td>
@@ -503,6 +595,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         </tbody>
                     </table>
                 </div>
+                @if($isStaManager)
+                </form>
+                @endif
 
                 <!-- Pagination and Per Page Controls -->
                 @if($users->hasPages() || $users->total() > 5)

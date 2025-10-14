@@ -267,4 +267,18 @@ return [
     'bulk_upload_audit_log' => ':count user(s) were imported from :file',
     'bulk_upload_summary_title' => 'Summary',
     'bulk_upload_template_hint' => 'Template headers: :headers',
+
+    // Bulk status updates
+    'bulk_status_update' => 'Change Status',
+    'bulk_status_select_placeholder' => 'Choose status...',
+    'bulk_status_apply' => 'Apply Status',
+    'bulk_status_select_all' => 'Select all users',
+    'bulk_status_none_selected' => 'Please select at least one user before applying a status change.',
+    'bulk_status_select_status' => 'Please choose a status to apply.',
+    'bulk_status_user_required' => 'Select at least one user.',
+    'bulk_status_status_required' => 'Please choose a status.',
+    'bulk_status_status_invalid' => 'Invalid status selected.',
+    'bulk_status_success' => '{1}:count user status updated to :status.|[2,*]:count users statuses updated to :status.',
+    'bulk_status_skipped' => 'Skipped users already set to that status: :emails',
+    'bulk_status_audit_log' => 'Status changed for :name from :old to :new',
 ];
