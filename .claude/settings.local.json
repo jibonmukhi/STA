@@ -15,7 +15,9 @@
       "Bash(if [ -d \"resources/views/emails\" ])",
       "Bash(then echo \"Directory exists\")",
       "Bash(else mkdir -p resources/views/emails)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(dir:*)",
+      "Bash(del .\\NUL)"
     ],
     "deny": [],
     "ask": []

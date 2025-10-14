@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'Invitation Details')
+@section('page-title', __('companies.invitation_details'))
 
 @push('styles')
 <style>
@@ -55,10 +55,10 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="mb-0">
-                <i class="fas fa-file-alt me-2"></i>Invitation Details
+                <i class="fas fa-file-alt me-2"></i>{{ __('companies.invitation_details') }}
             </h4>
             <a href="{{ route('companies.invitations.index') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Invitations
+                <i class="fas fa-arrow-left me-2"></i>{{ __('companies.back_to_invitations') }}
             </a>
         </div>
     </div>
@@ -77,26 +77,26 @@
                         <h5 class="mb-3">{{ $invitation->company_name }}</h5>
                         <div class="d-flex align-items-center gap-3">
                             <div>
-                                <span class="info-label">Status:</span>
+                                <span class="info-label">{{ __('companies.status') }}:</span>
                                 {!! $invitation->status_badge !!}
                             </div>
                             <div>
-                                <span class="info-label">Sent:</span>
+                                <span class="info-label">{{ __('companies.sent') }}:</span>
                                 <span class="text-muted">{{ $invitation->created_at->format('M j, Y g:i A') }}</span>
                             </div>
                             @if($invitation->isAccepted())
                             <div>
-                                <span class="info-label">Accepted:</span>
+                                <span class="info-label">{{ __('companies.accepted_time') }}:</span>
                                 <span class="text-success">{{ $invitation->accepted_at->diffForHumans() }}</span>
                             </div>
                             @elseif($invitation->isExpired())
                             <div>
-                                <span class="info-label">Expired:</span>
+                                <span class="info-label">{{ __('companies.expired_time') }}:</span>
                                 <span class="text-danger">{{ $invitation->expires_at->diffForHumans() }}</span>
                             </div>
                             @else
                             <div>
-                                <span class="info-label">Expires:</span>
+                                <span class="info-label">{{ __('companies.expires') }}:</span>
                                 <span class="text-warning">{{ $invitation->expires_at->diffForHumans() }}</span>
                             </div>
                             @endif
@@ -108,10 +108,10 @@
                                 <!-- Resend Invitation -->
                                 <form action="{{ route('companies.invitations.resend', $invitation->id) }}"
                                       method="POST" class="d-inline"
-                                      onsubmit="return confirm('Are you sure you want to resend this invitation?');">
+                                      onsubmit="return confirm('{{ __('companies.are_you_sure_resend') }}');">
                                     @csrf
                                     <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-redo me-2"></i>Resend Invitation
+                                        <i class="fas fa-redo me-2"></i>{{ __('companies.resend_invitation') }}
                                     </button>
                                 </form>
                             @endif
@@ -120,13 +120,13 @@
                                 <!-- View Company -->
                                 <a href="{{ route('companies.show', $invitation->company_id) }}"
                                    class="btn btn-primary">
-                                    <i class="fas fa-building me-2"></i>View Company
+                                    <i class="fas fa-building me-2"></i>{{ __('companies.view_company') }}
                                 </a>
 
                                 <!-- View User -->
                                 <a href="{{ route('users.show', $invitation->user_id) }}"
                                    class="btn btn-secondary">
-                                    <i class="fas fa-user me-2"></i>View User
+                                    <i class="fas fa-user me-2"></i>{{ __('companies.view_user') }}
                                 </a>
                             @endif
 
@@ -134,11 +134,11 @@
                                 <!-- Delete Invitation -->
                                 <form action="{{ route('companies.invitations.destroy', $invitation->id) }}"
                                       method="POST" class="d-inline"
-                                      onsubmit="return confirm('Are you sure you want to delete this invitation?');">
+                                      onsubmit="return confirm('{{ __('companies.are_you_sure_delete') }}');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger">
-                                        <i class="fas fa-trash me-2"></i>Delete
+                                        <i class="fas fa-trash me-2"></i>{{ __('companies.delete') }}
                                     </button>
                                 </form>
                             @endif
@@ -157,37 +157,37 @@
         <div class="card h-100">
             <div class="card-header bg-primary text-white">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-building me-2"></i>Company Information
+                    <i class="fas fa-building me-2"></i>{{ __('companies.company_information') }}
                 </h5>
             </div>
             <div class="card-body">
-                <div class="info-label">Company Name</div>
+                <div class="info-label">{{ __('companies.company_name') }}</div>
                 <div class="info-value">{{ $invitation->company_name }}</div>
 
-                <div class="info-label">Company Email</div>
+                <div class="info-label">{{ __('companies.company_email') }}</div>
                 <div class="info-value">
                     <a href="mailto:{{ $invitation->company_email }}">{{ $invitation->company_email }}</a>
                 </div>
 
                 @if($invitation->company_phone)
-                <div class="info-label">Company Phone</div>
+                <div class="info-label">{{ __('companies.company_phone') }}</div>
                 <div class="info-value">{{ $invitation->company_phone }}</div>
                 @endif
 
                 @if($invitation->company_piva)
-                <div class="info-label">P.IVA</div>
+                <div class="info-label">{{ __('companies.piva') }}</div>
                 <div class="info-value">{{ $invitation->company_piva }}</div>
                 @endif
 
                 @if($invitation->company_ateco_code)
-                <div class="info-label">ATECO Code</div>
+                <div class="info-label">{{ __('companies.ateco_code') }}</div>
                 <div class="info-value">{{ $invitation->company_ateco_code }}</div>
                 @endif
 
                 @if($invitation->isAccepted() && $invitation->company)
                 <div class="mt-3">
                     <a href="{{ route('companies.show', $invitation->company_id) }}" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-external-link-alt me-2"></i>View Full Company Profile
+                        <i class="fas fa-external-link-alt me-2"></i>{{ __('companies.view_full_company_profile') }}
                     </a>
                 </div>
                 @endif
@@ -200,19 +200,19 @@
         <div class="card h-100">
             <div class="card-header bg-success text-white">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-user-tie me-2"></i>Manager Information
+                    <i class="fas fa-user-tie me-2"></i>{{ __('companies.company_manager_info') }}
                 </h5>
             </div>
             <div class="card-body">
-                <div class="info-label">Manager Name</div>
+                <div class="info-label">{{ __('companies.manager_name') }}</div>
                 <div class="info-value">{{ $invitation->manager_name }} {{ $invitation->manager_surname }}</div>
 
-                <div class="info-label">Manager Email</div>
+                <div class="info-label">{{ __('companies.manager_email') }}</div>
                 <div class="info-value">
                     <a href="mailto:{{ $invitation->manager_email }}">{{ $invitation->manager_email }}</a>
                 </div>
 
-                <div class="info-label">Username</div>
+                <div class="info-label">{{ __('companies.username') }}</div>
                 <div class="info-value">
                     <code>{{ $invitation->manager_username }}</code>
                 </div>
@@ -220,7 +220,7 @@
                 @if($invitation->isAccepted() && $invitation->user)
                 <div class="mt-3">
                     <a href="{{ route('users.show', $invitation->user_id) }}" class="btn btn-sm btn-outline-success">
-                        <i class="fas fa-external-link-alt me-2"></i>View User Profile
+                        <i class="fas fa-external-link-alt me-2"></i>{{ __('companies.view_user_profile') }}
                     </a>
                 </div>
                 @endif
@@ -233,27 +233,27 @@
         <div class="card h-100">
             <div class="card-header bg-info text-white">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-history me-2"></i>Timeline
+                    <i class="fas fa-history me-2"></i>{{ __('companies.timeline') }}
                 </h5>
             </div>
             <div class="card-body">
                 <div class="timeline-item">
-                    <div class="info-label">Invitation Created</div>
+                    <div class="info-label">{{ __('companies.invitation_created') }}</div>
                     <div class="info-value">
                         {{ $invitation->created_at->format('M j, Y g:i A') }}
                         <small class="text-muted">({{ $invitation->created_at->diffForHumans() }})</small>
                     </div>
                     @if($invitation->inviter)
-                    <small class="text-muted">Invited by: {{ $invitation->inviter->name }}</small>
+                    <small class="text-muted">{{ __('companies.invited_by') }}: {{ $invitation->inviter->name }}</small>
                     @endif
                 </div>
 
                 <div class="timeline-item">
-                    <div class="info-label">Expiration Date</div>
+                    <div class="info-label">{{ __('companies.expiration_date') }}</div>
                     <div class="info-value">
                         {{ $invitation->expires_at->format('M j, Y g:i A') }}
                         @if($invitation->isExpired())
-                            <span class="badge bg-danger ms-2">Expired</span>
+                            <span class="badge bg-danger ms-2">{{ __('companies.expired') }}</span>
                         @else
                             <small class="text-muted">({{ $invitation->expires_at->diffForHumans() }})</small>
                         @endif
@@ -262,7 +262,7 @@
 
                 @if($invitation->isAccepted())
                 <div class="timeline-item">
-                    <div class="info-label">Accepted Date</div>
+                    <div class="info-label">{{ __('companies.accepted_date') }}</div>
                     <div class="info-value">
                         {{ $invitation->accepted_at->format('M j, Y g:i A') }}
                         <small class="text-muted">({{ $invitation->accepted_at->diffForHumans() }})</small>
@@ -279,11 +279,11 @@
         <div class="card h-100">
             <div class="card-header bg-warning text-dark">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-link me-2"></i>Invitation Link
+                    <i class="fas fa-link me-2"></i>{{ __('companies.invitation_link') }}
                 </h5>
             </div>
             <div class="card-body">
-                <p class="text-muted mb-3">Share this link with the company manager to accept the invitation:</p>
+                <p class="text-muted mb-3">{{ __('companies.share_link_text') }}</p>
 
                 <div class="invitation-link-box" id="invitationLinkBox">
                     {{ route('invitation.accept', $invitation->token) }}
@@ -291,12 +291,12 @@
 
                 <button type="button" class="btn btn-info mt-3 w-100"
                         onclick="copyInvitationLink('{{ route('invitation.accept', $invitation->token) }}')">
-                    <i class="fas fa-copy me-2"></i>Copy Invitation Link
+                    <i class="fas fa-copy me-2"></i>{{ __('companies.copy_link') }}
                 </button>
 
                 <div class="alert alert-info mt-3 mb-0">
                     <i class="fas fa-info-circle me-2"></i>
-                    <small>This link will expire on {{ $invitation->expires_at->format('M j, Y') }}</small>
+                    <small>{{ __('companies.link_expires_on') }} {{ $invitation->expires_at->format('M j, Y') }}</small>
                 </div>
             </div>
         </div>
@@ -310,21 +310,21 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-info-circle me-2"></i>Additional Information
+                    <i class="fas fa-info-circle me-2"></i>{{ __('companies.additional_information') }}
                 </h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="info-label">Invitation ID</div>
+                        <div class="info-label">{{ __('companies.invitation_id') }}</div>
                         <div class="info-value"><code>#{{ $invitation->id }}</code></div>
                     </div>
                     <div class="col-md-4">
-                        <div class="info-label">Token (Last 8 chars)</div>
+                        <div class="info-label">{{ __('companies.token_last_chars') }}</div>
                         <div class="info-value"><code>...{{ substr($invitation->token, -8) }}</code></div>
                     </div>
                     <div class="col-md-4">
-                        <div class="info-label">Last Updated</div>
+                        <div class="info-label">{{ __('companies.last_updated') }}</div>
                         <div class="info-value">{{ $invitation->updated_at->format('M j, Y g:i A') }}</div>
                     </div>
                 </div>
@@ -339,10 +339,10 @@
 function copyInvitationLink(url) {
     navigator.clipboard.writeText(url).then(function() {
         // Show success message
-        alert('Invitation link copied to clipboard!');
+        alert('{{ __('companies.link_copied') }}');
     }, function(err) {
         console.error('Could not copy text: ', err);
-        alert('Failed to copy link. Please copy manually.');
+        alert('{{ __('companies.link_copy_failed') }}');
     });
 }
 </script>

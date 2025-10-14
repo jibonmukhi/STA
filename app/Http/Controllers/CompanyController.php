@@ -495,8 +495,14 @@ class CompanyController extends Controller
             $query->where('status', $request->filter_status);
         }
 
+        // Handle per page
+        $perPage = $request->get('per_page', 15);
+        if (!in_array($perPage, [10, 15, 25, 50, 100])) {
+            $perPage = 15;
+        }
+
         // Get invitations with pagination
-        $invitations = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        $invitations = $query->orderBy('created_at', 'desc')->paginate($perPage)->withQueryString();
 
         // Calculate statistics
         $stats = [

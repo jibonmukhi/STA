@@ -361,8 +361,29 @@
         }
 
         if (confirm(`Are you sure you want to approve ${selectedUsers.length} selected user(s)?`)) {
-            // In a real implementation, this would make AJAX calls or submit a form
-            alert(`Bulk approval feature would be implemented here for ${selectedUsers.length} users.`);
+            // Create and submit form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route('users.bulk-approve') }}';
+
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+
+            // Add selected user IDs
+            selectedUsers.forEach(userId => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'user_ids[]';
+                input.value = userId;
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
         }
     }
 
@@ -375,14 +396,35 @@
         }
 
         if (confirm(`Are you sure you want to reject and delete ${selectedUsers.length} selected user(s)? This action cannot be undone.`)) {
-            // In a real implementation, this would make AJAX calls or submit a form
-            alert(`Bulk rejection feature would be implemented here for ${selectedUsers.length} users.`);
+            // Create and submit form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route('users.bulk-reject') }}';
+
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+
+            // Add selected user IDs
+            selectedUsers.forEach(userId => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'user_ids[]';
+                input.value = userId;
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
         }
     }
 
     function viewUserDetails(userId) {
-        // In a real implementation, this would open a modal or navigate to user details
-        alert(`Viewing detailed information for user ID: ${userId}`);
+        // Navigate to user details page
+        window.location.href = '{{ url('users') }}/' + userId;
     }
 </script>
 @endsection

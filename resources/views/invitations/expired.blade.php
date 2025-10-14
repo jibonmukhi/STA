@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invitation Expired - {{ config('app.name') }}</title>
+    <title>{{ __('companies.invitation_expired') }} - {{ config('app.name') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -38,33 +38,31 @@
     <div class="invitation-card">
         <div class="invitation-header">
             <i class="fas fa-clock fa-3x mb-3"></i>
-            <h2 class="mb-0">Invitation Expired</h2>
+            <h2 class="mb-0">{{ __('companies.invitation_expired') }}</h2>
         </div>
 
         <div class="invitation-body">
             <div class="text-center mb-4">
                 <div class="alert alert-danger">
                     <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                    <h4>This invitation has expired</h4>
+                    <h4>{{ __('companies.invitation_has_expired') }}</h4>
                     <p class="mb-0">
-                        The invitation for <strong>{{ $invitation->company_name }}</strong> expired on
-                        <strong>{{ $invitation->expires_at->format('F j, Y \a\t g:i A') }}</strong>.
+                        {{ __('companies.expired_for_company', ['company' => $invitation->company_name, 'date' => $invitation->expires_at->format('F j, Y \a\t g:i A')]) }}
                     </p>
                 </div>
             </div>
 
             <div class="alert alert-info">
                 <i class="fas fa-info-circle me-2"></i>
-                <strong>What to do next:</strong>
+                <strong>{{ __('companies.what_to_do_next') }}</strong>
                 <p class="mb-0 mt-2">
-                    Please contact the system administrator to request a new invitation.
-                    They will be able to send you a fresh invitation link.
+                    {{ __('companies.contact_admin_new_invitation') }}
                 </p>
             </div>
 
             <div class="text-center mt-4">
                 <a href="{{ route('login') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Go to Login Page
+                    <i class="fas fa-arrow-left me-2"></i>{{ __('companies.go_to_login') }}
                 </a>
             </div>
         </div>

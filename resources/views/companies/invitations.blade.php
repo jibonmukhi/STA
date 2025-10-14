@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', 'Company Invitations')
+@section('page-title', __('companies.company_invitations'))
 
 @push('styles')
 <style>
@@ -32,14 +32,14 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="mb-0">
-                <i class="fas fa-envelope-open-text me-2"></i>Company Invitations
+                <i class="fas fa-envelope-open-text me-2"></i>{{ __('companies.company_invitations') }}
             </h4>
             <div class="btn-group">
                 <a href="{{ route('companies.invite.form') }}" class="btn btn-success">
-                    <i class="fas fa-paper-plane me-2"></i>Send New Invitation
+                    <i class="fas fa-paper-plane me-2"></i>{{ __('companies.send_new_invitation') }}
                 </a>
                 <a href="{{ route('companies.index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-building me-2"></i>Back to Companies
+                    <i class="fas fa-building me-2"></i>{{ __('companies.back_to_companies') }}
                 </a>
             </div>
         </div>
@@ -54,7 +54,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h3 class="mb-0">{{ $stats['pending'] ?? 0 }}</h3>
-                        <p class="text-muted mb-0">Pending</p>
+                        <p class="text-muted mb-0">{{ __('companies.pending') }}</p>
                     </div>
                     <div class="text-warning">
                         <i class="fas fa-clock fa-2x"></i>
@@ -69,7 +69,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h3 class="mb-0">{{ $stats['accepted'] ?? 0 }}</h3>
-                        <p class="text-muted mb-0">Accepted</p>
+                        <p class="text-muted mb-0">{{ __('companies.accepted') }}</p>
                     </div>
                     <div class="text-success">
                         <i class="fas fa-check-circle fa-2x"></i>
@@ -84,7 +84,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h3 class="mb-0">{{ $stats['expired'] ?? 0 }}</h3>
-                        <p class="text-muted mb-0">Expired</p>
+                        <p class="text-muted mb-0">{{ __('companies.expired') }}</p>
                     </div>
                     <div class="text-danger">
                         <i class="fas fa-times-circle fa-2x"></i>
@@ -99,7 +99,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h3 class="mb-0">{{ $stats['total'] ?? 0 }}</h3>
-                        <p class="text-muted mb-0">Total</p>
+                        <p class="text-muted mb-0">{{ __('companies.total') }}</p>
                     </div>
                     <div class="text-secondary">
                         <i class="fas fa-envelope fa-2x"></i>
@@ -119,33 +119,36 @@
         <div class="card">
             <div class="card-body">
                 <form method="GET" action="{{ route('companies.invitations.index') }}" class="row g-3">
+                    <!-- Hidden input to preserve per_page value -->
+                    <input type="hidden" name="per_page" value="{{ request('per_page', 15) }}">
+
                     <div class="col-md-3">
-                        <label for="filter_status" class="form-label">Status</label>
+                        <label for="filter_status" class="form-label">{{ __('companies.status') }}</label>
                         <select name="filter_status" id="filter_status" class="form-select">
-                            <option value="">All Statuses</option>
-                            <option value="pending" {{ request('filter_status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="accepted" {{ request('filter_status') == 'accepted' ? 'selected' : '' }}>Accepted</option>
-                            <option value="expired" {{ request('filter_status') == 'expired' ? 'selected' : '' }}>Expired</option>
+                            <option value="">{{ __('companies.all_statuses') }}</option>
+                            <option value="pending" {{ request('filter_status') == 'pending' ? 'selected' : '' }}>{{ __('companies.pending') }}</option>
+                            <option value="accepted" {{ request('filter_status') == 'accepted' ? 'selected' : '' }}>{{ __('companies.accepted') }}</option>
+                            <option value="expired" {{ request('filter_status') == 'expired' ? 'selected' : '' }}>{{ __('companies.expired') }}</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="search_company" class="form-label">Company Name</label>
+                        <label for="search_company" class="form-label">{{ __('companies.company_name') }}</label>
                         <input type="text" name="search_company" id="search_company" class="form-control"
-                               value="{{ request('search_company') }}" placeholder="Search company...">
+                               value="{{ request('search_company') }}" placeholder="{{ __('companies.search_by_name') }}">
                     </div>
                     <div class="col-md-3">
-                        <label for="search_email" class="form-label">Manager Email</label>
+                        <label for="search_email" class="form-label">{{ __('companies.manager_email') }}</label>
                         <input type="text" name="search_email" id="search_email" class="form-control"
-                               value="{{ request('search_email') }}" placeholder="Search email...">
+                               value="{{ request('search_email') }}" placeholder="{{ __('companies.search_by_email') }}">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">&nbsp;</label>
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary flex-fill">
-                                <i class="fas fa-search me-2"></i>Filter
+                                <i class="fas fa-search me-2"></i>{{ __('companies.filter') }}
                             </button>
                             <a href="{{ route('companies.invitations.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-redo me-2"></i>Reset
+                                <i class="fas fa-redo me-2"></i>{{ __('companies.reset') }}
                             </a>
                         </div>
                     </div>
@@ -161,16 +164,16 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-list me-2"></i>All Invitations ({{ $invitations->total() }})
+                    <i class="fas fa-list me-2"></i>{{ __('companies.all_invitations') }} ({{ $invitations->total() }})
                 </h5>
             </div>
             <div class="card-body">
                 @if($invitations->isEmpty())
                     <div class="text-center py-5">
                         <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">No invitations found.</p>
+                        <p class="text-muted">{{ __('companies.no_invitations_found') }}</p>
                         <a href="{{ route('companies.invite.form') }}" class="btn btn-primary mt-2">
-                            <i class="fas fa-paper-plane me-2"></i>Send First Invitation
+                            <i class="fas fa-paper-plane me-2"></i>{{ __('companies.send_first_invitation') }}
                         </a>
                     </div>
                 @else
@@ -178,14 +181,14 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Company Name</th>
-                                    <th>Company Email</th>
-                                    <th>Manager</th>
-                                    <th>Manager Email</th>
-                                    <th>Status</th>
-                                    <th>Sent Date</th>
-                                    <th>Expires At</th>
-                                    <th>Actions</th>
+                                    <th>{{ __('companies.company_name') }}</th>
+                                    <th>{{ __('companies.company_email') }}</th>
+                                    <th>{{ __('companies.manager') }}</th>
+                                    <th>{{ __('companies.manager_email') }}</th>
+                                    <th>{{ __('companies.status') }}</th>
+                                    <th>{{ __('companies.sent_date') }}</th>
+                                    <th>{{ __('companies.expires_at') }}</th>
+                                    <th>{{ __('companies.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -194,7 +197,7 @@
                                     <td>
                                         <strong>{{ $invitation->company_name }}</strong>
                                         @if($invitation->company_piva)
-                                            <br><small class="text-muted">P.IVA: {{ $invitation->company_piva }}</small>
+                                            <br><small class="text-muted">{{ __('companies.piva') }}: {{ $invitation->company_piva }}</small>
                                         @endif
                                     </td>
                                     <td>{{ $invitation->company_email }}</td>
@@ -208,12 +211,12 @@
                                     <td>
                                         @if($invitation->isExpired())
                                             <span class="text-danger">
-                                                <i class="fas fa-exclamation-triangle me-1"></i>Expired
+                                                <i class="fas fa-exclamation-triangle me-1"></i>{{ __('companies.expired') }}
                                             </span><br>
                                             <small class="text-muted">{{ $invitation->expires_at->diffForHumans() }}</small>
                                         @elseif($invitation->isAccepted())
                                             <span class="text-success">
-                                                <i class="fas fa-check me-1"></i>Accepted
+                                                <i class="fas fa-check me-1"></i>{{ __('companies.accepted') }}
                                             </span><br>
                                             <small class="text-muted">{{ $invitation->accepted_at->diffForHumans() }}</small>
                                         @else
@@ -228,10 +231,10 @@
                                                 <!-- Resend Invitation -->
                                                 <form action="{{ route('companies.invitations.resend', $invitation->id) }}"
                                                       method="POST" class="d-inline"
-                                                      onsubmit="return confirm('Are you sure you want to resend this invitation?');">
+                                                      onsubmit="return confirm('{{ __('companies.are_you_sure_resend') }}');">
                                                     @csrf
                                                     <button type="submit" class="btn btn-success"
-                                                            title="Resend Invitation">
+                                                            title="{{ __('companies.resend_invitation') }}">
                                                         <i class="fas fa-redo"></i>
                                                     </button>
                                                 </form>
@@ -239,7 +242,7 @@
                                                 <!-- Copy Link -->
                                                 <button type="button" class="btn btn-info"
                                                         onclick="copyInvitationLink('{{ route('invitation.accept', $invitation->token) }}')"
-                                                        title="Copy Invitation Link">
+                                                        title="{{ __('companies.copy_invitation_link') }}">
                                                     <i class="fas fa-copy"></i>
                                                 </button>
                                             @endif
@@ -247,13 +250,13 @@
                                             @if($invitation->isAccepted())
                                                 <!-- View Company -->
                                                 <a href="{{ route('companies.show', $invitation->company_id) }}"
-                                                   class="btn btn-primary" title="View Company">
+                                                   class="btn btn-primary" title="{{ __('companies.view_company') }}">
                                                     <i class="fas fa-building"></i>
                                                 </a>
 
                                                 <!-- View User -->
                                                 <a href="{{ route('users.show', $invitation->user_id) }}"
-                                                   class="btn btn-secondary" title="View User">
+                                                   class="btn btn-secondary" title="{{ __('companies.view_user') }}">
                                                     <i class="fas fa-user"></i>
                                                 </a>
                                             @endif
@@ -261,7 +264,7 @@
                                             <!-- View Details -->
                                             <a href="{{ route('companies.invitations.details', $invitation->id) }}"
                                                class="btn btn-outline-primary"
-                                               title="View Details">
+                                               title="{{ __('companies.view_details') }}">
                                                 <i class="fas fa-eye"></i>
                                             </a>
 
@@ -269,11 +272,11 @@
                                                 <!-- Delete Invitation -->
                                                 <form action="{{ route('companies.invitations.destroy', $invitation->id) }}"
                                                       method="POST" class="d-inline"
-                                                      onsubmit="return confirm('Are you sure you want to delete this invitation?');">
+                                                      onsubmit="return confirm('{{ __('companies.are_you_sure_delete') }}');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger"
-                                                            title="Delete Invitation">
+                                                            title="{{ __('companies.delete_invitation') }}">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -286,11 +289,24 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
+                    <!-- Pagination Controls -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div>
-                            Showing {{ $invitations->firstItem() ?? 0 }} to {{ $invitations->lastItem() ?? 0 }} of {{ $invitations->total() }} invitations
+                        <!-- Rows Per Page Dropdown (Left) -->
+                        <div class="d-flex align-items-center">
+                            <label for="per_page" class="mb-0 me-2">{{ __('companies.rows_per_page') }}</label>
+                            <select name="per_page" id="per_page" class="form-select form-select-sm" style="width: auto;" onchange="changePerPage(this.value)">
+                                <option value="10" {{ request('per_page', 15) == 10 ? 'selected' : '' }}>10</option>
+                                <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                                <option value="25" {{ request('per_page', 15) == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ request('per_page', 15) == 50 ? 'selected' : '' }}>50</option>
+                                <option value="100" {{ request('per_page', 15) == 100 ? 'selected' : '' }}>100</option>
+                            </select>
+                            <span class="ms-3 text-muted">
+                                {{ __('companies.showing') }} {{ $invitations->firstItem() ?? 0 }} {{ __('companies.to') }} {{ $invitations->lastItem() ?? 0 }} {{ __('companies.of') }} {{ $invitations->total() }} {{ __('companies.invitations') }}
+                            </span>
                         </div>
+
+                        <!-- Pagination Links (Right) -->
                         <div>
                             {{ $invitations->links() }}
                         </div>
@@ -312,6 +328,20 @@ function copyInvitationLink(url, id = null) {
         console.error('Could not copy text: ', err);
         alert('Failed to copy link. Please copy manually.');
     });
+}
+
+function changePerPage(perPage) {
+    // Get current URL
+    const url = new URL(window.location.href);
+
+    // Update or add per_page parameter
+    url.searchParams.set('per_page', perPage);
+
+    // Reset to first page when changing per_page
+    url.searchParams.delete('page');
+
+    // Redirect to new URL
+    window.location.href = url.toString();
 }
 </script>
 @endpush

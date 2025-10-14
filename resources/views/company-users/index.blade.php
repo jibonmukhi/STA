@@ -172,8 +172,16 @@
                                 {{ $userCompanies->find(request('company'))->name ?? 'Unknown Company' }}
                             </span>
                         @endif
+                        <span class="badge bg-warning ms-2" id="selectedCount" style="display: none;">
+                            <span id="selectedCountText">0</span> selected
+                        </span>
                     </h5>
                     <div class="d-flex gap-2">
+                        @if($users->where('status', 'parked')->count() > 0)
+                            <button type="button" class="btn btn-success" id="sendForApprovalBtn" onclick="sendForApproval()" disabled>
+                                <i class="fas fa-paper-plane me-1"></i> Send for Approval
+                            </button>
+                        @endif
                         <div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-download me-1"></i> Export
@@ -198,6 +206,11 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
+                                        <th width="50">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="selectAll">
+                                            </div>
+                                        </th>
                                         <th>User</th>
                                         <th>Email</th>
                                         <th>Phone</th>
@@ -211,6 +224,14 @@
                                 <tbody>
                                     @foreach($users as $user)
                                     <tr>
+                                        <td>
+                                            @if($user->status === 'parked')
+                                                <div class="form-check">
+                                                    <input class="form-check-input user-checkbox" type="checkbox"
+                                                           value="{{ $user->id }}" id="user_{{ $user->id }}">
+                                                </div>
+                                            @endif
+                                        </td>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <img src="{{ $user->photo_url }}" alt="{{ $user->name }}"
@@ -330,6 +351,83 @@
 </div>
 
 <script>
+    // Select all checkbox functionality
+    document.getElementById('selectAll')?.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.user-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateSelectedCount();
+    });
+
+    // Update select all when individual checkboxes change
+    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateSelectedCount();
+
+            const allCheckboxes = document.querySelectorAll('.user-checkbox');
+            const checkedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
+            const selectAllCheckbox = document.getElementById('selectAll');
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = allCheckboxes.length === checkedCheckboxes.length;
+                selectAllCheckbox.indeterminate = checkedCheckboxes.length > 0 && checkedCheckboxes.length < allCheckboxes.length;
+            }
+        });
+    });
+
+    function updateSelectedCount() {
+        const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+        const count = checkedBoxes.length;
+        const selectedCountBadge = document.getElementById('selectedCount');
+        const selectedCountText = document.getElementById('selectedCountText');
+        const sendBtn = document.getElementById('sendForApprovalBtn');
+
+        if (count > 0) {
+            selectedCountBadge.style.display = 'inline-block';
+            selectedCountText.textContent = count;
+            if (sendBtn) sendBtn.disabled = false;
+        } else {
+            selectedCountBadge.style.display = 'none';
+            if (sendBtn) sendBtn.disabled = true;
+        }
+    }
+
+    function sendForApproval() {
+        const selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
+
+        if (selectedUsers.length === 0) {
+            alert('Please select at least one user to send for approval.');
+            return;
+        }
+
+        if (confirm(`Are you sure you want to send ${selectedUsers.length} user(s) for approval?\n\nSTA Managers will be notified via email.`)) {
+            // Create and submit form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route('company-users.send-for-approval') }}';
+
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+
+            // Add selected user IDs
+            selectedUsers.forEach(userId => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'user_ids[]';
+                input.value = userId;
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
     function viewUser(userId) {
         alert(`Viewing details for user ID: ${userId}\nThis would show detailed user information.`);
     }

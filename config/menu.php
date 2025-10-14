@@ -155,6 +155,23 @@ return [
             'permission' => 'view dashboard'
         ],
         [
+            'title' => 'navigation.company_users',
+            'icon' => 'fas fa-users',
+            'permission' => 'manage company users',
+            'submenu' => [
+                [
+                    'title' => 'navigation.view_users',
+                    'route' => 'company-users.index',
+                    'permission' => 'manage company users'
+                ],
+                [
+                    'title' => 'navigation.add_user',
+                    'route' => 'company-users.create',
+                    'permission' => 'create users'
+                ]
+            ]
+        ],
+        [
             'title' => 'navigation.certificate_management',
             'route' => 'certificates.index',
             'icon' => 'fas fa-certificate',
@@ -203,23 +220,6 @@ return [
             'route' => 'my-companies.index',
             'icon' => 'fas fa-building',
             'permission' => 'view companies'
-        ],
-        [
-            'title' => 'navigation.company_users',
-            'icon' => 'fas fa-users',
-            'permission' => 'manage company users',
-            'submenu' => [
-                [
-                    'title' => 'navigation.view_users',
-                    'route' => 'company-users.index',
-                    'permission' => 'manage company users'
-                ],
-                [
-                    'title' => 'navigation.add_user',
-                    'route' => 'company-users.create',
-                    'permission' => 'create users'
-                ]
-            ]
         ],
         [
             'title' => 'navigation.company_reports',

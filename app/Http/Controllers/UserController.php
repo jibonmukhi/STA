@@ -7,6 +7,7 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Notification;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -14,6 +15,7 @@ use App\Services\AuditLogService;
 use App\Http\Requests\BulkUserUploadRequest;
 use App\Http\Requests\BulkUserStatusRequest;
 use App\Services\UserImportService;
+use App\Notifications\UserApprovalRequestNotification;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -588,7 +590,8 @@ class UserController extends Controller
     {
         $user = auth()->user();
         $companies = $user->companies;
-        $roles = Role::where('name', '!=', 'sta_manager')->get(); // Company managers can't assign STA manager role
+        // Company managers can't assign STA manager role or teacher role
+        $roles = Role::whereNotIn('name', ['sta_manager', 'teacher'])->get();
 
         return view('company-users.create', compact('companies', 'roles'));
     }
@@ -644,13 +647,89 @@ class UserController extends Controller
                 }
             }
 
+            // Log user creation
+            AuditLogService::logCustom(
+                'user_created_by_company',
+                "Company user {$user->full_name} created with parked status",
+                'users',
+                'info',
+                [
+                    'user_id' => $user->id,
+                    'created_by' => auth()->id(),
+                    'status' => 'parked',
+                    'requires_approval' => true
+                ]
+            );
+
             return redirect()->route('company-users.index')
-                ->with('success', 'User created successfully. Default password is: password123');
+                ->with('success', 'User created successfully. User is in pending status. Select users and send for approval when ready. Default password is: password123');
 
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Failed to create user: ' . $e->getMessage())
                 ->withInput();
+        }
+    }
+
+    /**
+     * Send selected users for approval
+     */
+    public function sendForApproval(Request $request)
+    {
+        try {
+            $request->validate([
+                'user_ids' => 'required|array|min:1',
+                'user_ids.*' => 'exists:users,id'
+            ]);
+
+            $userIds = $request->input('user_ids');
+            $users = User::whereIn('id', $userIds)
+                ->where('status', 'parked')
+                ->get();
+
+            if ($users->isEmpty()) {
+                return redirect()->back()
+                    ->with('warning', 'No users found with pending status.');
+            }
+
+            // Verify these users belong to company manager's companies
+            $managerCompanyIds = auth()->user()->companies->pluck('id');
+            foreach ($users as $user) {
+                $userCompanyIds = $user->companies->pluck('id');
+                $hasCommonCompany = $managerCompanyIds->intersect($userCompanyIds)->isNotEmpty();
+
+                if (!$hasCommonCompany) {
+                    return redirect()->back()
+                        ->with('error', 'You can only send users from your companies for approval.');
+                }
+            }
+
+            // Send notification to all STA Managers
+            $staManagers = User::role('sta_manager')->get();
+            Notification::send($staManagers, new UserApprovalRequestNotification($users, auth()->user()));
+
+            // Log the approval request
+            AuditLogService::logCustom(
+                'users_sent_for_approval',
+                count($users) . " user(s) sent for approval by " . auth()->user()->name,
+                'users',
+                'info',
+                [
+                    'user_ids' => $users->pluck('id')->toArray(),
+                    'user_count' => count($users),
+                    'requested_by' => auth()->id(),
+                ]
+            );
+
+            $message = count($users) === 1
+                ? "1 user has been sent for approval. STA Managers have been notified."
+                : count($users) . " users have been sent for approval. STA Managers have been notified.";
+
+            return redirect()->back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to send users for approval: ' . $e->getMessage());
         }
     }
 }

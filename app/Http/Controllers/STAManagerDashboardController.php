@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Company;
 use App\Services\AuditLogService;
+use App\Notifications\UserApprovedNotification;
+use App\Notifications\UserRejectedNotification;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class STAManagerDashboardController extends Controller
 {
@@ -90,6 +93,17 @@ class STAManagerDashboardController extends Controller
                 ]
             );
 
+            // Notify company managers who created this user
+            $companyManagers = User::role('company_manager')
+                ->whereHas('companies', function($q) use ($user) {
+                    $q->whereIn('companies.id', $user->companies->pluck('id'));
+                })
+                ->get();
+
+            if ($companyManagers->isNotEmpty()) {
+                Notification::send($companyManagers, new UserApprovedNotification($user, Auth::user()));
+            }
+
             return redirect()->back()
                 ->with('success', "User {$user->full_name} has been approved successfully.");
 
@@ -110,6 +124,21 @@ class STAManagerDashboardController extends Controller
             $userName = $user->full_name;
             $userEmail = $user->email;
             $userId = $user->id;
+
+            // Collect user data before deletion for notification
+            $userData = [
+                'name' => $user->name,
+                'surname' => $user->surname,
+                'email' => $user->email,
+                'full_name' => $user->full_name,
+            ];
+
+            // Get company managers to notify before deleting user
+            $companyManagers = User::role('company_manager')
+                ->whereHas('companies', function($q) use ($user) {
+                    $q->whereIn('companies.id', $user->companies->pluck('id'));
+                })
+                ->get();
 
             // Log user rejection (before deletion)
             AuditLogService::logCustom(
@@ -139,6 +168,11 @@ class STAManagerDashboardController extends Controller
 
             // Delete the user
             $user->delete();
+
+            // Send rejection notification to company managers
+            if ($companyManagers->isNotEmpty()) {
+                Notification::send($companyManagers, new UserRejectedNotification($userData, Auth::user()));
+            }
 
             return redirect()->back()
                 ->with('success', "User {$userName} has been rejected and removed from the system.");
@@ -189,5 +223,185 @@ class STAManagerDashboardController extends Controller
             'companyStats',
             'recentActivity'
         ));
+    }
+
+    /**
+     * Bulk approve multiple users
+     */
+    public function bulkApproveUsers(Request $request): RedirectResponse
+    {
+        try {
+            $request->validate([
+                'user_ids' => 'required|array|min:1',
+                'user_ids.*' => 'exists:users,id'
+            ]);
+
+            $userIds = $request->input('user_ids');
+            $users = User::whereIn('id', $userIds)
+                ->where('status', 'parked')
+                ->get();
+
+            if ($users->isEmpty()) {
+                return redirect()->back()
+                    ->with('warning', 'No users found with pending status.');
+            }
+
+            $approvedCount = 0;
+            $skipped = [];
+
+            foreach ($users as $user) {
+                if ($user->status !== 'parked') {
+                    $skipped[] = $user->full_name;
+                    continue;
+                }
+
+                $user->update(['status' => 'active']);
+                $approvedCount++;
+
+                // Log individual approval
+                AuditLogService::logCustom(
+                    'user_approved_bulk',
+                    "User {$user->full_name} (ID: {$user->id}) was approved in bulk action by " . Auth::user()->name,
+                    'users',
+                    'info',
+                    [
+                        'user_id' => $user->id,
+                        'user_email' => $user->email,
+                        'approved_by' => Auth::id(),
+                        'bulk_action' => true
+                    ]
+                );
+            }
+
+            // Get all company managers who need to be notified
+            $companyIds = $users->flatMap(function($user) {
+                return $user->companies->pluck('id');
+            })->unique();
+
+            $companyManagers = User::role('company_manager')
+                ->whereHas('companies', function($q) use ($companyIds) {
+                    $q->whereIn('companies.id', $companyIds);
+                })
+                ->get();
+
+            // Send bulk approval notification
+            if ($companyManagers->isNotEmpty()) {
+                Notification::send($companyManagers, new UserApprovedNotification($users, Auth::user()));
+            }
+
+            $message = $approvedCount === 1
+                ? "1 user has been approved successfully."
+                : "{$approvedCount} users have been approved successfully.";
+
+            if (!empty($skipped)) {
+                $message .= " Skipped users (not in pending status): " . implode(', ', $skipped);
+            }
+
+            return redirect()->back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to approve users: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk reject multiple users
+     */
+    public function bulkRejectUsers(Request $request): RedirectResponse
+    {
+        try {
+            $request->validate([
+                'user_ids' => 'required|array|min:1',
+                'user_ids.*' => 'exists:users,id'
+            ]);
+
+            $userIds = $request->input('user_ids');
+            $users = User::whereIn('id', $userIds)
+                ->where('status', 'parked')
+                ->get();
+
+            if ($users->isEmpty()) {
+                return redirect()->back()
+                    ->with('warning', 'No users found with pending status.');
+            }
+
+            $rejectedCount = 0;
+            $usersData = [];
+
+            // Collect data and company managers before deletion
+            $companyIds = $users->flatMap(function($user) {
+                return $user->companies->pluck('id');
+            })->unique();
+
+            $companyManagers = User::role('company_manager')
+                ->whereHas('companies', function($q) use ($companyIds) {
+                    $q->whereIn('companies.id', $companyIds);
+                })
+                ->get();
+
+            foreach ($users as $user) {
+                if ($user->status !== 'parked') {
+                    continue;
+                }
+
+                $userName = $user->full_name;
+                $userEmail = $user->email;
+                $userId = $user->id;
+
+                // Collect user data for notification
+                $usersData[] = [
+                    'name' => $user->name,
+                    'surname' => $user->surname,
+                    'email' => $user->email,
+                    'full_name' => $user->full_name,
+                ];
+
+                // Log rejection
+                AuditLogService::logCustom(
+                    'user_rejected_bulk',
+                    "User {$userName} (ID: {$userId}, Email: {$userEmail}) was rejected in bulk action by " . Auth::user()->name,
+                    'users',
+                    'warning',
+                    [
+                        'user_id' => $userId,
+                        'user_email' => $userEmail,
+                        'user_name' => $userName,
+                        'rejected_by' => Auth::id(),
+                        'bulk_action' => true
+                    ]
+                );
+
+                // Delete user photo if exists
+                if ($user->photo) {
+                    $photoPath = storage_path('app/public/' . $user->photo);
+                    if (file_exists($photoPath)) {
+                        unlink($photoPath);
+                    }
+                }
+
+                // Detach from companies
+                $user->companies()->detach();
+
+                // Delete user
+                $user->delete();
+                $rejectedCount++;
+            }
+
+            // Send bulk rejection notification
+            if ($companyManagers->isNotEmpty() && !empty($usersData)) {
+                Notification::send($companyManagers, new UserRejectedNotification($usersData, Auth::user()));
+            }
+
+            $message = $rejectedCount === 1
+                ? "1 user has been rejected and removed from the system."
+                : "{$rejectedCount} users have been rejected and removed from the system.";
+
+            return redirect()->back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to reject users: ' . $e->getMessage());
+        }
     }
 }

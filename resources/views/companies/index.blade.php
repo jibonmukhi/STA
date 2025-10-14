@@ -119,10 +119,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         <!-- ATECO Code Search - Priority -->
                         <div class="col-md-3">
                             <label for="search_ateco_code" class="form-label fw-semibold text-primary">
-                                <i class="fas fa-tag me-1"></i>ATECO Code
+                                <i class="fas fa-tag me-1"></i>{{ __('companies.ateco_code') }}
                             </label>
-                            <input type="text" class="form-control border-primary" id="search_ateco_code" name="search_ateco_code" 
-                                   placeholder="Search by ATECO code..." value="{{ request('search_ateco_code') }}">
+                            <input type="text" class="form-control border-primary" id="search_ateco_code" name="search_ateco_code"
+                                   placeholder="{{ __('companies.search_by_ateco') }}" value="{{ request('search_ateco_code') }}">
                         </div>
                         
                         <!-- Name Search -->
@@ -150,9 +150,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <!-- P.IVA Search Row -->
                     <div class="row g-3 mt-2">
                         <div class="col-md-3">
-                            <label for="search_piva" class="form-label">P.IVA / VAT</label>
-                            <input type="text" class="form-control" id="search_piva" name="search_piva" 
-                                   placeholder="Search by P.IVA..." value="{{ request('search_piva') }}">
+                            <label for="search_piva" class="form-label">{{ __('companies.vat_number') }}</label>
+                            <input type="text" class="form-control" id="search_piva" name="search_piva"
+                                   placeholder="{{ __('companies.search_by_piva') }}" value="{{ request('search_piva') }}">
                         </div>
                     </div>
                     
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 , {{ __('companies.status') }}: {{ request('search_status') == '1' ? __('companies.active') : __('companies.inactive') }}
                             @endif
                             @if(request('search_date_from') || request('search_date_to'))
-                                , Date: {{ request('search_date_from') ?? 'Any' }} to {{ request('search_date_to') ?? 'Any' }}
+                                , {{ __('companies.date') }}: {{ request('search_date_from') ?? __('companies.any') }} {{ __('companies.to') }} {{ request('search_date_to') ?? __('companies.any') }}
                             @endif
                         </p>
                     @endif
@@ -257,10 +257,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <i class="fas fa-plus me-2"></i>{{ __('companies.add_new_company') }}
                 </a>
                 <a href="{{ route('companies.invite.form') }}" class="btn btn-success">
-                    <i class="fas fa-envelope me-2"></i>Invite Company Manager
+                    <i class="fas fa-envelope me-2"></i>{{ __('companies.invite_company_manager') }}
                 </a>
                 <a href="{{ route('companies.invitations.index') }}" class="btn btn-info">
-                    <i class="fas fa-list me-2"></i>View Invitations
+                    <i class="fas fa-list me-2"></i>{{ __('companies.view_all_invitations') }}
                 </a>
             </div>
             @endcan
@@ -283,9 +283,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tr>
                                 <th width="5%">#</th>
                                 <th width="8%" class="bg-light">
-                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'ateco_code', 'direction' => request('sort') === 'ateco_code' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'ateco_code', 'direction' => request('sort') === 'ateco_code' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
                                        class="text-decoration-none text-primary fw-semibold">
-                                        <i class="fas fa-tag me-1"></i>ATECO
+                                        <i class="fas fa-tag me-1"></i>{{ __('companies.ateco') }}
                                         @if(request('sort') === 'ateco_code')
                                             <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @else

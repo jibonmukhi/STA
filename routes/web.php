@@ -93,6 +93,8 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
     Route::get('/users/pending/approvals', [STAManagerDashboardController::class, 'pendingApprovals'])->name('users.pending.approvals');
     Route::post('/users/{user}/approve', [STAManagerDashboardController::class, 'approveUser'])->name('users.approve');
     Route::post('/users/{user}/reject', [STAManagerDashboardController::class, 'rejectUser'])->name('users.reject');
+    Route::post('/users/bulk-approve', [STAManagerDashboardController::class, 'bulkApproveUsers'])->name('users.bulk-approve');
+    Route::post('/users/bulk-reject', [STAManagerDashboardController::class, 'bulkRejectUsers'])->name('users.bulk-reject');
 
     // System Reports
     Route::get('/system/reports', [STAManagerDashboardController::class, 'systemReports'])->name('system.reports');
@@ -149,6 +151,7 @@ Route::middleware(['auth', 'role:company_manager'])->group(function () {
     Route::get('company-users', [UserController::class, 'companyUsers'])->name('company-users.index');
     Route::get('company-users/create', [UserController::class, 'createCompanyUser'])->name('company-users.create');
     Route::post('company-users', [UserController::class, 'storeCompanyUser'])->name('company-users.store');
+    Route::post('company-users/send-for-approval', [UserController::class, 'sendForApproval'])->name('company-users.send-for-approval');
 
     // Company profile management
     Route::get('my-companies', [CompanyController::class, 'myCompanies'])->name('my-companies.index');

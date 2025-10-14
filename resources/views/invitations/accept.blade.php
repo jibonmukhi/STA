@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accept Company Invitation - {{ config('app.name') }}</title>
+    <title>{{ __('companies.accept_invitation') }} - {{ config('app.name') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -74,7 +74,7 @@
     <div class="invitation-card">
         <div class="invitation-header">
             <i class="fas fa-envelope-open-text fa-3x mb-3"></i>
-            <h2 class="mb-0">Company Manager Invitation</h2>
+            <h2 class="mb-0">{{ __('companies.company_manager_invitation') }}</h2>
             <p class="mb-0 mt-2">{{ config('app.name') }}</p>
         </div>
 
@@ -86,31 +86,31 @@
             @endif
 
             <div class="text-center mb-4">
-                <h4>Welcome, {{ $invitation->manager_name }}!</h4>
-                <p class="text-muted">You've been invited to manage a company on {{ config('app.name') }}</p>
+                <h4>{{ __('companies.welcome') }}, {{ $invitation->manager_name }}!</h4>
+                <p class="text-muted">{{ __('companies.invited_to_manage') }} {{ config('app.name') }}</p>
             </div>
 
             <div class="company-info">
                 <h5 class="mb-3">
-                    <i class="fas fa-building me-2 text-primary"></i>Company Details
+                    <i class="fas fa-building me-2 text-primary"></i>{{ __('companies.company_details') }}
                 </h5>
                 <div class="info-item">
-                    <span class="info-label">Company Name:</span>
+                    <span class="info-label">{{ __('companies.company_name') }}:</span>
                     <span class="info-value">{{ $invitation->company_name }}</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Company Email:</span>
+                    <span class="info-label">{{ __('companies.company_email') }}:</span>
                     <span class="info-value">{{ $invitation->company_email }}</span>
                 </div>
                 @if($invitation->company_phone)
                     <div class="info-item">
-                        <span class="info-label">Phone:</span>
+                        <span class="info-label">{{ __('companies.phone') }}:</span>
                         <span class="info-value">{{ $invitation->company_phone }}</span>
                     </div>
                 @endif
                 @if($invitation->company_piva)
                     <div class="info-item">
-                        <span class="info-label">P.IVA:</span>
+                        <span class="info-label">{{ __('companies.piva') }}:</span>
                         <span class="info-value">{{ $invitation->company_piva }}</span>
                     </div>
                 @endif
@@ -118,31 +118,31 @@
 
             <div class="expiry-notice">
                 <i class="fas fa-clock me-2"></i>
-                <strong>Invitation Expires:</strong> {{ $invitation->expires_at->format('F j, Y \a\t g:i A') }}
+                <strong>{{ __('companies.invitation_expires') }}</strong> {{ $invitation->expires_at->format('F j, Y \a\t g:i A') }}
             </div>
 
             <div class="alert alert-info">
                 <i class="fas fa-info-circle me-2"></i>
-                <strong>Next Steps:</strong>
+                <strong>{{ __('companies.next_steps') }}</strong>
                 <ol class="mb-0 mt-2 ps-3">
-                    <li>Click the "Accept Invitation" button below</li>
-                    <li>You will be redirected to the login page</li>
-                    <li>Use the credentials sent to your email</li>
-                    <li>Change your temporary password on first login</li>
-                    <li>Start managing your company!</li>
+                    <li>{{ __('companies.step_click_accept') }}</li>
+                    <li>{{ __('companies.step_redirect_login') }}</li>
+                    <li>{{ __('companies.step_use_credentials') }}</li>
+                    <li>{{ __('companies.step_change_temp_password') }}</li>
+                    <li>{{ __('companies.step_start_managing') }}</li>
                 </ol>
             </div>
 
             <form action="{{ route('invitation.accept.process', ['token' => $invitation->token]) }}" method="POST" class="text-center mt-4">
                 @csrf
                 <button type="submit" class="btn btn-primary btn-accept">
-                    <i class="fas fa-check-circle me-2"></i>Accept Invitation
+                    <i class="fas fa-check-circle me-2"></i>{{ __('companies.accept_invitation') }}
                 </button>
             </form>
 
             <div class="text-center mt-4">
                 <p class="text-muted small mb-0">
-                    If you didn't expect this invitation, you can safely ignore this page.
+                    {{ __('companies.ignore_if_unexpected') }}
                 </p>
             </div>
         </div>

@@ -25,6 +25,34 @@
         </div>
     </div>
 
+    <!-- Flash Messages -->
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>There were some errors with your submission:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <form action="{{ route('company-users.store') }}" method="POST" enctype="multipart/form-data">
@@ -109,8 +137,9 @@
                             <div class="col-md-6 mb-3">
                                 <label for="country" class="form-label">Country</label>
                                 <select class="form-select @error('country') is-invalid @enderror" id="country" name="country">
+                                    <option value="">Select Country</option>
                                     @foreach(dataVaultItems('country') as $item)
-                                        <option value="{{ $item['code'] }}" {{ old('country', 'IT') === $item['code'] ? 'selected' : '' }}>
+                                        <option value="{{ $item['code'] }}" {{ old('country') === $item['code'] ? 'selected' : '' }}>
                                             {{ $item['label'] }}
                                         </option>
                                     @endforeach

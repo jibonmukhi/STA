@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Company Manager Invitation</title>
+    <title>{{ __('companies.company_manager_invitation') }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -115,73 +115,73 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Company Manager Invitation</h1>
+            <h1>{{ __('companies.company_manager_invitation') }}</h1>
         </div>
 
         <div class="content">
-            <p>Dear {{ $invitation->manager_name }} {{ $invitation->manager_surname }},</p>
+            <p>{{ __('companies.email_greeting') }} {{ $invitation->manager_name }} {{ $invitation->manager_surname }},</p>
 
-            <p>You have been invited to join <strong>{{ config('app.name') }}</strong> as a <strong>Company Manager</strong> for the following company:</p>
+            <p>{{ __('companies.email_invited_as_manager', ['app' => config('app.name')]) }}</p>
 
             <div class="company-info">
-                <h3>Company Details</h3>
-                <p><strong>Company Name:</strong> {{ $invitation->company_name }}</p>
-                <p><strong>Email:</strong> {{ $invitation->company_email }}</p>
+                <h3>{{ __('companies.email_company_details') }}</h3>
+                <p><strong>{{ __('companies.company_name') }}:</strong> {{ $invitation->company_name }}</p>
+                <p><strong>{{ __('companies.email') }}:</strong> {{ $invitation->company_email }}</p>
                 @if($invitation->company_phone)
-                    <p><strong>Phone:</strong> {{ $invitation->company_phone }}</p>
+                    <p><strong>{{ __('companies.phone') }}:</strong> {{ $invitation->company_phone }}</p>
                 @endif
                 @if($invitation->company_piva)
-                    <p><strong>P.IVA:</strong> {{ $invitation->company_piva }}</p>
+                    <p><strong>{{ __('companies.piva') }}:</strong> {{ $invitation->company_piva }}</p>
                 @endif
             </div>
 
             <div class="credentials-box">
-                <h3>Your Login Credentials</h3>
-                <p>Please use the following credentials to access your account:</p>
+                <h3>{{ __('companies.email_login_credentials') }}</h3>
+                <p>{{ __('companies.email_use_credentials') }}</p>
 
                 <div class="credential-item">
-                    <span class="credential-label">Username / Email:</span>
+                    <span class="credential-label">{{ __('companies.email_username') }}</span>
                     <span class="credential-value">{{ $invitation->manager_email }}</span>
                 </div>
 
                 <div class="credential-item">
-                    <span class="credential-label">Temporary Password:</span>
+                    <span class="credential-label">{{ __('companies.email_temp_password') }}</span>
                     <span class="credential-value">{{ $plainPassword }}</span>
                 </div>
             </div>
 
             <div class="warning">
-                <strong>Important:</strong> This is a temporary password. You will be required to change it upon your first login for security purposes.
+                <strong>{{ __('companies.email_important') }}</strong> {{ __('companies.email_temp_password_notice') }}
             </div>
 
             <div style="text-align: center;">
-                <a href="{{ $invitationUrl }}" class="button">Accept Invitation & Login</a>
+                <a href="{{ $invitationUrl }}" class="button">{{ __('companies.email_accept_and_login') }}</a>
             </div>
 
             <p class="expiry-notice">
-                ⏱️ This invitation will expire on {{ $invitation->expires_at->format('F j, Y \a\t g:i A') }}
+                ⏱️ {{ __('companies.email_expires_on') }} {{ $invitation->expires_at->format('F j, Y \a\t g:i A') }}
             </p>
 
-            <h3>Next Steps:</h3>
+            <h3>{{ __('companies.email_next_steps') }}</h3>
             <ol>
-                <li>Click the "Accept Invitation" button above</li>
-                <li>You will be redirected to the login page</li>
-                <li>Use the credentials provided above to log in</li>
-                <li>Change your temporary password to a secure one</li>
-                <li>Complete your profile information</li>
-                <li>Start managing your company!</li>
+                <li>{{ __('companies.email_step_1') }}</li>
+                <li>{{ __('companies.email_step_2') }}</li>
+                <li>{{ __('companies.email_step_3') }}</li>
+                <li>{{ __('companies.email_step_4') }}</li>
+                <li>{{ __('companies.email_step_5') }}</li>
+                <li>{{ __('companies.email_step_6') }}</li>
             </ol>
 
-            <p>If you did not expect this invitation or believe you received this email in error, please ignore it or contact the system administrator.</p>
+            <p>{{ __('companies.email_ignore_if_error') }}</p>
 
-            <p>Best regards,<br>
-            <strong>{{ config('app.name') }} Team</strong></p>
+            <p>{{ __('companies.email_best_regards') }}<br>
+            <strong>{{ __('companies.email_team', ['app' => config('app.name')]) }}</strong></p>
         </div>
 
         <div class="footer">
-            <p>This is an automated message. Please do not reply to this email.</p>
-            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
-            <p>If the button doesn't work, copy and paste this link into your browser:<br>
+            <p>{{ __('companies.email_automated_message') }}</p>
+            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. {{ __('companies.email_all_rights_reserved') }}</p>
+            <p>{{ __('companies.email_button_not_working') }}<br>
             <a href="{{ $invitationUrl }}">{{ $invitationUrl }}</a></p>
         </div>
     </div>

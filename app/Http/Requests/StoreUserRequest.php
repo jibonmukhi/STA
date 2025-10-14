@@ -21,6 +21,9 @@ class StoreUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Check if this is from company user creation (which uses default password)
+        $isCompanyUserCreation = request()->routeIs('company-users.store');
+
         return [
             'name' => 'required|string|max:255',
             'surname' => 'required|string|max:255',
@@ -35,7 +38,8 @@ class StoreUserRequest extends FormRequest
             'photo' => 'nullable|file|max:2048',
             'address' => 'nullable|string|max:500',
             'status' => 'nullable|in:active,inactive,parked',
-            'password' => 'required|string|min:8|confirmed',
+            // Password is only required when NOT creating from company-users route
+            'password' => $isCompanyUserCreation ? 'nullable' : 'required|string|min:8|confirmed',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,name',
             'companies' => 'nullable|array',
