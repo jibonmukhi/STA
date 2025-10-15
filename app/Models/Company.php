@@ -72,4 +72,20 @@ class Company extends Model
                     ->withPivot(['is_primary', 'role_in_company', 'joined_at'])
                     ->withTimestamps();
     }
+
+    /**
+     * Get all notes sent to this company
+     */
+    public function notes()
+    {
+        return $this->hasMany(CompanyNote::class);
+    }
+
+    /**
+     * Get unread notes for this company
+     */
+    public function unreadNotes()
+    {
+        return $this->hasMany(CompanyNote::class)->where('is_read', false);
+    }
 }

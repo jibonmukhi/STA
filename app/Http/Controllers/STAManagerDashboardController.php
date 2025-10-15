@@ -33,7 +33,11 @@ class STAManagerDashboardController extends Controller
 
     public function pendingApprovals(Request $request): View
     {
-        $query = User::with(['roles', 'companies'])
+        $query = User::with(['roles', 'companies.users' => function($query) {
+                $query->whereHas('roles', function($q) {
+                    $q->where('name', 'company_manager');
+                });
+            }])
             ->where('status', 'pending_approval');
 
         // Apply search filters

@@ -18,6 +18,8 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    @stack('styles')
+
     <style>
         :root {
             --primary-color: #4f46e5;

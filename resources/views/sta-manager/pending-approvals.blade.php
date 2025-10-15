@@ -2,23 +2,14 @@
 
 @section('page-title', __('users.pending_user_approvals'))
 
+@push('styles')
+<style>
+    /* No custom z-index - let Bootstrap handle it naturally */
+</style>
+@endpush
+
 @section('content')
 <div class="container-fluid">
-    <!-- Success/Error Messages -->
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>{{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -267,7 +258,7 @@
                                             <div class="small text-muted">{{ $user->created_at->diffForHumans() }}</div>
                                         </td>
                                         <td>
-                                            <div class="d-flex gap-1">
+                                            <div class="d-flex gap-1 flex-wrap">
                                                 <form action="{{ route('users.approve', $user) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     <button type="submit" class="btn btn-success btn-sm"
@@ -287,6 +278,18 @@
                                                 <button class="btn btn-outline-info btn-sm" onclick="viewUserDetails({{ $user->id }})">
                                                     <i class="fas fa-eye me-1"></i> View
                                                 </button>
+
+                                                @if($user->companies->isNotEmpty())
+                                                    @php
+                                                        $firstCompany = $user->companies->first();
+                                                    @endphp
+                                                    <button type="button" class="btn btn-warning btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#sendNoteModal{{ $firstCompany->id }}_{{ $user->id }}"
+                                                            title="Send note to {{ $firstCompany->name }}">
+                                                        <i class="fas fa-sticky-note me-1"></i> Note
+                                                    </button>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -329,7 +332,123 @@
             </div>
         </div>
     </div>
+
 </div>
+
+<!-- Send Note Modals (placed at body level to avoid any container conflicts) -->
+@if($pendingUsers->count() > 0)
+    @foreach($pendingUsers as $user)
+        @if($user->companies->isNotEmpty())
+            @php
+                $firstCompany = $user->companies->first();
+            @endphp
+            <div class="modal fade" id="sendNoteModal{{ $firstCompany->id }}_{{ $user->id }}" tabindex="-1" aria-labelledby="sendNoteModalLabel{{ $firstCompany->id }}_{{ $user->id }}" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <form method="POST" action="{{ route('companies.send-note', $firstCompany) }}" id="noteForm{{ $firstCompany->id }}_{{ $user->id }}">
+                            @csrf
+                            <div class="modal-header bg-warning text-white">
+                                <h5 class="modal-title" id="sendNoteModalLabel{{ $firstCompany->id }}_{{ $user->id }}">
+                                    <i class="fas fa-sticky-note me-2"></i>Send Note to Company Manager
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Regarding User:</strong> {{ $user->full_name }} ({{ $user->email }})
+                                </div>
+
+                                @if($user->companies->count() > 1)
+                                <div class="mb-3">
+                                    <label for="company_select{{ $firstCompany->id }}_{{ $user->id }}" class="form-label">
+                                        Select Company <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="company_select{{ $firstCompany->id }}_{{ $user->id }}" required onchange="updateFormAction{{ $firstCompany->id }}_{{ $user->id }}(this.value)">
+                                        @foreach($user->companies as $company)
+                                            <option value="{{ $company->id }}" {{ $loop->first ? 'selected' : '' }}>
+                                                {{ $company->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <div class="form-text">This user belongs to multiple companies. Select which company to send the note to.</div>
+                                </div>
+
+                                <script>
+                                    function updateFormAction{{ $firstCompany->id }}_{{ $user->id }}(companyId) {
+                                        const form = document.getElementById('noteForm{{ $firstCompany->id }}_{{ $user->id }}');
+                                        form.action = '{{ url('companies') }}/' + companyId + '/send-note';
+                                    }
+                                </script>
+                                @else
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ $firstCompany->logo_url }}" alt="{{ $firstCompany->name }}" class="avatar avatar-sm rounded me-2">
+                                        <div>
+                                            <strong>{{ $firstCompany->name }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
+
+                                @php
+                                    // Get company managers for display
+                                    $selectedCompany = $user->companies->count() > 1 ? null : $firstCompany;
+                                    $companyManagers = $selectedCompany ? $selectedCompany->users->filter(function($user) {
+                                        return $user->hasRole('company_manager');
+                                    }) : collect();
+                                @endphp
+
+                                @if($selectedCompany && $companyManagers->isNotEmpty())
+                                <div class="alert alert-warning">
+                                    <strong><i class="fas fa-users me-2"></i>Recipients ({{ $companyManagers->count() }} manager{{$companyManagers->count() > 1 ? 's' : ''}}):</strong>
+                                    <div class="mt-2">
+                                        @foreach($companyManagers as $manager)
+                                            <div class="mb-1">
+                                                <i class="fas fa-envelope me-1 text-muted"></i>
+                                                <strong>{{ $manager->full_name }}</strong>: {{ $manager->email }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @elseif($user->companies->count() > 1)
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <small>Select a company above to see the manager's email addresses</small>
+                                </div>
+                                @endif
+
+                                <div class="mb-3">
+                                    <label for="subject{{ $firstCompany->id }}_{{ $user->id }}" class="form-label">
+                                        Subject <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="subject{{ $firstCompany->id }}_{{ $user->id }}" name="subject" required maxlength="255" placeholder="e.g., Missing document for user approval">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="message{{ $firstCompany->id }}_{{ $user->id }}" class="form-label">
+                                        Message <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea class="form-control" id="message{{ $firstCompany->id }}_{{ $user->id }}" name="message" rows="6" required maxlength="2000" placeholder="Please specify what is missing or needs attention..."></textarea>
+                                    <div class="form-text">
+                                        <i class="fas fa-envelope me-1"></i>This note will be sent to all managers of the selected company.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-paper-plane me-1"></i>Send Note
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
+@endif
 
 <script>
     // Select all checkbox functionality
@@ -426,5 +545,27 @@
         // Navigate to user details page
         window.location.href = '{{ url('users') }}/' + userId;
     }
+
+    // Ensure all modals are properly initialized and can be interacted with
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all modal elements
+        const modalElements = document.querySelectorAll('.modal');
+
+        modalElements.forEach(function(modalEl) {
+            // Ensure modal is appended to body if not already
+            if (modalEl.parentElement !== document.body) {
+                document.body.appendChild(modalEl);
+            }
+
+            // Add event listener to ensure modal works
+            modalEl.addEventListener('shown.bs.modal', function () {
+                // Focus on first input when modal opens
+                const firstInput = this.querySelector('input[type="text"], textarea');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            });
+        });
+    });
 </script>
 @endsection

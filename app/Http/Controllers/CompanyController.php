@@ -4,14 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\CompanyInvitation;
+use App\Models\CompanyNote;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use App\Services\AuditLogService;
 use App\Mail\CompanyInvitationMail;
 use App\Http\Requests\CompanyInvitationRequest;
+use App\Notifications\CompanyManagerNoteNotification;
 
 class CompanyController extends Controller
 {
@@ -622,6 +625,113 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Failed to delete invitation: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send a note to a company manager
+     */
+    public function sendNote(Request $request, Company $company)
+    {
+        try {
+            // Validate the request
+            $validated = $request->validate([
+                'subject' => 'required|string|max:255',
+                'message' => 'required|string|max:2000',
+            ]);
+
+            // Create the note
+            $note = CompanyNote::create([
+                'company_id' => $company->id,
+                'sent_by' => auth()->id(),
+                'subject' => $validated['subject'],
+                'message' => $validated['message'],
+            ]);
+
+            // Get all company managers for this company
+            $companyManagers = $company->users()
+                ->whereHas('roles', function ($query) {
+                    $query->where('name', 'company_manager');
+                })
+                ->get();
+
+            // Check if we found any company managers
+            if ($companyManagers->isEmpty()) {
+                \Log::warning('No company managers found for company', [
+                    'company_id' => $company->id,
+                    'company_name' => $company->name,
+                ]);
+
+                return redirect()->back()
+                    ->with('error', "No company managers found for {$company->name}. Note saved but not sent.");
+            }
+
+            // Send notification to each company manager individually
+            $sentCount = 0;
+            $failedEmails = [];
+
+            foreach ($companyManagers as $manager) {
+                try {
+                    // Send notification (this will queue email and save to database)
+                    $manager->notify(new CompanyManagerNoteNotification($note));
+                    $sentCount++;
+
+                    \Log::info('Notification sent to company manager', [
+                        'manager_id' => $manager->id,
+                        'manager_email' => $manager->email,
+                        'manager_name' => $manager->full_name,
+                        'note_id' => $note->id,
+                    ]);
+                } catch (\Exception $notificationError) {
+                    $failedEmails[] = $manager->email;
+                    \Log::error('Failed to send notification to manager', [
+                        'manager_id' => $manager->id,
+                        'manager_email' => $manager->email,
+                        'error' => $notificationError->getMessage(),
+                        'trace' => $notificationError->getTraceAsString()
+                    ]);
+                }
+            }
+
+            // Log the action
+            AuditLogService::logCustom(
+                'company_note_sent',
+                "Note sent to company {$company->name}: {$validated['subject']}",
+                'companies',
+                'info',
+                [
+                    'note_id' => $note->id,
+                    'company_id' => $company->id,
+                    'company_name' => $company->name,
+                    'subject' => $validated['subject'],
+                    'sent_by' => auth()->id(),
+                    'recipients_count' => $companyManagers->count(),
+                    'sent_count' => $sentCount,
+                    'failed_count' => count($failedEmails),
+                    'recipients' => $companyManagers->pluck('email')->toArray(),
+                    'failed_emails' => $failedEmails,
+                ]
+            );
+
+            // Prepare success message
+            $message = "Note sent successfully to {$sentCount} manager(s) of {$company->name}.";
+            if (!empty($failedEmails)) {
+                $message .= " Failed to send to: " . implode(', ', $failedEmails);
+            }
+
+            return redirect()->back()
+                ->with('success', $message);
+
+        } catch (\Exception $e) {
+            \Log::error('Failed to send note', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'company_id' => $company->id ?? null,
+            ]);
+
+            return redirect()->back()
+                ->withErrors(['error' => 'Failed to send note: ' . $e->getMessage()])
+                ->withInput();
         }
     }
 }

@@ -124,6 +124,9 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
     // Company Management Routes
     Route::resource('companies', CompanyController::class);
 
+    // Company Note Routes
+    Route::post('/companies/{company}/send-note', [CompanyController::class, 'sendNote'])->name('companies.send-note');
+
     // Settings Management Routes (STA Manager only)
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingsController::class, 'store'])->name('settings.store');

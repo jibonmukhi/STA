@@ -440,15 +440,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         @endcan
-                                        
+
                                         @can('edit companies')
                                         <a href="{{ route('companies.edit', $company) }}" class="btn btn-sm btn-outline-primary" title="{{ __('companies.edit') }}">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         @endcan
-                                        
+
                                         @can('delete companies')
-                                        <form method="POST" action="{{ route('companies.destroy', $company) }}" style="display: inline;" 
+                                        <form method="POST" action="{{ route('companies.destroy', $company) }}" style="display: inline;"
                                               onsubmit="return confirm('{{ __('companies.delete_confirmation') }}')">
                                             @csrf
                                             @method('DELETE')
