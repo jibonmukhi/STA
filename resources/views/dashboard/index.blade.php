@@ -1,4 +1,6 @@
-@extends('layouts.dashboard')
+@extends('layouts.advanced-dashboard')
+
+@section('page-title', 'Dashboard Overview')
 
 @section('content')
 <div class="row">

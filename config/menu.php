@@ -37,6 +37,11 @@ return [
                     'title' => 'navigation.pending_approvals',
                     'route' => 'users.pending.approvals',
                     'permission' => 'approve users'
+                ],
+                [
+                    'title' => 'navigation.sent_notes',
+                    'route' => 'sta-manager.sent-notes',
+                    'permission' => 'view companies'
                 ]
             ]
         ],

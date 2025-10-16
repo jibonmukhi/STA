@@ -65,4 +65,7 @@ return [
     // Company Manager specific
     'my_profile' => 'My Profile',
     'bulk_import' => 'Bulk Import',
+
+    // STA Manager specific
+    'sent_notes' => 'Notes Log',
 ];

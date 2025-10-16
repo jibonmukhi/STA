@@ -354,10 +354,83 @@
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    <strong>Regarding User:</strong> {{ $user->full_name }} ({{ $user->email }})
+                                <!-- Detailed User Information Card -->
+                                <div class="card border-info mb-3">
+                                    <div class="card-header bg-info text-white">
+                                        <i class="fas fa-user me-2"></i><strong>Regarding User - Complete Information</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3 text-center">
+                                                <img src="{{ $user->photo_url }}" alt="{{ $user->full_name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                                            </div>
+                                            <div class="col-md-9">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-2">
+                                                        <small class="text-muted">Full Name:</small><br>
+                                                        <strong>{{ $user->full_name }}</strong>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <small class="text-muted">Email:</small><br>
+                                                        <strong>{{ $user->email }}</strong>
+                                                    </div>
+                                                    @if($user->cf)
+                                                    <div class="col-md-6 mb-2">
+                                                        <small class="text-muted">Codice Fiscale:</small><br>
+                                                        <strong>{{ $user->cf }}</strong>
+                                                    </div>
+                                                    @endif
+                                                    @if($user->date_of_birth)
+                                                    <div class="col-md-6 mb-2">
+                                                        <small class="text-muted">Date of Birth (Age):</small><br>
+                                                        <strong>{{ $user->date_of_birth->format('d/m/Y') }} ({{ $user->age }} years)</strong>
+                                                    </div>
+                                                    @endif
+                                                    @if($user->phone)
+                                                    <div class="col-md-6 mb-2">
+                                                        <small class="text-muted">Phone:</small><br>
+                                                        <strong>{{ $user->phone }}</strong>
+                                                    </div>
+                                                    @endif
+                                                    @if($user->mobile)
+                                                    <div class="col-md-6 mb-2">
+                                                        <small class="text-muted">Mobile:</small><br>
+                                                        <strong>{{ $user->mobile }}</strong>
+                                                    </div>
+                                                    @endif
+                                                    @if($user->address)
+                                                    <div class="col-12 mb-2">
+                                                        <small class="text-muted">Address:</small><br>
+                                                        <strong>{{ $user->address }}</strong>
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Company Details -->
+                                        <div class="mt-3 pt-3 border-top">
+                                            <h6 class="text-info mb-2"><i class="fas fa-building me-2"></i>Company Details:</h6>
+                                            @foreach($user->companies as $userCompany)
+                                            <div class="d-flex align-items-center mb-2 ps-3">
+                                                <img src="{{ $userCompany->logo_url }}" alt="{{ $userCompany->name }}" class="avatar avatar-sm rounded me-2">
+                                                <div>
+                                                    <strong>{{ $userCompany->name }}</strong>
+                                                    @if($userCompany->pivot && $userCompany->pivot->percentage)
+                                                    <span class="badge bg-primary ms-2">{{ $userCompany->pivot->percentage }}%</span>
+                                                    @endif
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        Role: <strong>{{ $userCompany->pivot->role_in_company ?? 'Member' }}</strong>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <input type="hidden" name="user_id" value="{{ $user->id }}">
 
                                 @if($user->companies->count() > 1)
                                 <div class="mb-3">

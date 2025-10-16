@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\CompanyInvitation;
 use App\Models\CompanyNote;
+use App\Models\NotificationTracking;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -636,13 +637,41 @@ class CompanyController extends Controller
         try {
             // Validate the request
             $validated = $request->validate([
+                'user_id' => 'required|exists:users,id',
                 'subject' => 'required|string|max:255',
                 'message' => 'required|string|max:2000',
             ]);
 
+            // Get the user this note is about
+            $targetUser = User::with('companies')->findOrFail($validated['user_id']);
+
+            // Prepare user data snapshot
+            $userData = [
+                'id' => $targetUser->id,
+                'full_name' => $targetUser->full_name,
+                'email' => $targetUser->email,
+                'phone' => $targetUser->phone,
+                'mobile' => $targetUser->mobile,
+                'cf' => $targetUser->cf,
+                'date_of_birth' => $targetUser->date_of_birth?->format('Y-m-d'),
+                'age' => $targetUser->age,
+                'address' => $targetUser->address,
+                'photo_url' => $targetUser->photo_url,
+                'companies' => $targetUser->companies->map(function($comp) {
+                    return [
+                        'id' => $comp->id,
+                        'name' => $comp->name,
+                        'percentage' => $comp->pivot->percentage ?? null,
+                        'role' => $comp->pivot->role_in_company ?? 'Member',
+                    ];
+                })->toArray(),
+            ];
+
             // Create the note
             $note = CompanyNote::create([
                 'company_id' => $company->id,
+                'user_id' => $validated['user_id'],
+                'user_data' => $userData,
                 'sent_by' => auth()->id(),
                 'subject' => $validated['subject'],
                 'message' => $validated['message'],
@@ -673,17 +702,72 @@ class CompanyController extends Controller
             foreach ($companyManagers as $manager) {
                 try {
                     // Send notification (this will queue email and save to database)
-                    $manager->notify(new CompanyManagerNoteNotification($note));
+                    $notification = $manager->notify(new CompanyManagerNoteNotification($note));
                     $sentCount++;
+
+                    // Create tracking record for email
+                    NotificationTracking::create([
+                        'notification_id' => $manager->id . '_' . $note->id . '_' . now()->timestamp,
+                        'recipient_user_id' => $manager->id,
+                        'company_id' => $company->id,
+                        'company_note_id' => $note->id,
+                        'notification_type' => 'email',
+                        'status' => 'sent',
+                        'sent_at' => now(),
+                        'metadata' => [
+                            'recipient_email' => $manager->email,
+                            'recipient_name' => $manager->full_name,
+                            'subject' => $note->subject,
+                            'target_user_id' => $targetUser->id,
+                            'target_user_name' => $targetUser->full_name,
+                        ],
+                    ]);
+
+                    // Create tracking record for database notification
+                    NotificationTracking::create([
+                        'notification_id' => $manager->id . '_' . $note->id . '_db_' . now()->timestamp,
+                        'recipient_user_id' => $manager->id,
+                        'company_id' => $company->id,
+                        'company_note_id' => $note->id,
+                        'notification_type' => 'database',
+                        'status' => 'delivered',
+                        'sent_at' => now(),
+                        'delivered_at' => now(),
+                        'metadata' => [
+                            'recipient_email' => $manager->email,
+                            'recipient_name' => $manager->full_name,
+                            'subject' => $note->subject,
+                            'target_user_id' => $targetUser->id,
+                            'target_user_name' => $targetUser->full_name,
+                        ],
+                    ]);
 
                     \Log::info('Notification sent to company manager', [
                         'manager_id' => $manager->id,
                         'manager_email' => $manager->email,
                         'manager_name' => $manager->full_name,
                         'note_id' => $note->id,
+                        'target_user' => $targetUser->full_name,
                     ]);
                 } catch (\Exception $notificationError) {
                     $failedEmails[] = $manager->email;
+
+                    // Create failed tracking record
+                    NotificationTracking::create([
+                        'notification_id' => $manager->id . '_' . $note->id . '_failed_' . now()->timestamp,
+                        'recipient_user_id' => $manager->id,
+                        'company_id' => $company->id,
+                        'company_note_id' => $note->id,
+                        'notification_type' => 'email',
+                        'status' => 'failed',
+                        'sent_at' => now(),
+                        'error_message' => $notificationError->getMessage(),
+                        'metadata' => [
+                            'recipient_email' => $manager->email,
+                            'target_user_id' => $targetUser->id,
+                        ],
+                    ]);
+
                     \Log::error('Failed to send notification to manager', [
                         'manager_id' => $manager->id,
                         'manager_email' => $manager->email,
@@ -696,13 +780,16 @@ class CompanyController extends Controller
             // Log the action
             AuditLogService::logCustom(
                 'company_note_sent',
-                "Note sent to company {$company->name}: {$validated['subject']}",
+                "Note sent to company {$company->name} regarding user {$targetUser->full_name}: {$validated['subject']}",
                 'companies',
                 'info',
                 [
                     'note_id' => $note->id,
                     'company_id' => $company->id,
                     'company_name' => $company->name,
+                    'target_user_id' => $targetUser->id,
+                    'target_user_name' => $targetUser->full_name,
+                    'target_user_email' => $targetUser->email,
                     'subject' => $validated['subject'],
                     'sent_by' => auth()->id(),
                     'recipients_count' => $companyManagers->count(),

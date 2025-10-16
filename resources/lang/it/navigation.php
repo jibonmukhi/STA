@@ -60,4 +60,12 @@ return [
 
     // Audit Logs
     'audit_logs' => 'Registri di Controllo',
+    'activity_log' => 'Registro Attività',
+
+    // Company Manager specific
+    'my_profile' => 'Il Mio Profilo',
+    'bulk_import' => 'Importazione Massiva',
+
+    // STA Manager specific
+    'sent_notes' => 'Registro Note',
 ];

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Company;
+use App\Models\CompanyNote;
 use App\Services\AuditLogService;
 use App\Notifications\UserApprovedNotification;
 use App\Notifications\UserRejectedNotification;
@@ -407,5 +408,81 @@ class STAManagerDashboardController extends Controller
             return redirect()->back()
                 ->with('error', 'Failed to reject users: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Display sent notes activity log for STA Manager
+     */
+    public function sentNotes(Request $request): View
+    {
+        $query = CompanyNote::with([
+            'company',
+            'user',
+            'sender',
+            'notificationTracking.recipient'
+        ])->orderBy('created_at', 'desc');
+
+        // Apply filters
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('subject', 'like', "%{$search}%")
+                  ->orWhere('message', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('surname', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('company', function($companyQuery) use ($search) {
+                      $companyQuery->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('company_filter')) {
+            $query->where('company_id', $request->get('company_filter'));
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->get('date_from'));
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->get('date_to'));
+        }
+
+        if ($request->filled('status_filter')) {
+            $status = $request->get('status_filter');
+            if ($status === 'read') {
+                $query->whereHas('notificationTracking', function($q) {
+                    $q->where('status', 'read');
+                });
+            } elseif ($status === 'unread') {
+                $query->whereHas('notificationTracking', function($q) {
+                    $q->whereIn('status', ['sent', 'delivered']);
+                });
+            } elseif ($status === 'failed') {
+                $query->whereHas('notificationTracking', function($q) {
+                    $q->where('status', 'failed');
+                });
+            }
+        }
+
+        // Pagination
+        $perPage = $request->get('per_page', 25);
+        $notes = $query->paginate($perPage)->withQueryString();
+
+        // Statistics
+        $stats = [
+            'total_notes' => CompanyNote::count(),
+            'notes_today' => CompanyNote::whereDate('created_at', today())->count(),
+            'notes_this_week' => CompanyNote::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'notes_this_month' => CompanyNote::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
+        ];
+
+        // Get companies for filter
+        $companies = Company::orderBy('name')->get();
+
+        return view('sta-manager.sent-notes', compact('notes', 'stats', 'companies'));
     }
 }

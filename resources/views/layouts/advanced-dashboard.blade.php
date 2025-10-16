@@ -1229,7 +1229,10 @@
             }
         });
     </script>
-    
+
+    <!-- Modals Section (for proper z-index stacking) -->
+    @yield('modals')
+
     @stack('scripts')
 </body>
 </html>

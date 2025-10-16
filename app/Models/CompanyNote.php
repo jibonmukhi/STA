@@ -8,6 +8,8 @@ class CompanyNote extends Model
 {
     protected $fillable = [
         'company_id',
+        'user_id',
+        'user_data',
         'sent_by',
         'subject',
         'message',
@@ -18,6 +20,7 @@ class CompanyNote extends Model
     protected $casts = [
         'is_read' => 'boolean',
         'read_at' => 'datetime',
+        'user_data' => 'array',
     ];
 
     /**
@@ -34,6 +37,22 @@ class CompanyNote extends Model
     public function sender()
     {
         return $this->belongsTo(User::class, 'sent_by');
+    }
+
+    /**
+     * Get the user this note is about
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Get notification tracking records for this note
+     */
+    public function notificationTracking()
+    {
+        return $this->hasMany(NotificationTracking::class, 'company_note_id');
     }
 
     /**

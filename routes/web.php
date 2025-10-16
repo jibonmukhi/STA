@@ -110,6 +110,9 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
     // System Reports
     Route::get('/system/reports', [STAManagerDashboardController::class, 'systemReports'])->name('system.reports');
 
+    // Sent Notes Activity Log
+    Route::get('/sta-manager/sent-notes', [STAManagerDashboardController::class, 'sentNotes'])->name('sta-manager.sent-notes');
+
     // Role Management Routes
     Route::resource('roles', RoleController::class);
 
