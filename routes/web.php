@@ -165,6 +165,19 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
 
 // Company Manager Routes
 Route::middleware(['auth', 'role:company_manager'])->group(function () {
+    // Profile Management
+    Route::get('/company-manager/profile', [\App\Http\Controllers\CompanyManagerController::class, 'profile'])->name('company-manager.profile');
+    Route::put('/company-manager/profile', [\App\Http\Controllers\CompanyManagerController::class, 'updateProfile'])->name('company-manager.profile.update');
+    Route::put('/company-manager/password', [\App\Http\Controllers\CompanyManagerController::class, 'updatePassword'])->name('company-manager.password.update');
+
+    // Audit Logs
+    Route::get('/company-manager/audit-logs', [\App\Http\Controllers\CompanyManagerController::class, 'auditLogs'])->name('company-manager.audit-logs');
+
+    // Bulk User Import
+    Route::get('/company-manager/bulk-import', [\App\Http\Controllers\CompanyManagerController::class, 'bulkImportForm'])->name('company-manager.bulk-import');
+    Route::post('/company-manager/bulk-import', [\App\Http\Controllers\CompanyManagerController::class, 'bulkImport'])->name('company-manager.bulk-import.process');
+    Route::get('/company-manager/template/download', [\App\Http\Controllers\CompanyManagerController::class, 'downloadTemplate'])->name('company-manager.template.download');
+
     // Limited user management (only company users)
     Route::get('company-users', [UserController::class, 'companyUsers'])->name('company-users.index');
     Route::get('company-users/create', [UserController::class, 'createCompanyUser'])->name('company-users.create');

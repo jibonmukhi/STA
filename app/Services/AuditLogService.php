@@ -140,7 +140,7 @@ class AuditLogService
 
         return self::log(
             action: 'logged_in',
-            description: "{$user->name} logged in",
+            description: __('audit_actions.desc_logged_in', ['name' => $user->name]),
             module: 'auth',
             metadata: [
                 'login_at' => now()->toISOString(),
@@ -158,7 +158,7 @@ class AuditLogService
 
         return self::log(
             action: 'logged_out',
-            description: "{$user->name} logged out",
+            description: __('audit_actions.desc_logged_out', ['name' => $user->name]),
             module: 'auth',
             metadata: [
                 'logout_at' => now()->toISOString(),
@@ -176,7 +176,7 @@ class AuditLogService
         return self::log(
             action: 'password_changed',
             model: $user,
-            description: "Password changed for {$user->name}",
+            description: __('audit_actions.desc_password_changed', ['name' => $user->name]),
             module: 'auth',
             severity: 'warning'
         );
@@ -190,7 +190,7 @@ class AuditLogService
         return self::log(
             action: 'role_assigned',
             model: $user,
-            description: "Role '{$role}' assigned to {$user->name}",
+            description: __('audit_actions.desc_role_assigned', ['role' => $role, 'name' => $user->name]),
             module: 'users',
             metadata: ['role' => $role]
         );
@@ -204,7 +204,7 @@ class AuditLogService
         return self::log(
             action: 'role_removed',
             model: $user,
-            description: "Role '{$role}' removed from {$user->name}",
+            description: __('audit_actions.desc_role_removed', ['role' => $role, 'name' => $user->name]),
             module: 'users',
             severity: 'warning',
             metadata: ['role' => $role]
@@ -219,7 +219,7 @@ class AuditLogService
         return self::log(
             action: 'file_uploaded',
             model: $model,
-            description: "File uploaded: {$filename}",
+            description: __('audit_actions.desc_file_uploaded', ['filename' => $filename]),
             module: 'files',
             metadata: [
                 'filename' => $filename,
@@ -237,7 +237,7 @@ class AuditLogService
         return self::log(
             action: 'file_deleted',
             model: $model,
-            description: "File deleted: {$filename}",
+            description: __('audit_actions.desc_file_deleted', ['filename' => $filename]),
             module: 'files',
             severity: 'warning',
             metadata: ['filename' => $filename]
@@ -251,7 +251,7 @@ class AuditLogService
     {
         return self::log(
             action: 'export',
-            description: "Data exported: {$type}",
+            description: __('audit_actions.desc_data_exported', ['type' => $type]),
             module: 'export',
             metadata: [
                 'type' => $type,
@@ -268,7 +268,7 @@ class AuditLogService
     {
         return self::log(
             action: 'import',
-            description: "Data imported: {$type}",
+            description: __('audit_actions.desc_data_imported', ['type' => $type]),
             module: 'import',
             metadata: [
                 'type' => $type,

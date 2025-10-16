@@ -23,7 +23,9 @@
       "Bash(else echo \"File not found\")",
       "Bash(if [ -f \"resources/views/notifications/index.blade.php\" ])",
       "Bash(then echo \"notifications index view exists\")",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(if [ -d \"resources/views/company-manager\" ])",
+      "Bash(else mkdir -p resources/views/company-manager)"
     ],
     "deny": [],
     "ask": []

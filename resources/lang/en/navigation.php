@@ -60,4 +60,9 @@ return [
 
     // Audit Logs
     'audit_logs' => 'Audit Logs',
+    'activity_log' => 'Activity Log',
+
+    // Company Manager specific
+    'my_profile' => 'My Profile',
+    'bulk_import' => 'Bulk Import',
 ];

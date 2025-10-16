@@ -155,6 +155,11 @@ return [
             'permission' => 'view dashboard'
         ],
         [
+            'title' => 'navigation.my_profile',
+            'route' => 'company-manager.profile',
+            'icon' => 'fas fa-user-circle',
+        ],
+        [
             'title' => 'navigation.company_users',
             'icon' => 'fas fa-users',
             'permission' => 'manage company users',
@@ -168,8 +173,17 @@ return [
                     'title' => 'navigation.add_user',
                     'route' => 'company-users.create',
                     'permission' => 'create users'
+                ],
+                [
+                    'title' => 'navigation.bulk_import',
+                    'route' => 'company-manager.bulk-import',
                 ]
             ]
+        ],
+        [
+            'title' => 'navigation.activity_log',
+            'route' => 'company-manager.audit-logs',
+            'icon' => 'fas fa-history',
         ],
         [
             'title' => 'navigation.certificate_management',
