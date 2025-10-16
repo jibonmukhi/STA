@@ -3,14 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\CompanyNote;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CompanyManagerNoteNotification extends Notification implements ShouldQueue
+class CompanyManagerNoteNotification extends Notification
 {
-    use Queueable;
 
     protected $companyNote;
 

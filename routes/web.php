@@ -127,6 +127,10 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
     // Company Note Routes
     Route::post('/companies/{company}/send-note', [CompanyController::class, 'sendNote'])->name('companies.send-note');
 
+    // Debug Routes (STA Manager only) - REMOVE IN PRODUCTION AFTER FIXING
+    Route::get('/debug/notifications', [\App\Http\Controllers\DebugNotificationController::class, 'index'])->name('debug.notifications');
+    Route::post('/debug/test-notification', [\App\Http\Controllers\DebugNotificationController::class, 'testNotification'])->name('debug.test-notification');
+
     // Settings Management Routes (STA Manager only)
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingsController::class, 'store'])->name('settings.store');
