@@ -182,6 +182,10 @@ return [
                 [
                     'title' => 'navigation.bulk_import',
                     'route' => 'company-manager.bulk-import',
+                ],
+                [
+                    'title' => 'navigation.profile_change_requests',
+                    'route' => 'company-manager.profile-change-requests',
                 ]
             ]
         ],

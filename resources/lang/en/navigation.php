@@ -65,6 +65,7 @@ return [
     // Company Manager specific
     'my_profile' => 'My Profile',
     'bulk_import' => 'Bulk Import',
+    'profile_change_requests' => 'Profile Change Requests',
 
     // STA Manager specific
     'sent_notes' => 'Notes Log',

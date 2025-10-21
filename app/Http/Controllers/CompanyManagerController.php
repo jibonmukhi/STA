@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\AuditLog;
+use App\Models\ProfileChangeRequest;
+use App\Notifications\ProfileChangeReviewedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -539,5 +541,179 @@ class CompanyManagerController extends Controller
 
             return back()->withErrors(['excel_file' => 'Failed to process file: ' . $e->getMessage()]);
         }
+    }
+
+    /**
+     * Show profile change requests for company manager
+     */
+    public function profileChangeRequests()
+    {
+        $user = Auth::user();
+
+        // Check if user is a company manager
+        if (!$user->hasRole('company_manager')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Get all user IDs from companies this manager manages
+        $companyUserIds = $user->companies()
+            ->with('users')
+            ->get()
+            ->pluck('users')
+            ->flatten()
+            ->pluck('id')
+            ->unique()
+            ->toArray();
+
+        // Get pending profile change requests from users in managed companies
+        $requests = ProfileChangeRequest::whereIn('user_id', $companyUserIds)
+            ->where('status', 'pending')
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('company-manager.profile-change-requests.index', compact('requests'));
+    }
+
+    /**
+     * Show specific profile change request for review
+     */
+    public function showProfileChangeRequest($id)
+    {
+        $user = Auth::user();
+
+        // Check if user is a company manager
+        if (!$user->hasRole('company_manager')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Get the request
+        $changeRequest = ProfileChangeRequest::with('user')->findOrFail($id);
+
+        // Check if the request user belongs to one of manager's companies
+        $companyUserIds = $user->companies()
+            ->with('users')
+            ->get()
+            ->pluck('users')
+            ->flatten()
+            ->pluck('id')
+            ->unique()
+            ->toArray();
+
+        if (!in_array($changeRequest->user_id, $companyUserIds)) {
+            abort(403, 'Unauthorized to view this request');
+        }
+
+        // Get field labels for display
+        $fieldLabels = [
+            'name' => trans('profile.name'),
+            'surname' => trans('profile.surname'),
+            'email' => trans('profile.email'),
+            'phone' => trans('profile.phone'),
+            'mobile' => trans('profile.mobile'),
+            'gender' => trans('profile.gender'),
+            'date_of_birth' => trans('profile.date_of_birth'),
+            'place_of_birth' => trans('profile.place_of_birth'),
+            'country' => trans('profile.country'),
+            'cf' => trans('profile.codice_fiscale'),
+            'address' => trans('profile.address'),
+            'photo' => trans('profile.profile_photo'),
+        ];
+
+        return view('company-manager.profile-change-requests.show', compact('changeRequest', 'fieldLabels'));
+    }
+
+    /**
+     * Approve profile change request
+     */
+    public function approveProfileChangeRequest($id)
+    {
+        $user = Auth::user();
+
+        // Check if user is a company manager
+        if (!$user->hasRole('company_manager')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Get the request
+        $changeRequest = ProfileChangeRequest::with('user')->findOrFail($id);
+
+        // Check if the request user belongs to one of manager's companies
+        $companyUserIds = $user->companies()
+            ->with('users')
+            ->get()
+            ->pluck('users')
+            ->flatten()
+            ->pluck('id')
+            ->unique()
+            ->toArray();
+
+        if (!in_array($changeRequest->user_id, $companyUserIds)) {
+            abort(403, 'Unauthorized to approve this request');
+        }
+
+        // Check if already reviewed
+        if ($changeRequest->status !== 'pending') {
+            return redirect()->route('company-manager.profile-change-requests')
+                ->with('error', 'This request has already been reviewed.');
+        }
+
+        // Approve the request
+        $changeRequest->approve($user);
+
+        // Notify the user
+        $changeRequest->user->notify(new ProfileChangeReviewedNotification($changeRequest, true));
+
+        return redirect()->route('company-manager.profile-change-requests')
+            ->with('success', trans('profile.changes_approved'));
+    }
+
+    /**
+     * Reject profile change request
+     */
+    public function rejectProfileChangeRequest(Request $request, $id)
+    {
+        $user = Auth::user();
+
+        // Check if user is a company manager
+        if (!$user->hasRole('company_manager')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $request->validate([
+            'rejection_reason' => 'nullable|string|max:1000',
+        ]);
+
+        // Get the change request
+        $changeRequest = ProfileChangeRequest::with('user')->findOrFail($id);
+
+        // Check if the request user belongs to one of manager's companies
+        $companyUserIds = $user->companies()
+            ->with('users')
+            ->get()
+            ->pluck('users')
+            ->flatten()
+            ->pluck('id')
+            ->unique()
+            ->toArray();
+
+        if (!in_array($changeRequest->user_id, $companyUserIds)) {
+            abort(403, 'Unauthorized to reject this request');
+        }
+
+        // Check if already reviewed
+        if ($changeRequest->status !== 'pending') {
+            return redirect()->route('company-manager.profile-change-requests')
+                ->with('error', 'This request has already been reviewed.');
+        }
+
+        // Reject the request
+        $changeRequest->reject($user, $request->input('rejection_reason'));
+
+        // Notify the user
+        $changeRequest->user->notify(new ProfileChangeReviewedNotification($changeRequest, false));
+
+        return redirect()->route('company-manager.profile-change-requests')
+            ->with('success', trans('profile.changes_rejected'));
     }
 }

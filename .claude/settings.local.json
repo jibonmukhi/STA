@@ -25,7 +25,9 @@
       "Bash(then echo \"notifications index view exists\")",
       "Bash(cat:*)",
       "Bash(if [ -d \"resources/views/company-manager\" ])",
-      "Bash(else mkdir -p resources/views/company-manager)"
+      "Bash(else mkdir -p resources/views/company-manager)",
+      "Bash(if [ -d \"resources/views/company-manager/profile-change-requests\" ])",
+      "Bash(else mkdir -p resources/views/company-manager/profile-change-requests)"
     ],
     "deny": [],
     "ask": []

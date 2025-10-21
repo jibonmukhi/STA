@@ -181,6 +181,12 @@ Route::middleware(['auth', 'role:company_manager'])->group(function () {
     Route::post('/company-manager/bulk-import', [\App\Http\Controllers\CompanyManagerController::class, 'bulkImport'])->name('company-manager.bulk-import.process');
     Route::get('/company-manager/template/download', [\App\Http\Controllers\CompanyManagerController::class, 'downloadTemplate'])->name('company-manager.template.download');
 
+    // Profile Change Requests
+    Route::get('/company-manager/profile-change-requests', [\App\Http\Controllers\CompanyManagerController::class, 'profileChangeRequests'])->name('company-manager.profile-change-requests');
+    Route::get('/company-manager/profile-change-requests/{request}', [\App\Http\Controllers\CompanyManagerController::class, 'showProfileChangeRequest'])->name('company-manager.profile-change-requests.show');
+    Route::post('/company-manager/profile-change-requests/{request}/approve', [\App\Http\Controllers\CompanyManagerController::class, 'approveProfileChangeRequest'])->name('company-manager.profile-change-requests.approve');
+    Route::post('/company-manager/profile-change-requests/{request}/reject', [\App\Http\Controllers\CompanyManagerController::class, 'rejectProfileChangeRequest'])->name('company-manager.profile-change-requests.reject');
+
     // Limited user management (only company users)
     Route::get('company-users', [UserController::class, 'companyUsers'])->name('company-users.index');
     Route::get('company-users/create', [UserController::class, 'createCompanyUser'])->name('company-users.create');

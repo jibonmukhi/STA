@@ -1,6 +1,15 @@
 <div>
     <h5 class="mb-3">{{ trans('profile.personal_information') }}</h5>
-    
+
+    @if(isset($pendingRequest) && $pendingRequest)
+        <div class="alert alert-warning">
+            <i class="fas fa-clock me-2"></i>
+            <strong>{{ trans('profile.pending_request_exists') }}</strong>
+            <p class="mb-0 mt-2">{{ trans('profile.pending_request_message') }}</p>
+            <small class="text-muted">{{ trans('profile.requested_on') }}: {{ $pendingRequest->created_at->format('M d, Y H:i') }}</small>
+        </div>
+    @endif
+
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
     </form>
@@ -8,6 +17,10 @@
     <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data">
         @csrf
         @method('patch')
+        @php
+            // Only disable if user requires approval AND has a pending request
+            $isDisabled = (isset($requiresApproval) && $requiresApproval && isset($pendingRequest) && $pendingRequest) ? 'disabled' : '';
+        @endphp
 
         <div class="row">
             <!-- Photo Upload -->
@@ -27,8 +40,8 @@
                     
                     <div class="mb-3">
                         <label for="photo" class="form-label">{{ trans('profile.profile_photo') }}</label>
-                        <input type="file" class="form-control @error('photo') is-invalid @enderror" 
-                               id="photo" name="photo" accept="image/*" onchange="previewPhoto(this)">
+                        <input type="file" class="form-control @error('photo') is-invalid @enderror"
+                               id="photo" name="photo" accept="image/*" onchange="previewPhoto(this)" {{ $isDisabled }}>
                         @error('photo')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -45,8 +58,8 @@
             <!-- Name -->
             <div class="col-md-6 mb-3">
                 <label for="name" class="form-label">{{ trans('profile.name') }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                       id="name" name="name" value="{{ old('name', $user->name) }}" required>
+                <input type="text" class="form-control @error('name') is-invalid @enderror"
+                       id="name" name="name" value="{{ old('name', $user->name) }}" required {{ $isDisabled }}>
                 @error('name')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -55,8 +68,8 @@
             <!-- Surname -->
             <div class="col-md-6 mb-3">
                 <label for="surname" class="form-label">{{ trans('profile.surname') }}</label>
-                <input type="text" class="form-control @error('surname') is-invalid @enderror" 
-                       id="surname" name="surname" value="{{ old('surname', $user->surname) }}">
+                <input type="text" class="form-control @error('surname') is-invalid @enderror"
+                       id="surname" name="surname" value="{{ old('surname', $user->surname) }}" {{ $isDisabled }}>
                 @error('surname')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -65,8 +78,8 @@
             <!-- Email -->
             <div class="col-md-6 mb-3">
                 <label for="email" class="form-label">{{ trans('profile.email') }} <span class="text-danger">*</span></label>
-                <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                       id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                <input type="email" class="form-control @error('email') is-invalid @enderror"
+                       id="email" name="email" value="{{ old('email', $user->email) }}" required {{ $isDisabled }}>
                 @error('email')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -92,8 +105,8 @@
             <!-- Phone -->
             <div class="col-md-6 mb-3">
                 <label for="phone" class="form-label">{{ trans('profile.phone') }}</label>
-                <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
-                       id="phone" name="phone" value="{{ old('phone', $user->phone) }}">
+                <input type="tel" class="form-control @error('phone') is-invalid @enderror"
+                       id="phone" name="phone" value="{{ old('phone', $user->phone) }}" {{ $isDisabled }}>
                 @error('phone')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -102,8 +115,8 @@
             <!-- Mobile -->
             <div class="col-md-6 mb-3">
                 <label for="mobile" class="form-label">{{ trans('profile.mobile') }}</label>
-                <input type="tel" class="form-control @error('mobile') is-invalid @enderror" 
-                       id="mobile" name="mobile" value="{{ old('mobile', $user->mobile) }}">
+                <input type="tel" class="form-control @error('mobile') is-invalid @enderror"
+                       id="mobile" name="mobile" value="{{ old('mobile', $user->mobile) }}" {{ $isDisabled }}>
                 @error('mobile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -112,7 +125,7 @@
             <!-- Gender -->
             <div class="col-md-6 mb-3">
                 <label for="gender" class="form-label">{{ trans('profile.gender') }}</label>
-                <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender">
+                <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender" {{ $isDisabled }}>
                     <option value="">{{ trans('profile.select_gender') }}</option>
                     <option value="male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>{{ trans('profile.male') }}</option>
                     <option value="female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>{{ trans('profile.female') }}</option>
@@ -126,9 +139,9 @@
             <!-- Date of Birth -->
             <div class="col-md-6 mb-3">
                 <label for="date_of_birth" class="form-label">{{ trans('profile.date_of_birth') }}</label>
-                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" 
-                       id="date_of_birth" name="date_of_birth" 
-                       value="{{ old('date_of_birth', $user->date_of_birth ? $user->date_of_birth->format('Y-m-d') : '') }}">
+                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror"
+                       id="date_of_birth" name="date_of_birth"
+                       value="{{ old('date_of_birth', $user->date_of_birth ? $user->date_of_birth->format('Y-m-d') : '') }}" {{ $isDisabled }}>
                 @error('date_of_birth')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -137,8 +150,8 @@
             <!-- Place of Birth -->
             <div class="col-md-6 mb-3">
                 <label for="place_of_birth" class="form-label">{{ trans('profile.place_of_birth') }}</label>
-                <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror" 
-                       id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth', $user->place_of_birth) }}">
+                <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror"
+                       id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth', $user->place_of_birth) }}" {{ $isDisabled }}>
                 @error('place_of_birth')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -147,8 +160,8 @@
             <!-- Country -->
             <div class="col-md-6 mb-3">
                 <label for="country" class="form-label">{{ trans('profile.country') }}</label>
-                <input type="text" class="form-control @error('country') is-invalid @enderror" 
-                       id="country" name="country" value="{{ old('country', $user->country ?? 'IT') }}">
+                <input type="text" class="form-control @error('country') is-invalid @enderror"
+                       id="country" name="country" value="{{ old('country', $user->country ?? 'IT') }}" {{ $isDisabled }}>
                 @error('country')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -157,8 +170,8 @@
             <!-- Codice Fiscale -->
             <div class="col-md-6 mb-3">
                 <label for="cf" class="form-label">{{ trans('profile.codice_fiscale') }}</label>
-                <input type="text" class="form-control @error('cf') is-invalid @enderror" 
-                       id="cf" name="cf" value="{{ old('cf', $user->cf) }}" maxlength="16">
+                <input type="text" class="form-control @error('cf') is-invalid @enderror"
+                       id="cf" name="cf" value="{{ old('cf', $user->cf) }}" maxlength="16" {{ $isDisabled }}>
                 @error('cf')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -167,23 +180,49 @@
             <!-- Address -->
             <div class="col-12 mb-3">
                 <label for="address" class="form-label">{{ trans('profile.address') }}</label>
-                <textarea class="form-control @error('address') is-invalid @enderror" 
-                          id="address" name="address" rows="3">{{ old('address', $user->address) }}</textarea>
+                <textarea class="form-control @error('address') is-invalid @enderror"
+                          id="address" name="address" rows="3" {{ $isDisabled }}>{{ old('address', $user->address) }}</textarea>
                 @error('address')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+
+            <!-- Request Message (Optional) - Only for end users who need approval -->
+            @if(isset($requiresApproval) && $requiresApproval && (!isset($pendingRequest) || !$pendingRequest))
+                <div class="col-12 mb-3">
+                    <label for="request_message" class="form-label">{{ trans('profile.reason_for_changes') }}</label>
+                    <textarea class="form-control" id="request_message" name="request_message" rows="2"
+                              placeholder="{{ trans('profile.reason_for_changes_placeholder') }}">{{ old('request_message') }}</textarea>
+                    <small class="form-text text-muted">{{ trans('profile.reason_for_changes_help') }}</small>
+                </div>
+            @endif
         </div>
 
         <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-2"></i>{{ trans('profile.update_profile') }}
+            <button type="submit" class="btn btn-primary" {{ $isDisabled }}>
+                @if(isset($requiresApproval) && $requiresApproval)
+                    <i class="fas fa-paper-plane me-2"></i>{{ trans('profile.request_profile_update') }}
+                @else
+                    <i class="fas fa-save me-2"></i>{{ trans('profile.update_profile') }}
+                @endif
             </button>
         </div>
+
+        @if (session('status') === 'profile-change-requested')
+            <div class="alert alert-success mt-3">
+                <i class="fas fa-check-circle me-2"></i>{{ trans('profile.changes_submitted') }}
+            </div>
+        @endif
 
         @if (session('status') === 'profile-updated')
             <div class="alert alert-success mt-3">
                 <i class="fas fa-check-circle me-2"></i>{{ trans('profile.profile_updated') }}
+            </div>
+        @endif
+
+        @if (session('info'))
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle me-2"></i>{{ session('info') }}
             </div>
         @endif
     </form>
