@@ -509,7 +509,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td>{{ $user->id }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-user-circle fa-lg me-2 text-muted"></i>
+                                        <img src="{{ $user->photo_url }}" alt="{{ $user->full_name }}"
+                                             class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
                                         <div>
                                             <div class="fw-bold">{{ $user->full_name }}</div>
                                             @if($user->id === auth()->id())

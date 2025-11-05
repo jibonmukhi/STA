@@ -279,7 +279,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <img src="{{ $user->photo_url }}" alt="{{ $user->name }}"
-                                                     class="avatar avatar-sm rounded-circle me-2">
+                                                     class="avatar avatar-sm rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
                                                 <div>
                                                     <div class="fw-bold">{{ $user->full_name }}</div>
                                                     @if($user->cf)

@@ -220,6 +220,21 @@
 
     <!-- Sidebar -->
     <div class="col-lg-4">
+        <!-- User Profile Photo -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-camera me-2"></i>{{ __('users.profile_photo') ?? 'Profile Photo' }}
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ $user->photo_url }}" alt="{{ $user->full_name }}"
+                     class="img-fluid rounded-circle shadow-sm mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                <h6 class="mb-1">{{ $user->full_name }}</h6>
+                <p class="text-muted small mb-0">{{ $user->email }}</p>
+            </div>
+        </div>
+
         <!-- System Information -->
         <div class="card mb-4">
             <div class="card-header">

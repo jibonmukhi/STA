@@ -160,7 +160,7 @@
                 <div class="card-body">
                     <div class="text-center mb-3">
                         <img src="{{ Auth::user()->photo_url }}" alt="{{ Auth::user()->name }}"
-                             class="avatar avatar-xl rounded-circle">
+                             class="avatar avatar-xl rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
                         <h5 class="mt-2 mb-0">{{ Auth::user()->full_name }}</h5>
                         <p class="text-muted">{{ Auth::user()->email }}</p>
                     </div>

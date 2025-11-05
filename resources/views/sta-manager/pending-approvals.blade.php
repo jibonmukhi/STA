@@ -188,7 +188,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <img src="{{ $user->photo_url }}" alt="{{ $user->name }}"
-                                                     class="avatar avatar-lg rounded-circle me-3">
+                                                     class="avatar avatar-sm rounded-circle me-3" style="width: 32px; height: 32px; object-fit: cover;">
                                                 <div>
                                                     <div class="fw-bold h6 mb-1">{{ $user->full_name }}</div>
                                                     @if($user->cf)
@@ -236,7 +236,7 @@
                                                     <div class="company-item mb-2">
                                                         <div class="d-flex align-items-center">
                                                             <img src="{{ $company->logo_url }}" alt="{{ $company->name }}"
-                                                                 class="avatar avatar-xs rounded me-2">
+                                                                 class="avatar avatar-xs rounded me-2" style="width: 24px; height: 24px; object-fit: cover;">
                                                             <div>
                                                                 <div class="fw-bold small">{{ $company->name }}</div>
                                                                 <div class="text-muted small">
@@ -362,7 +362,7 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-3 text-center">
-                                                <img src="{{ $user->photo_url }}" alt="{{ $user->full_name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                                                <img src="{{ $user->photo_url }}" alt="{{ $user->full_name }}" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
                                             </div>
                                             <div class="col-md-9">
                                                 <div class="row">
@@ -413,7 +413,7 @@
                                             <h6 class="text-info mb-2"><i class="fas fa-building me-2"></i>Company Details:</h6>
                                             @foreach($user->companies as $userCompany)
                                             <div class="d-flex align-items-center mb-2 ps-3">
-                                                <img src="{{ $userCompany->logo_url }}" alt="{{ $userCompany->name }}" class="avatar avatar-sm rounded me-2">
+                                                <img src="{{ $userCompany->logo_url }}" alt="{{ $userCompany->name }}" class="avatar avatar-sm rounded me-2" style="width: 24px; height: 24px; object-fit: cover;">
                                                 <div>
                                                     <strong>{{ $userCompany->name }}</strong>
                                                     @if($userCompany->pivot && $userCompany->pivot->percentage)
@@ -456,7 +456,7 @@
                                 @else
                                 <div class="mb-3">
                                     <div class="d-flex align-items-center">
-                                        <img src="{{ $firstCompany->logo_url }}" alt="{{ $firstCompany->name }}" class="avatar avatar-sm rounded me-2">
+                                        <img src="{{ $firstCompany->logo_url }}" alt="{{ $firstCompany->name }}" class="avatar avatar-sm rounded me-2" style="width: 24px; height: 24px; object-fit: cover;">
                                         <div>
                                             <strong>{{ $firstCompany->name }}</strong>
                                         </div>

@@ -177,23 +177,23 @@
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th>{{ __('users.name') ?? 'Name' }}</th>
-                                    <th>{{ __('users.email') ?? 'Email' }}</th>
-                                    <th>{{ __('users.role') ?? 'Role' }}</th>
-                                    <th>{{ __('users.percentage') ?? 'Percentage' }}</th>
-                                    <th>{{ __('users.primary') ?? 'Primary' }}</th>
-                                    <th>{{ __('users.status') ?? 'Status' }}</th>
-                                    <th class="text-end">{{ __('users.actions') ?? 'Actions' }}</th>
+                                    <th style="width: 20%;">{{ __('users.name') ?? 'Name' }}</th>
+                                    <th style="width: 20%;">{{ __('users.email') ?? 'Email' }}</th>
+                                    <th style="width: 15%;">{{ __('users.role') ?? 'Role' }}</th>
+                                    <th style="width: 10%;">{{ __('users.percentage') ?? 'Percentage' }}</th>
+                                    <th style="width: 10%;">{{ __('users.primary') ?? 'Primary' }}</th>
+                                    <th style="width: 10%;">{{ __('users.status') ?? 'Status' }}</th>
+                                    <th class="text-end" style="width: 15%;">{{ __('users.actions') ?? 'Actions' }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($company->users as $user)
                                 <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
+                                    <td style="white-space: nowrap;">
+                                        <div class="d-flex align-items-center" style="min-width: 150px;">
                                             <img src="{{ $user->photo_url }}" alt="{{ $user->full_name }}"
-                                                 class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
-                                            <strong>{{ $user->full_name }}</strong>
+                                                 class="rounded-circle me-2 flex-shrink-0" style="width: 32px; height: 32px; object-fit: cover;">
+                                            <strong class="text-truncate">{{ $user->full_name }}</strong>
                                         </div>
                                     </td>
                                     <td>

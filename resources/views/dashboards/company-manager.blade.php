@@ -153,7 +153,7 @@
                         @foreach($recentCompanyUsers as $user)
                             <div class="d-flex align-items-center mb-3 {{ !$loop->last ? 'border-bottom pb-3' : '' }}">
                                 <img src="{{ $user->photo_url }}" alt="{{ $user->name }}"
-                                     class="avatar avatar-sm rounded-circle me-3">
+                                     class="avatar avatar-sm rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
                                 <div class="flex-grow-1">
                                     <h6 class="mb-0">{{ $user->full_name }}</h6>
                                     <small class="text-muted">{{ $user->created_at->diffForHumans() }}</small>
