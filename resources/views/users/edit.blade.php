@@ -94,8 +94,10 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="gender" class="form-label">Gender</label>
-                                <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender">
+                                <label for="gender" class="form-label">
+                                    Gender <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender" required>
                                     <option value="">Select Gender</option>
                                     <option value="male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>Male</option>
                                     <option value="female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>Female</option>
@@ -109,9 +111,11 @@
 
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="date_of_birth" class="form-label">Date of Birth</label>
-                                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" 
-                                       id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $user->date_of_birth?->format('Y-m-d')) }}">
+                                <label for="date_of_birth" class="form-label">
+                                    Date of Birth <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror"
+                                       id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $user->date_of_birth?->format('Y-m-d')) }}" required>
                                 @error('date_of_birth')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -120,9 +124,11 @@
 
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="place_of_birth" class="form-label">Place of Birth</label>
-                                <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror" 
-                                       id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth', $user->place_of_birth) }}">
+                                <label for="place_of_birth" class="form-label">
+                                    Place of Birth <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror"
+                                       id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth', $user->place_of_birth) }}" required>
                                 @error('place_of_birth')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -134,8 +140,10 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="country" class="form-label">Country</label>
-                                <select class="form-select @error('country') is-invalid @enderror" id="country" name="country">
+                                <label for="country" class="form-label">
+                                    Country <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('country') is-invalid @enderror" id="country" name="country" required>
                                     @foreach(dataVaultItems('country') as $item)
                                         <option value="{{ $item['code'] }}" {{ old('country', $user->country ?? 'IT') == $item['code'] ? 'selected' : '' }}>
                                             {{ $item['label'] }}
@@ -149,10 +157,12 @@
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="cf" class="form-label">Codice Fiscale (CF)</label>
-                                <input type="text" class="form-control @error('cf') is-invalid @enderror" 
-                                       id="cf" name="cf" value="{{ old('cf', $user->cf) }}" maxlength="16" 
-                                       placeholder="e.g. RSSMRA90A01H501X">
+                                <label for="cf" class="form-label">
+                                    Codice Fiscale (CF) <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control @error('cf') is-invalid @enderror"
+                                       id="cf" name="cf" value="{{ old('cf', $user->cf) }}" maxlength="16"
+                                       placeholder="e.g. RSSMRA90A01H501X" required>
                                 <div class="form-text">Italian tax identification code</div>
                                 @error('cf')
                                     <div class="invalid-feedback">{{ $message }}</div>

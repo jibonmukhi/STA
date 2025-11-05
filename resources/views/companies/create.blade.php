@@ -95,9 +95,11 @@
 
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="email" class="form-label">{{ __('companies.email') }}</label>
-                                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                               id="email" name="email" value="{{ old('email') }}">
+                                        <label for="email" class="form-label">
+                                            {{ __('companies.email') }} <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                               id="email" name="email" value="{{ old('email') }}" required>
                                         @error('email')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -119,9 +121,11 @@
 
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="piva" class="form-label">{{ __('companies.tax_id') }} / VAT Number</label>
-                                        <input type="text" class="form-control @error('piva') is-invalid @enderror" 
-                                               id="piva" name="piva" value="{{ old('piva') }}">
+                                        <label for="piva" class="form-label">
+                                            {{ __('companies.tax_id') }} / VAT Number <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control @error('piva') is-invalid @enderror"
+                                               id="piva" name="piva" value="{{ old('piva') }}" required>
                                         @error('piva')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror

@@ -83,9 +83,11 @@
 
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="surname" class="form-label">{{ __('users.surname') }}</label>
-                                <input type="text" class="form-control @error('surname') is-invalid @enderror" 
-                                       id="surname" name="surname" value="{{ old('surname') }}">
+                                <label for="surname" class="form-label">
+                                    {{ __('users.surname') }} <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control @error('surname') is-invalid @enderror"
+                                       id="surname" name="surname" value="{{ old('surname') }}" required>
                                 @error('surname')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -96,8 +98,10 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="gender" class="form-label">{{ __('users.gender') }}</label>
-                                <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender">
+                                <label for="gender" class="form-label">
+                                    {{ __('users.gender') }} <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender" required>
                                     <option value="">{{ __('users.select_gender') }}</option>
                                     <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>{{ __('users.male') }}</option>
                                     <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>{{ __('users.female') }}</option>
@@ -111,9 +115,11 @@
 
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="date_of_birth" class="form-label">{{ __('users.date_of_birth') }}</label>
-                                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" 
-                                       id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') }}">
+                                <label for="date_of_birth" class="form-label">
+                                    {{ __('users.date_of_birth') }} <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror"
+                                       id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') }}" required>
                                 @error('date_of_birth')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -122,9 +128,11 @@
 
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="place_of_birth" class="form-label">{{ __('users.place_of_birth') }}</label>
-                                <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror" 
-                                       id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth') }}">
+                                <label for="place_of_birth" class="form-label">
+                                    {{ __('users.place_of_birth') }} <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror"
+                                       id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth') }}" required>
                                 @error('place_of_birth')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -136,8 +144,10 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="country" class="form-label">{{ __('users.country') }}</label>
-                                <select class="form-select @error('country') is-invalid @enderror" id="country" name="country">
+                                <label for="country" class="form-label">
+                                    {{ __('users.country') }} <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('country') is-invalid @enderror" id="country" name="country" required>
                                     @foreach(dataVaultItems('country') as $item)
                                         <option value="{{ $item['code'] }}" {{ old('country', 'IT') == $item['code'] ? 'selected' : '' }}>
                                             {{ $item['label'] }}
@@ -151,10 +161,12 @@
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="cf" class="form-label">{{ __('users.codice_fiscale') }}</label>
-                                <input type="text" class="form-control @error('cf') is-invalid @enderror" 
-                                       id="cf" name="cf" value="{{ old('cf') }}" maxlength="16" 
-                                       placeholder="e.g. RSSMRA90A01H501X">
+                                <label for="cf" class="form-label">
+                                    {{ __('users.codice_fiscale') }} <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control @error('cf') is-invalid @enderror"
+                                       id="cf" name="cf" value="{{ old('cf') }}" maxlength="16"
+                                       placeholder="e.g. RSSMRA90A01H501X" required>
                                 <div class="form-text">{{ __('users.italian_tax_code') }}</div>
                                 @error('cf')
                                     <div class="invalid-feedback">{{ $message }}</div>

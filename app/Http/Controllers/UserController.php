@@ -122,9 +122,30 @@ class UserController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
+        // Italian translations for headers
+        $italianHeaders = [
+            'name' => 'NOME',
+            'surname' => 'COGNOME',
+            'email' => 'EMAIL',
+            'password' => 'PASSWORD',
+            'status' => 'STATO',
+            'role' => 'RUOLO',
+            'companies' => 'AZIENDE',
+            'company_percentages' => 'PERCENTUALI AZIENDE',
+            'primary_company' => 'AZIENDA PRINCIPALE',
+            'date_of_birth' => 'DATA DI NASCITA',
+            'place_of_birth' => 'LUOGO DI NASCITA',
+            'country' => 'PAESE',
+            'phone' => 'TELEFONO',
+            'mobile' => 'CELLULARE',
+            'gender' => 'GENERE',
+            'cf' => 'CODICE FISCALE',
+            'address' => 'INDIRIZZO',
+        ];
+
         foreach (UserImportService::TEMPLATE_HEADERS as $index => $header) {
             $column = $index + 1;
-            $label = strtoupper(str_replace('_', ' ', $header));
+            $label = $italianHeaders[$header] ?? strtoupper(str_replace('_', ' ', $header));
 
             $sheet->setCellValueByColumnAndRow($column, 1, $label);
             $sheet->getColumnDimensionByColumn($column)->setAutoSize(true);
@@ -138,7 +159,7 @@ class UserController extends Controller
         $sheet->getStyle('1:1')->getFont()->setBold(true);
         $sheet->freezePane('A2');
 
-        $fileName = 'user_import_template_' . now()->format('Ymd_His') . '.xlsx';
+        $fileName = 'modello_importazione_utenti_' . now()->format('Ymd_His') . '.xlsx';
         $writer = new Xlsx($spreadsheet);
 
         return response()->streamDownload(

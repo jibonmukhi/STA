@@ -195,7 +195,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ $note->company->logo_url }}" alt="{{ $note->company->name }}" class="avatar avatar-sm rounded me-2">
+                                                <img src="{{ $note->company->logo_url }}" alt="{{ $note->company->name }}" class="avatar avatar-sm rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
                                                 <div>
                                                     <strong>{{ $note->company->name }}</strong>
                                                 </div>
@@ -204,7 +204,7 @@
                                         <td>
                                             @if($note->user)
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ $note->user->photo_url }}" alt="{{ $note->user->full_name }}" class="avatar avatar-sm rounded-circle me-2">
+                                                <img src="{{ $note->user->photo_url }}" alt="{{ $note->user->full_name }}" class="avatar avatar-sm rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
                                                 <div>
                                                     <strong>{{ $note->user->full_name }}</strong>
                                                     <br><small class="text-muted">{{ $note->user->email }}</small>
@@ -357,7 +357,7 @@ function updatePerPage(value) {
                                 @if($note->user_data)
                                 @php $userData = $note->user_data; @endphp
                                 <div class="text-center mb-3">
-                                    <img src="{{ $userData['photo_url'] ?? '' }}" alt="{{ $userData['full_name'] ?? '' }}" class="rounded-circle border border-3 border-light shadow-sm" style="width: 90px; height: 90px; object-fit: cover;">
+                                    <img src="{{ $userData['photo_url'] ?? '' }}" alt="{{ $userData['full_name'] ?? '' }}" class="rounded-circle border border-3 border-light shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
                                 </div>
                                 <table class="table table-sm table-borderless">
                                     <tr>

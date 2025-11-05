@@ -102,9 +102,9 @@ class CompanyController extends Controller
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'email' => 'nullable|email|max:255|unique:companies',
+                'email' => 'required|email|max:255|unique:companies',
                 'phone' => 'nullable|string|max:20',
-                'piva' => 'nullable|string|max:50',
+                'piva' => 'required|string|max:50',
                 'ateco_code' => 'nullable|string|max:10|regex:/^[0-9]+$/',
                 'website' => 'nullable|url|max:255',
                 'address' => 'nullable|string|max:500',
@@ -188,9 +188,9 @@ class CompanyController extends Controller
             $validated = $request->validate([
                 'ateco_code' => 'nullable|string|max:10|regex:/^[0-9]+$/',
                 'name' => 'required|string|max:255',
-                'email' => 'nullable|email|max:255|unique:companies,email,' . $company->id,
+                'email' => 'required|email|max:255|unique:companies,email,' . $company->id,
                 'phone' => 'nullable|string|max:20',
-                'piva' => 'nullable|string|max:50',
+                'piva' => 'required|string|max:50',
                 'website' => 'nullable|url|max:255',
                 'address' => 'nullable|string|max:500',
                 'logo' => 'nullable|file|max:2048',

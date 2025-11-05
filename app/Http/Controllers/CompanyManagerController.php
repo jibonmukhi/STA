@@ -252,20 +252,20 @@ class CompanyManagerController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Set headers
+        // Set headers (Italian)
         $headers = [
-            'Name *',
-            'Surname *',
+            'Nome *',
+            'Cognome *',
             'Email *',
-            'Phone',
-            'Mobile',
-            'Date of Birth (YYYY-MM-DD)',
-            'Place of Birth',
-            'Country',
-            'Gender (male/female/other)',
+            'Telefono',
+            'Cellulare',
+            'Data di Nascita (YYYY-MM-DD)',
+            'Luogo di Nascita',
+            'Paese',
+            'Genere (male/female/other)',
             'CF (Codice Fiscale)',
-            'Address',
-            'Company Percentage *',
+            'Indirizzo',
+            'Percentuale Azienda *',
         ];
 
         // Write headers in bold
@@ -278,19 +278,19 @@ class CompanyManagerController extends Controller
             $sheet->getColumnDimension($col)->setWidth(20);
         }
 
-        // Add sample data row
+        // Add sample data row (Italian)
         $sampleData = [
-            'John',
-            'Doe',
-            'john.doe@example.com',
-            '+39 123 456 7890',
-            '+39 987 654 3210',
-            '1990-01-15',
-            'Rome',
-            'Italy',
+            'Mario',
+            'Rossi',
+            'mario.rossi@example.com',
+            '+39 06 1234567',
+            '+39 333 1234567',
+            '1988-04-12',
+            'Roma',
+            'Italia',
             'male',
-            'RSSMRA80A01H501U',
-            'Via Roma 123, 00100 Rome, Italy',
+            'RSSMRA88D12H501X',
+            'Via Roma 1, 00100 Roma, Italia',
             '100',
         ];
 
@@ -299,20 +299,20 @@ class CompanyManagerController extends Controller
         $sheet->getStyle('A2:L2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle('A2:L2')->getFill()->getStartColor()->setARGB('FFE0E0E0');
 
-        // Add instructions in a separate section
+        // Add instructions in a separate section (Italian)
         $instructionRow = 4;
-        $sheet->setCellValue('A' . $instructionRow, 'INSTRUCTIONS:');
+        $sheet->setCellValue('A' . $instructionRow, 'ISTRUZIONI:');
         $sheet->getStyle('A' . $instructionRow)->getFont()->setBold(true);
 
         $instructions = [
-            '1. Fields marked with * are required',
-            '2. Email must be unique (not already in system)',
-            '3. Date format: YYYY-MM-DD (e.g., 1990-01-15)',
-            '4. Gender: must be male, female, or other',
-            '5. Company Percentage: must be between 1 and 100',
-            '6. Do not modify the header row',
-            '7. Delete the sample data row before uploading',
-            '8. Add your users starting from row 3',
+            '1. I campi contrassegnati con * sono obbligatori',
+            '2. L\'email deve essere univoca (non già presente nel sistema)',
+            '3. Formato data: YYYY-MM-DD (es. 1988-04-12)',
+            '4. Genere: deve essere male, female o other',
+            '5. Percentuale Azienda: deve essere compresa tra 1 e 100',
+            '6. Non modificare la riga di intestazione',
+            '7. Eliminare la riga di dati di esempio prima del caricamento',
+            '8. Aggiungere gli utenti a partire dalla riga 3',
         ];
 
         $instructionRow++;
@@ -330,8 +330,8 @@ class CompanyManagerController extends Controller
             ['user_id' => $user->id]
         );
 
-        // Generate filename
-        $filename = 'bulk_user_import_template_' . now()->format('Y_m_d') . '.xlsx';
+        // Generate filename (Italian)
+        $filename = 'modello_importazione_utenti_' . now()->format('Y_m_d') . '.xlsx';
 
         // Create writer and return download
         $writer = new Xlsx($spreadsheet);
