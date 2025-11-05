@@ -58,7 +58,11 @@ class STAManagerDashboardController extends Controller
         }
 
         $pendingUsers = $query->latest()->paginate(15);
-        $companies = Company::orderBy('name')->get();
+
+        // Get only companies that have pending approval users
+        $companies = Company::whereHas('users', function($q) {
+            $q->where('status', 'pending_approval');
+        })->orderBy('name')->get();
 
         $stats = [
             'total_pending' => User::where('status', 'pending_approval')->count(),
