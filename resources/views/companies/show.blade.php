@@ -162,6 +162,106 @@
                 </div>
             </div>
         </div>
+
+        <!-- Company Users Card -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-users me-2"></i>{{ __('companies.company_users') ?? 'Company Users' }}
+                    <span class="badge bg-primary ms-2">{{ $company->users->count() }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                @if($company->users->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{{ __('users.name') ?? 'Name' }}</th>
+                                    <th>{{ __('users.email') ?? 'Email' }}</th>
+                                    <th>{{ __('users.role') ?? 'Role' }}</th>
+                                    <th>{{ __('users.percentage') ?? 'Percentage' }}</th>
+                                    <th>{{ __('users.primary') ?? 'Primary' }}</th>
+                                    <th>{{ __('users.status') ?? 'Status' }}</th>
+                                    <th class="text-end">{{ __('users.actions') ?? 'Actions' }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($company->users as $user)
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ $user->photo_url }}" alt="{{ $user->full_name }}"
+                                                 class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                            <strong>{{ $user->full_name }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="mailto:{{ $user->email }}" class="text-decoration-none">
+                                            {{ $user->email }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @if($user->roles->isNotEmpty())
+                                            @foreach($user->roles as $role)
+                                                <span class="badge bg-info">{{ $role->name }}</span>
+                                            @endforeach
+                                        @else
+                                            <span class="text-muted">{{ __('users.no_role') ?? 'No Role' }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ $user->pivot->percentage ?? 0 }}%</span>
+                                    </td>
+                                    <td>
+                                        @if($user->pivot->is_primary)
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check"></i> {{ __('users.yes') ?? 'Yes' }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted">{{ __('users.no') ?? 'No' }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($user->status === 'active')
+                                            <span class="badge bg-success">{{ __('users.active') ?? 'Active' }}</span>
+                                        @elseif($user->status === 'parked')
+                                            <span class="badge bg-warning">{{ __('users.parked') ?? 'Parked' }}</span>
+                                        @else
+                                            <span class="badge bg-secondary">{{ __('users.inactive') ?? 'Inactive' }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            @can('view users')
+                                            <a href="{{ route('users.show', $user) }}"
+                                               class="btn btn-outline-primary"
+                                               title="{{ __('users.view_user') ?? 'View User' }}">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            @endcan
+                                            @can('edit users')
+                                            <a href="{{ route('users.edit', $user) }}"
+                                               class="btn btn-outline-secondary"
+                                               title="{{ __('users.edit_user') ?? 'Edit User' }}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            @endcan
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">{{ __('companies.no_users') ?? 'No users associated with this company yet.' }}</p>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 
     <!-- Company Logo Card -->

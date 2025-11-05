@@ -163,6 +163,11 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
+        // Load users with their roles and pivot data
+        $company->load(['users' => function($query) {
+            $query->with('roles')->orderBy('name');
+        }]);
+
         return view('companies.show', compact('company'));
     }
 
