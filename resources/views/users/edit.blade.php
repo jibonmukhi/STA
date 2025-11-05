@@ -9,7 +9,7 @@
             <h4 class="mb-0">
                 <i class="fas fa-user-edit me-2"></i>{{ __('users.edit_user') }}: {{ $user->full_name }}
             </h4>
-            <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ isset($isCompanyManager) && $isCompanyManager ? route('company-users.show', $user) : route('users.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>{{ __('users.back_to_users') }}
             </a>
         </div>
@@ -50,7 +50,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('users.update', $user) }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ isset($isCompanyManager) && $isCompanyManager ? route('company-users.update', $user) : route('users.update', $user) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -439,7 +439,7 @@
                     <hr>
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{{ route('users.index') }}" class="btn btn-secondary">
+                        <a href="{{ isset($isCompanyManager) && $isCompanyManager ? route('company-users.show', $user) : route('users.index') }}" class="btn btn-secondary">
                             <i class="fas fa-times me-2"></i>Cancel
                         </a>
                         <button type="submit" class="btn btn-primary">

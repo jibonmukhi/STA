@@ -785,7 +785,11 @@ class UserController extends Controller
         }
 
         $user->load(['roles', 'companies']);
-        return view('users.show', compact('user'));
+
+        // Flag to indicate this is company manager context
+        $isCompanyManager = true;
+
+        return view('users.show', compact('user', 'isCompanyManager'));
     }
 
     /**
@@ -816,7 +820,10 @@ class UserController extends Controller
             ];
         })->values();
 
-        return view('users.edit', compact('user', 'roles', 'companies', 'existingCompanies'));
+        // Flag to indicate this is company manager context
+        $isCompanyManager = true;
+
+        return view('users.edit', compact('user', 'roles', 'companies', 'existingCompanies', 'isCompanyManager'));
     }
 
     /**
@@ -882,7 +889,7 @@ class UserController extends Controller
                 $user->companies()->sync($companyData);
             }
 
-            return redirect()->route('company-users.index')
+            return redirect()->route('company-users.show', $user)
                 ->with('success', __('users.user_updated'));
 
         } catch (\Exception $e) {

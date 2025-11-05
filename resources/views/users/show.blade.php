@@ -18,11 +18,11 @@
                 @endif
             </h4>
             <div class="btn-group">
-                <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ isset($isCompanyManager) && $isCompanyManager ? route('company-users.index') : route('users.index') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>{{ __('users.back_to_users') }}
                 </a>
                 @can('edit users')
-                <a href="{{ route('users.edit', $user) }}" class="btn btn-primary">
+                <a href="{{ isset($isCompanyManager) && $isCompanyManager ? route('company-users.edit', $user) : route('users.edit', $user) }}" class="btn btn-primary">
                     <i class="fas fa-edit me-2"></i>{{ __('users.edit_user_btn') }}
                 </a>
                 @endcan
@@ -302,7 +302,7 @@
                 <i class="fas fa-building fa-3x text-muted mb-3"></i>
                 <p class="text-muted mb-3">No company associations found.</p>
                 @can('edit users')
-                    <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ isset($isCompanyManager) && $isCompanyManager ? route('company-users.edit', $user) : route('users.edit', $user) }}" class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-plus me-1"></i>Add Companies
                     </a>
                 @endcan
@@ -320,7 +320,7 @@
             <div class="card-body">
                 <div class="d-grid gap-2">
                     @can('edit users')
-                    <a href="{{ route('users.edit', $user) }}" class="btn btn-primary">
+                    <a href="{{ isset($isCompanyManager) && $isCompanyManager ? route('company-users.edit', $user) : route('users.edit', $user) }}" class="btn btn-primary">
                         <i class="fas fa-edit me-2"></i>Edit User
                     </a>
                     @endcan
