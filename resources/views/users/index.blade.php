@@ -65,7 +65,7 @@ function toggleAdvancedSearch() {
 
 document.addEventListener('DOMContentLoaded', function() {
     // Show advanced search if any advanced fields have values
-    const hasAdvancedValues = {{ request('search_gender') || request('search_status') || request('search_company') || request('search_date_from') || request('search_date_to') ? 'true' : 'false' }};
+    const hasAdvancedValues = {{ request('search_mobile') || request('search_gender') || request('search_status') || request('search_date_from') || request('search_date_to') ? 'true' : 'false' }};
     if (hasAdvancedValues) {
         toggleAdvancedSearch();
     }
@@ -214,29 +214,35 @@ document.addEventListener('DOMContentLoaded', function() {
                         <!-- Name Search -->
                         <div class="col-md-3">
                             <label for="search_name" class="form-label">{{ __('users.first_name') }}</label>
-                            <input type="text" class="form-control" id="search_name" name="search_name" 
+                            <input type="text" class="form-control" id="search_name" name="search_name"
                                    placeholder="{{ __('users.search_by_name') }}" value="{{ request('search_name') }}">
                         </div>
-                        
+
                         <!-- Surname Search -->
                         <div class="col-md-3">
                             <label for="search_surname" class="form-label">{{ __('users.surname') }}</label>
-                            <input type="text" class="form-control" id="search_surname" name="search_surname" 
+                            <input type="text" class="form-control" id="search_surname" name="search_surname"
                                    placeholder="{{ __('users.search_by_surname') }}" value="{{ request('search_surname') }}">
                         </div>
-                        
+
                         <!-- Email Search -->
                         <div class="col-md-3">
                             <label for="search_email" class="form-label">{{ __('users.email') }}</label>
-                            <input type="text" class="form-control" id="search_email" name="search_email" 
+                            <input type="text" class="form-control" id="search_email" name="search_email"
                                    placeholder="{{ __('users.search_by_email') }}" value="{{ request('search_email') }}">
                         </div>
-                        
-                        <!-- Mobile Search -->
+
+                        <!-- Company Search -->
                         <div class="col-md-3">
-                            <label for="search_mobile" class="form-label">{{ __('users.mobile') }}</label>
-                            <input type="text" class="form-control" id="search_mobile" name="search_mobile" 
-                                   placeholder="{{ __('users.search_by_mobile') }}" value="{{ request('search_mobile') }}">
+                            <label for="search_company" class="form-label">{{ __('users.company') }}</label>
+                            <select class="form-select" id="search_company" name="search_company">
+                                <option value="">{{ __('users.all_companies') }}</option>
+                                @foreach($companies as $company)
+                                    <option value="{{ $company->id }}" {{ request('search_company') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     
@@ -257,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search me-1"></i>{{ __('users.search') }}
                                 </button>
-                                @if(request('search_name') || request('search_surname') || request('search_email') || request('search_mobile') || request('search_tax_id'))
+                                @if(request('search_name') || request('search_surname') || request('search_email') || request('search_company') || request('search_tax_id') || request('search_mobile') || request('search_gender') || request('search_status') || request('search_date_from') || request('search_date_to'))
                                     <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">
                                         <i class="fas fa-times me-1"></i>{{ __('users.clear_all') }}
                                     </a>
@@ -271,6 +277,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     <!-- Advanced Search Options (Hidden by default) -->
                     <div id="advanced-search" class="row mt-3" style="display: none;">
+                        <div class="col-md-3">
+                            <label for="search_mobile" class="form-label">{{ __('users.mobile') }}</label>
+                            <input type="text" class="form-control" id="search_mobile" name="search_mobile"
+                                   placeholder="{{ __('users.search_by_mobile') }}" value="{{ request('search_mobile') }}">
+                        </div>
                         <div class="col-md-3">
                             <label for="search_gender" class="form-label">{{ __('users.gender') }}</label>
                             <select class="form-select" id="search_gender" name="search_gender">
@@ -291,26 +302,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <label for="search_company" class="form-label">{{ __('users.company') }}</label>
-                            <select class="form-select" id="search_company" name="search_company">
-                                <option value="">{{ __('users.all_companies') }}</option>
-                                @foreach($companies as $company)
-                                    <option value="{{ $company->id }}" {{ request('search_company') == $company->id ? 'selected' : '' }}>
-                                        {{ $company->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
                         <div class="col-md-3"></div>
                         <div class="col-md-3 mt-3">
                             <label for="search_date_from" class="form-label">{{ __('users.created_from') }}</label>
-                            <input type="date" class="form-control" id="search_date_from" name="search_date_from" 
+                            <input type="date" class="form-control" id="search_date_from" name="search_date_from"
                                    value="{{ request('search_date_from') }}">
                         </div>
                         <div class="col-md-3 mt-3">
                             <label for="search_date_to" class="form-label">{{ __('users.created_to') }}</label>
-                            <input type="date" class="form-control" id="search_date_to" name="search_date_to" 
+                            <input type="date" class="form-control" id="search_date_to" name="search_date_to"
                                    value="{{ request('search_date_to') }}">
                         </div>
                     </div>
@@ -332,13 +332,24 @@ document.addEventListener('DOMContentLoaded', function() {
             <div>
                 @php
                     $hasAnySearch = request('search_name') || request('search_surname') || request('search_email') || request('search_mobile') || request('search_tax_id') || request('search_gender') || request('search_status') || request('search_company') || request('search_date_from') || request('search_date_to');
-                    $searchTerms = collect([
+
+                    // Build search terms display
+                    $searchTermsArray = [
                         __('users.name') => request('search_name'),
                         __('users.surname') => request('search_surname'),
                         __('users.email') => request('search_email'),
-                        __('users.mobile') => request('search_mobile'),
                         __('users.tax_id_code') => request('search_tax_id')
-                    ])->filter()->map(function($value, $key) {
+                    ];
+
+                    // Add company name if filtered
+                    if (request('search_company')) {
+                        $selectedCompany = $companies->firstWhere('id', request('search_company'));
+                        if ($selectedCompany) {
+                            $searchTermsArray[__('users.company')] = $selectedCompany->name;
+                        }
+                    }
+
+                    $searchTerms = collect($searchTermsArray)->filter()->map(function($value, $key) {
                         return $key . ': "' . $value . '"';
                     })->join(', ');
                 @endphp
