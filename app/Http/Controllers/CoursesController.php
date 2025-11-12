@@ -90,6 +90,10 @@ class CoursesController extends Controller
             'status' => 'required|string|in:active,inactive,ongoing,done',
             'available_from' => 'nullable|date',
             'available_until' => 'nullable|date|after_or_equal:available_from',
+            'start_date' => 'nullable|date',
+            'start_time' => 'nullable',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'end_time' => 'nullable',
         ]);
 
         $course = Course::create($validated);
@@ -143,6 +147,10 @@ class CoursesController extends Controller
             'status' => 'required|string|in:active,inactive,ongoing,done',
             'available_from' => 'nullable|date',
             'available_until' => 'nullable|date|after_or_equal:available_from',
+            'start_date' => 'nullable|date',
+            'start_time' => 'nullable',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'end_time' => 'nullable',
         ]);
 
         // Log course status change if applicable

@@ -235,6 +235,46 @@
                             </div>
                         </div>
 
+                        <h5 class="mt-4 mb-3">Course Schedule (Start to End Time)</h5>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control @error('start_date') is-invalid @enderror"
+                                       name="start_date" value="{{ old('start_date', $course->start_date?->format('Y-m-d')) }}">
+                                @error('start_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Start Time</label>
+                                <input type="time" class="form-control @error('start_time') is-invalid @enderror"
+                                       name="start_time" value="{{ old('start_time', $course->start_time) }}">
+                                @error('start_time')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control @error('end_date') is-invalid @enderror"
+                                       name="end_date" value="{{ old('end_date', $course->end_date?->format('Y-m-d')) }}">
+                                @error('end_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">End Time</label>
+                                <input type="time" class="form-control @error('end_time') is-invalid @enderror"
+                                       name="end_time" value="{{ old('end_time', $course->end_time) }}">
+                                @error('end_time')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="is_active" value="1"

@@ -185,6 +185,39 @@
                             </div>
                         </div>
                     @endif
+
+                    @if($course->start_date || $course->end_date)
+                        <hr class="my-4">
+                        <h6 class="mb-3"><i class="fas fa-clock"></i> Course Schedule</h6>
+
+                        @if($course->start_date)
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <strong>Start:</strong>
+                                </div>
+                                <div class="col-sm-9">
+                                    {{ $course->start_date->format('M d, Y') }}
+                                    @if($course->start_time)
+                                        at {{ \Carbon\Carbon::parse($course->start_time)->format('g:i A') }}
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
+                        @if($course->end_date)
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <strong>End:</strong>
+                                </div>
+                                <div class="col-sm-9">
+                                    {{ $course->end_date->format('M d, Y') }}
+                                    @if($course->end_time)
+                                        at {{ \Carbon\Carbon::parse($course->end_time)->format('g:i A') }}
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+                    @endif
                 </div>
             </div>
         </div>

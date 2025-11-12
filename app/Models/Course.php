@@ -32,6 +32,10 @@ class Course extends Model
         'status',
         'available_from',
         'available_until',
+        'start_date',
+        'start_time',
+        'end_date',
+        'end_time',
     ];
 
     protected $casts = [
@@ -41,6 +45,8 @@ class Course extends Model
         'is_mandatory' => 'boolean',
         'available_from' => 'date',
         'available_until' => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
 
     public function scopeActive($query)
