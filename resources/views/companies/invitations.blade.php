@@ -249,16 +249,20 @@
 
                                             @if($invitation->isAccepted())
                                                 <!-- View Company -->
-                                                <a href="{{ route('companies.show', $invitation->company_id) }}"
-                                                   class="btn btn-primary" title="{{ __('companies.view_company') }}">
-                                                    <i class="fas fa-building"></i>
-                                                </a>
+                                                @if($invitation->company_id)
+                                                    <a href="{{ route('companies.show', $invitation->company_id) }}"
+                                                       class="btn btn-primary" title="{{ __('companies.view_company') }}">
+                                                        <i class="fas fa-building"></i>
+                                                    </a>
+                                                @endif
 
                                                 <!-- View User -->
-                                                <a href="{{ route('users.show', $invitation->user_id) }}"
-                                                   class="btn btn-secondary" title="{{ __('companies.view_user') }}">
-                                                    <i class="fas fa-user"></i>
-                                                </a>
+                                                @if($invitation->user_id)
+                                                    <a href="{{ route('users.show', $invitation->user_id) }}"
+                                                       class="btn btn-secondary" title="{{ __('companies.view_user') }}">
+                                                        <i class="fas fa-user"></i>
+                                                    </a>
+                                                @endif
                                             @endif
 
                                             <!-- View Details -->
