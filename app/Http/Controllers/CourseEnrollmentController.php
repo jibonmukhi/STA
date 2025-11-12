@@ -90,6 +90,50 @@ class CourseEnrollmentController extends Controller
             ->with('success', "{$enrolled} user(s) enrolled successfully.");
     }
 
+    public function edit(CourseEnrollment $enrollment)
+    {
+        $this->authorize('manageStudents', $enrollment->course);
+
+        $course = $enrollment->course;
+        return view('courses.enrollments.edit', compact('enrollment', 'course'));
+    }
+
+    public function update(Request $request, CourseEnrollment $enrollment)
+    {
+        $this->authorize('manageStudents', $enrollment->course);
+
+        $request->validate([
+            'progress_percentage' => 'required|integer|min:0|max:100',
+            'status' => 'required|in:enrolled,in_progress,completed,dropped,failed',
+            'final_score' => 'nullable|numeric|min:0|max:100',
+            'grade' => 'nullable|string|max:10',
+            'notes' => 'nullable|string',
+        ]);
+
+        $enrollment->update([
+            'progress_percentage' => $request->progress_percentage,
+            'status' => $request->status,
+            'final_score' => $request->final_score,
+            'grade' => $request->grade,
+            'notes' => $request->notes,
+        ]);
+
+        // Mark as completed if status is completed
+        if ($request->status === 'completed' && !$enrollment->completed_at) {
+            $enrollment->update(['completed_at' => now()]);
+        }
+
+        logActivity('course_enrollment_updated', 'CourseEnrollment', $enrollment->id, [
+            'course_title' => $enrollment->course->title,
+            'user_name' => $enrollment->user->name,
+            'progress' => $request->progress_percentage,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('courses.enrollments.index', $enrollment->course)
+            ->with('success', 'Enrollment updated successfully.');
+    }
+
     public function updateProgress(Request $request, CourseEnrollment $enrollment)
     {
         $this->authorize('manageStudents', $enrollment->course);

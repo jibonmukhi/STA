@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Auth;
 
 class CourseMaterialController extends Controller
 {
+    public function create(Course $course)
+    {
+        $this->authorize('update', $course);
+
+        return view('courses.materials.create', compact('course'));
+    }
+
     public function store(Request $request, Course $course)
     {
         $this->authorize('update', $course);

@@ -122,39 +122,42 @@
                                         <td>{{ $enrollment->final_score ?? '-' }}</td>
                                         <td>{{ $enrollment->grade ?? '-' }}</td>
                                         <td>
-                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#updateProgressModal{{ $enrollment->id }}">
+                                            <button type="button" class="btn btn-sm btn-primary" onclick="toggleEditForm({{ $enrollment->id }})" title="Edit Enrollment">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <form action="{{ route('enrollments.destroy', $enrollment) }}" method="POST" class="d-inline"
                                                   onsubmit="return confirm('Are you sure you want to remove this enrollment?');">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete Enrollment">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
                                         </td>
                                     </tr>
-
-                                    <!-- Update Progress Modal -->
-                                    <div class="modal fade" id="updateProgressModal{{ $enrollment->id }}" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <form action="{{ route('enrollments.update-progress', $enrollment) }}" method="POST">
+                                    <!-- Inline Edit Form Row -->
+                                    <tr id="editForm{{ $enrollment->id }}" style="display: none;" class="bg-light">
+                                        <td colspan="8">
+                                            <div class="p-3">
+                                                <h6 class="mb-3"><i class="fas fa-edit"></i> Edit Enrollment for {{ $enrollment->user->name }}</h6>
+                                                <form action="{{ route('enrollments.update', $enrollment) }}" method="POST">
                                                     @csrf
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Update Progress - {{ $enrollment->user->name }}</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Progress %</label>
-                                                            <input type="number" class="form-control" name="progress_percentage"
-                                                                   value="{{ $enrollment->progress_percentage }}" min="0" max="100" required>
+                                                    @method('PUT')
+
+                                                    <div class="row">
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="form-label">Progress Percentage <span class="text-danger">*</span></label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="number" class="form-control" name="progress_percentage"
+                                                                       value="{{ old('progress_percentage', $enrollment->progress_percentage) }}"
+                                                                       min="0" max="100" required>
+                                                                <span class="input-group-text">%</span>
+                                                            </div>
                                                         </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Status</label>
-                                                            <select class="form-select" name="status" required>
+
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="form-label">Status <span class="text-danger">*</span></label>
+                                                            <select class="form-select form-select-sm" name="status" required>
                                                                 <option value="enrolled" {{ $enrollment->status == 'enrolled' ? 'selected' : '' }}>Enrolled</option>
                                                                 <option value="in_progress" {{ $enrollment->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                                                                 <option value="completed" {{ $enrollment->status == 'completed' ? 'selected' : '' }}>Completed</option>
@@ -162,29 +165,45 @@
                                                                 <option value="failed" {{ $enrollment->status == 'failed' ? 'selected' : '' }}>Failed</option>
                                                             </select>
                                                         </div>
-                                                        <div class="mb-3">
+
+                                                        <div class="col-md-2 mb-3">
                                                             <label class="form-label">Final Score</label>
-                                                            <input type="number" class="form-control" name="final_score"
-                                                                   value="{{ $enrollment->final_score }}" min="0" max="100" step="0.01">
+                                                            <input type="number" class="form-control form-control-sm" name="final_score"
+                                                                   value="{{ old('final_score', $enrollment->final_score) }}"
+                                                                   min="0" max="100" step="0.01">
                                                         </div>
-                                                        <div class="mb-3">
+
+                                                        <div class="col-md-2 mb-3">
                                                             <label class="form-label">Grade</label>
-                                                            <input type="text" class="form-control" name="grade"
-                                                                   value="{{ $enrollment->grade }}" maxlength="10">
+                                                            <input type="text" class="form-control form-control-sm" name="grade"
+                                                                   value="{{ old('grade', $enrollment->grade) }}"
+                                                                   maxlength="10" placeholder="A+, B, Pass">
                                                         </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Notes</label>
-                                                            <textarea class="form-control" name="notes" rows="3">{{ $enrollment->notes }}</textarea>
+
+                                                        <div class="col-md-2 mb-3">
+                                                            <label class="form-label">&nbsp;</label>
+                                                            <div>
+                                                                <button type="submit" class="btn btn-success btn-sm">
+                                                                    <i class="fas fa-save"></i> Save
+                                                                </button>
+                                                                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEditForm({{ $enrollment->id }})">
+                                                                    <i class="fas fa-times"></i> Cancel
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-primary">Update Progress</button>
+
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <label class="form-label">Notes</label>
+                                                            <textarea class="form-control form-control-sm" name="notes" rows="2"
+                                                                      placeholder="Add any additional notes...">{{ old('notes', $enrollment->notes) }}</textarea>
+                                                        </div>
                                                     </div>
                                                 </form>
                                             </div>
-                                        </div>
-                                    </div>
+                                        </td>
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>
@@ -202,3 +221,22 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function toggleEditForm(enrollmentId) {
+    const formRow = document.getElementById('editForm' + enrollmentId);
+    if (formRow.style.display === 'none') {
+        // Hide all other open forms
+        document.querySelectorAll('[id^="editForm"]').forEach(form => {
+            form.style.display = 'none';
+        });
+        // Show this form
+        formRow.style.display = 'table-row';
+    } else {
+        // Hide this form
+        formRow.style.display = 'none';
+    }
+}
+</script>
+@endpush

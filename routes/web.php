@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/courses/{course}/schedule', [CoursesController::class, 'schedule'])->name('courses.schedule');
 
     // Course Materials Routes
+    Route::get('/courses/{course}/materials/create', [\App\Http\Controllers\CourseMaterialController::class, 'create'])->name('course-materials.create');
     Route::post('/courses/{course}/materials', [\App\Http\Controllers\CourseMaterialController::class, 'store'])->name('course-materials.store');
     Route::get('/course-materials/{material}/download', [\App\Http\Controllers\CourseMaterialController::class, 'download'])->name('course-materials.download');
     Route::delete('/course-materials/{material}', [\App\Http\Controllers\CourseMaterialController::class, 'destroy'])->name('course-materials.destroy');
@@ -98,6 +99,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/courses/{course}/enrollments', [\App\Http\Controllers\CourseEnrollmentController::class, 'index'])->name('courses.enrollments.index');
     Route::get('/courses/{course}/enrollments/create', [\App\Http\Controllers\CourseEnrollmentController::class, 'create'])->name('courses.enrollments.create');
     Route::post('/courses/{course}/enrollments', [\App\Http\Controllers\CourseEnrollmentController::class, 'store'])->name('courses.enrollments.store');
+    Route::get('/enrollments/{enrollment}/edit', [\App\Http\Controllers\CourseEnrollmentController::class, 'edit'])->name('enrollments.edit');
+    Route::put('/enrollments/{enrollment}', [\App\Http\Controllers\CourseEnrollmentController::class, 'update'])->name('enrollments.update');
     Route::post('/enrollments/{enrollment}/update-progress', [\App\Http\Controllers\CourseEnrollmentController::class, 'updateProgress'])->name('enrollments.update-progress');
     Route::delete('/enrollments/{enrollment}', [\App\Http\Controllers\CourseEnrollmentController::class, 'destroy'])->name('enrollments.destroy');
 

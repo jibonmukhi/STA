@@ -30,7 +30,8 @@
         },
         "files": [
             "app/Helpers/TranslationHelper.php",
-            "app/Helpers/DataVaultHelper.php"
+            "app/Helpers/DataVaultHelper.php",
+            "app/Helpers/AuditLogHelper.php"
         ]
     },
     "autoload-dev": {
