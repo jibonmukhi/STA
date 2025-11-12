@@ -112,6 +112,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/events/{event}', [\App\Http\Controllers\CourseEventController::class, 'update'])->name('events.update');
     Route::delete('/events/{event}', [\App\Http\Controllers\CourseEventController::class, 'destroy'])->name('events.destroy');
 
+    // Course-Company Assignment Routes
+    Route::post('/course-company-assignments', [\App\Http\Controllers\CourseCompanyAssignmentController::class, 'store'])->name('course-company-assignments.store');
+    Route::delete('/course-company-assignments/{assignment}', [\App\Http\Controllers\CourseCompanyAssignmentController::class, 'destroy'])->name('course-company-assignments.destroy');
+
     // Student-facing Course Routes
     Route::get('/my-courses', [\App\Http\Controllers\CourseEnrollmentController::class, 'myCourses'])->name('my-courses');
     Route::get('/course-catalog', [\App\Http\Controllers\CourseEnrollmentController::class, 'catalog'])->name('course-catalog');

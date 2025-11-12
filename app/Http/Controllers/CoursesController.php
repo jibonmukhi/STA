@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -195,15 +196,18 @@ class CoursesController extends Controller
 
     public function planning(): View
     {
-        $courses = Course::active()->get();
+        $courses = Course::active()->with('companyAssignments.company')->get();
         $categories = Course::getCategories();
         $levels = Course::getLevels();
         $deliveryMethods = Course::getDeliveryMethods();
 
+        // Get all active companies for assignment dropdown
+        $companies = Company::where('active', true)->orderBy('name')->get();
+
         // Group courses by category for better organization
         $coursesByCategory = $courses->groupBy('category');
 
-        return view('courses.planning', compact('courses', 'coursesByCategory', 'categories', 'levels', 'deliveryMethods'));
+        return view('courses.planning', compact('courses', 'coursesByCategory', 'categories', 'levels', 'deliveryMethods', 'companies'));
     }
 
     public function schedule(Course $course): View

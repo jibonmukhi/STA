@@ -110,6 +110,18 @@ class Course extends Model
         return $this->hasMany(CourseMaterial::class)->orderBy('order');
     }
 
+    public function companyAssignments(): HasMany
+    {
+        return $this->hasMany(CourseCompanyAssignment::class);
+    }
+
+    public function assignedCompanies()
+    {
+        return $this->belongsToMany(Company::class, 'course_company_assignments')
+                    ->withPivot(['assigned_by', 'assigned_date', 'due_date', 'is_mandatory', 'notes'])
+                    ->withTimestamps();
+    }
+
     public function scopeByTeacher($query, int $teacherId)
     {
         return $query->where('teacher_id', $teacherId);
