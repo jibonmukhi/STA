@@ -94,6 +94,11 @@ class Course extends Model
                     ->withTimestamps();
     }
 
+    public function materials(): HasMany
+    {
+        return $this->hasMany(CourseMaterial::class)->orderBy('order');
+    }
+
     public function scopeByTeacher($query, int $teacherId)
     {
         return $query->where('teacher_id', $teacherId);

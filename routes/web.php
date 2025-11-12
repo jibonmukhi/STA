@@ -89,6 +89,31 @@ Route::middleware('auth')->group(function () {
     Route::get('/courses/planning/overview', [CoursesController::class, 'planning'])->name('courses.planning');
     Route::get('/courses/{course}/schedule', [CoursesController::class, 'schedule'])->name('courses.schedule');
 
+    // Course Materials Routes
+    Route::post('/courses/{course}/materials', [\App\Http\Controllers\CourseMaterialController::class, 'store'])->name('course-materials.store');
+    Route::get('/course-materials/{material}/download', [\App\Http\Controllers\CourseMaterialController::class, 'download'])->name('course-materials.download');
+    Route::delete('/course-materials/{material}', [\App\Http\Controllers\CourseMaterialController::class, 'destroy'])->name('course-materials.destroy');
+
+    // Course Enrollments Routes
+    Route::get('/courses/{course}/enrollments', [\App\Http\Controllers\CourseEnrollmentController::class, 'index'])->name('courses.enrollments.index');
+    Route::get('/courses/{course}/enrollments/create', [\App\Http\Controllers\CourseEnrollmentController::class, 'create'])->name('courses.enrollments.create');
+    Route::post('/courses/{course}/enrollments', [\App\Http\Controllers\CourseEnrollmentController::class, 'store'])->name('courses.enrollments.store');
+    Route::post('/enrollments/{enrollment}/update-progress', [\App\Http\Controllers\CourseEnrollmentController::class, 'updateProgress'])->name('enrollments.update-progress');
+    Route::delete('/enrollments/{enrollment}', [\App\Http\Controllers\CourseEnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+
+    // Course Events Routes
+    Route::get('/courses/{course}/events', [\App\Http\Controllers\CourseEventController::class, 'index'])->name('courses.events.index');
+    Route::get('/courses/{course}/events/create', [\App\Http\Controllers\CourseEventController::class, 'create'])->name('courses.events.create');
+    Route::post('/courses/{course}/events', [\App\Http\Controllers\CourseEventController::class, 'store'])->name('courses.events.store');
+    Route::get('/events/{event}/edit', [\App\Http\Controllers\CourseEventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{event}', [\App\Http\Controllers\CourseEventController::class, 'update'])->name('events.update');
+    Route::delete('/events/{event}', [\App\Http\Controllers\CourseEventController::class, 'destroy'])->name('events.destroy');
+
+    // Student-facing Course Routes
+    Route::get('/my-courses', [\App\Http\Controllers\CourseEnrollmentController::class, 'myCourses'])->name('my-courses');
+    Route::get('/course-catalog', [\App\Http\Controllers\CourseEnrollmentController::class, 'catalog'])->name('course-catalog');
+    Route::post('/courses/{course}/enroll', [\App\Http\Controllers\CourseEnrollmentController::class, 'enroll'])->name('courses.enroll');
+
 });
 
 // STA Manager Routes (Super Admin)

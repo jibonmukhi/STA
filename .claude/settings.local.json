@@ -27,7 +27,8 @@
       "Bash(if [ -d \"resources/views/company-manager\" ])",
       "Bash(else mkdir -p resources/views/company-manager)",
       "Bash(if [ -d \"resources/views/company-manager/profile-change-requests\" ])",
-      "Bash(else mkdir -p resources/views/company-manager/profile-change-requests)"
+      "Bash(else mkdir -p resources/views/company-manager/profile-change-requests)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

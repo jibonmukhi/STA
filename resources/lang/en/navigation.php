@@ -44,10 +44,14 @@ return [
     'view_users' => 'View Users',
 
     // Course management
-    'course_management' => 'Course Management',
+    'course_management' => 'Courses',
     'all_courses' => 'All Courses',
     'add_course' => 'Add Course',
     'course_planning' => 'Course Planning',
+    'course_catalog' => 'Course Catalog',
+    'my_learning' => 'My Learning',
+    'course_enrollments' => 'Manage Enrollments',
+    'course_events' => 'Course Events',
 
     // Teacher menu
     'my_courses' => 'My Courses',

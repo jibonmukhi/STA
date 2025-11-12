@@ -44,10 +44,14 @@ return [
     'view_users' => 'Visualizza Utenti',
 
     // Course management
-    'course_management' => 'Gestione Corsi',
+    'course_management' => 'Corsi',
     'all_courses' => 'Tutti i Corsi',
     'add_course' => 'Aggiungi Corso',
     'course_planning' => 'Pianificazione Corsi',
+    'course_catalog' => 'Catalogo Corsi',
+    'my_learning' => 'Il Mio Apprendimento',
+    'course_enrollments' => 'Gestisci Iscrizioni',
+    'course_events' => 'Eventi del Corso',
 
     // Teacher menu
     'my_courses' => 'I Miei Corsi',

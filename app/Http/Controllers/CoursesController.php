@@ -92,6 +92,7 @@ class CoursesController extends Controller
 
     public function show(Course $course): View
     {
+        $course->load(['materials.uploader', 'teacher']);
         return view('courses.show', compact('course'));
     }
 
