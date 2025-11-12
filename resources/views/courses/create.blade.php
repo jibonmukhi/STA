@@ -125,13 +125,31 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Instructor</label>
-                            <input type="text" class="form-control @error('instructor') is-invalid @enderror"
-                                   name="instructor" value="{{ old('instructor') }}">
-                            @error('instructor')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Assigned Teacher</label>
+                                <select class="form-select @error('teacher_id') is-invalid @enderror" name="teacher_id">
+                                    <option value="">Select Teacher</option>
+                                    @foreach($teachers as $teacher)
+                                        <option value="{{ $teacher->id }}" {{ old('teacher_id') == $teacher->id ? 'selected' : '' }}>
+                                            {{ $teacher->full_name }} ({{ $teacher->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="form-text text-muted">Select a teacher from the system</small>
+                                @error('teacher_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Instructor Name</label>
+                                <input type="text" class="form-control @error('instructor') is-invalid @enderror"
+                                       name="instructor" value="{{ old('instructor') }}">
+                                <small class="form-text text-muted">Or enter instructor name manually</small>
+                                @error('instructor')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                 </div>

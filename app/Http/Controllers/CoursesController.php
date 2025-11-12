@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -40,7 +41,7 @@ class CoursesController extends Controller
             $query->active();
         }
 
-        $courses = $query->orderBy('title')->paginate(12);
+        $courses = $query->with('teacher')->orderBy('title')->paginate(12);
 
         $categories = Course::getCategories();
         $levels = Course::getLevels();
@@ -57,7 +58,10 @@ class CoursesController extends Controller
         $levels = Course::getLevels();
         $deliveryMethods = Course::getDeliveryMethods();
 
-        return view('courses.create', compact('categories', 'levels', 'deliveryMethods'));
+        // Get users with teacher role
+        $teachers = User::role('teacher')->orderBy('name')->get();
+
+        return view('courses.create', compact('categories', 'levels', 'deliveryMethods', 'teachers'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -75,6 +79,7 @@ class CoursesController extends Controller
             'credits' => 'nullable|numeric|min:0',
             'price' => 'required|numeric|min:0',
             'instructor' => 'nullable|string|max:255',
+            'teacher_id' => 'nullable|exists:users,id',
             'prerequisites' => 'nullable|string',
             'delivery_method' => 'required|string|in:online,offline,hybrid',
             'max_participants' => 'nullable|integer|min:1',
@@ -104,7 +109,10 @@ class CoursesController extends Controller
         $levels = Course::getLevels();
         $deliveryMethods = Course::getDeliveryMethods();
 
-        return view('courses.edit', compact('course', 'categories', 'levels', 'deliveryMethods'));
+        // Get users with teacher role
+        $teachers = User::role('teacher')->orderBy('name')->get();
+
+        return view('courses.edit', compact('course', 'categories', 'levels', 'deliveryMethods', 'teachers'));
     }
 
     public function update(Request $request, Course $course): RedirectResponse
@@ -122,6 +130,7 @@ class CoursesController extends Controller
             'credits' => 'nullable|numeric|min:0',
             'price' => 'required|numeric|min:0',
             'instructor' => 'nullable|string|max:255',
+            'teacher_id' => 'nullable|exists:users,id',
             'prerequisites' => 'nullable|string',
             'delivery_method' => 'required|string|in:online,offline,hybrid',
             'max_participants' => 'nullable|integer|min:1',

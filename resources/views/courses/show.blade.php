@@ -132,6 +132,38 @@
                         </div>
                     </div>
 
+                    @if($course->teacher)
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <strong>Assigned Teacher:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="card bg-light border-0">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ $course->teacher->photo_url }}" alt="{{ $course->teacher->full_name }}"
+                                                 class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center mb-1">
+                                                    <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
+                                                    <strong class="mb-0">{{ $course->teacher->full_name }}</strong>
+                                                </div>
+                                                <small class="text-muted d-block">
+                                                    <i class="fas fa-envelope me-1"></i>{{ $course->teacher->email }}
+                                                </small>
+                                                @if($course->teacher->phone)
+                                                    <small class="text-muted d-block">
+                                                        <i class="fas fa-phone me-1"></i>{{ $course->teacher->phone }}
+                                                    </small>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     @if($course->instructor)
                         <div class="row mb-3">
                             <div class="col-sm-3">
@@ -290,11 +322,13 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('modals')
 <!-- Upload Material Modal -->
 @can('update', $course)
-<div class="modal fade" id="uploadMaterialModal" tabindex="-1" aria-labelledby="uploadMaterialModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="uploadMaterialModal" tabindex="-1" aria-labelledby="uploadMaterialModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <form action="{{ route('course-materials.store', $course) }}" method="POST" enctype="multipart/form-data">
                 @csrf

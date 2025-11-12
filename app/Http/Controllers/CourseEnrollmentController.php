@@ -37,7 +37,9 @@ class CourseEnrollmentController extends Controller
         // Get users who are not already enrolled
         $enrolledUserIds = $course->enrollments()->pluck('user_id')->toArray();
         $availableUsers = User::whereNotIn('id', $enrolledUserIds)
-            ->where('role', '!=', 'admin')
+            ->whereDoesntHave('roles', function($query) {
+                $query->where('name', 'admin');
+            })
             ->orderBy('name')
             ->get();
 

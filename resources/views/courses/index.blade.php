@@ -150,8 +150,21 @@
                             @endif
                         </div>
 
-                        @if($course->instructor)
-                            <p class="card-text">
+                        @if($course->teacher)
+                            <div class="mb-2">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ $course->teacher->photo_url }}" alt="{{ $course->teacher->full_name }}"
+                                         class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover;">
+                                    <div>
+                                        <small class="text-muted d-block" style="line-height: 1.2;">
+                                            <i class="fas fa-chalkboard-teacher"></i> Teacher
+                                        </small>
+                                        <small><strong>{{ $course->teacher->full_name }}</strong></small>
+                                    </div>
+                                </div>
+                            </div>
+                        @elseif($course->instructor)
+                            <p class="card-text mb-2">
                                 <small class="text-muted">
                                     <i class="fas fa-user-tie"></i> {{ trans('courses.instructor') }}: {{ $course->instructor }}
                                 </small>
