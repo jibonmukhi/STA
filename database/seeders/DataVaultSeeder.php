@@ -94,6 +94,14 @@ class DataVaultSeeder extends Seeder
             ['code' => 'failed', 'label_en' => 'Failed', 'label_it' => 'Fallito', 'color' => 'danger'],
         ]);
 
+        // 9b. Course Status
+        $this->createCategory('course_status', 'Course Status', 'Stato Corso', [
+            ['code' => 'active', 'label_en' => 'Active', 'label_it' => 'Attivo', 'color' => 'success', 'icon' => 'fas fa-check-circle', 'is_default' => true],
+            ['code' => 'inactive', 'label_en' => 'Inactive', 'label_it' => 'Inattivo', 'color' => 'secondary', 'icon' => 'fas fa-times-circle'],
+            ['code' => 'ongoing', 'label_en' => 'Ongoing', 'label_it' => 'In Corso', 'color' => 'primary', 'icon' => 'fas fa-play-circle'],
+            ['code' => 'done', 'label_en' => 'Done', 'label_it' => 'Completato', 'color' => 'info', 'icon' => 'fas fa-flag-checkered'],
+        ]);
+
         // 10. Language
         $this->createCategory('language', 'Language', 'Lingua', [
             ['code' => 'en', 'label_en' => 'English', 'label_it' => 'Inglese', 'icon' => 'flag-icon flag-icon-gb'],

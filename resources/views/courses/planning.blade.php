@@ -146,6 +146,14 @@
                                                     </div>
 
                                                     <div class="mb-2">
+                                                        @php
+                                                            $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
+                                                            $statusIcon = dataVaultIcon('course_status', $course->status) ?? 'fas fa-circle';
+                                                            $statusLabel = dataVaultLabel('course_status', $course->status) ?? ucfirst($course->status);
+                                                        @endphp
+                                                        <span class="badge bg-{{ $statusColor }}">
+                                                            <i class="{{ $statusIcon }}"></i> {{ $statusLabel }}
+                                                        </span>
                                                         <span class="badge bg-secondary">{{ $deliveryMethods[$course->delivery_method] ?? ucfirst($course->delivery_method) }}</span>
                                                         @if($course->credits)
                                                             <span class="badge bg-info">{{ $course->credits }} credits</span>

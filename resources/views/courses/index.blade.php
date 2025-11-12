@@ -110,9 +110,14 @@
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <h5 class="card-title">{{ $course->title }}</h5>
                             <div class="text-end">
-                                @if(!$course->is_active)
-                                    <span class="badge bg-secondary mb-1">{{ trans('courses.inactive') }}</span><br>
-                                @endif
+                                @php
+                                    $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
+                                    $statusIcon = dataVaultIcon('course_status', $course->status) ?? 'fas fa-circle';
+                                    $statusLabel = dataVaultLabel('course_status', $course->status) ?? ucfirst($course->status);
+                                @endphp
+                                <span class="badge bg-{{ $statusColor }} mb-1">
+                                    <i class="{{ $statusIcon }}"></i> {{ $statusLabel }}
+                                </span><br>
                                 <span class="badge bg-primary">{{ trans('courses.levels.' . $course->level, [], null, ucfirst($course->level)) }}</span>
                             </div>
                         </div>

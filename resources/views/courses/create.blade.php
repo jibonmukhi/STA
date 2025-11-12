@@ -82,7 +82,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">Delivery Method *</label>
                                 <select class="form-select @error('delivery_method') is-invalid @enderror" name="delivery_method" required>
                                     <option value="">Select Method</option>
@@ -93,6 +93,19 @@
                                     @endforeach
                                 </select>
                                 @error('delivery_method')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Status *</label>
+                                <select class="form-select @error('status') is-invalid @enderror" name="status" required>
+                                    @foreach($statuses as $key => $value)
+                                        <option value="{{ $key }}" {{ old('status', 'active') == $key ? 'selected' : '' }}>
+                                            {{ $value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

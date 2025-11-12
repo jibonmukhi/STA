@@ -29,6 +29,7 @@ class Course extends Model
         'max_participants',
         'is_active',
         'is_mandatory',
+        'status',
         'available_from',
         'available_until',
     ];
@@ -70,6 +71,16 @@ class Course extends Model
     public static function getDeliveryMethods(): array
     {
         return dataVaultArray('delivery_method');
+    }
+
+    public static function getStatuses(): array
+    {
+        return dataVaultArray('course_status');
+    }
+
+    public function scopeByStatus($query, string $status)
+    {
+        return $query->where('status', $status);
     }
 
     public function courseEvents(): HasMany

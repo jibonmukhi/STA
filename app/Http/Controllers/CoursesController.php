@@ -57,11 +57,12 @@ class CoursesController extends Controller
         $categories = Course::getCategories();
         $levels = Course::getLevels();
         $deliveryMethods = Course::getDeliveryMethods();
+        $statuses = Course::getStatuses();
 
         // Get users with teacher role
         $teachers = User::role('teacher')->orderBy('name')->get();
 
-        return view('courses.create', compact('categories', 'levels', 'deliveryMethods', 'teachers'));
+        return view('courses.create', compact('categories', 'levels', 'deliveryMethods', 'statuses', 'teachers'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -85,6 +86,7 @@ class CoursesController extends Controller
             'max_participants' => 'nullable|integer|min:1',
             'is_active' => 'boolean',
             'is_mandatory' => 'boolean',
+            'status' => 'required|string|in:active,inactive,ongoing,done',
             'available_from' => 'nullable|date',
             'available_until' => 'nullable|date|after_or_equal:available_from',
         ]);
@@ -108,11 +110,12 @@ class CoursesController extends Controller
         $categories = Course::getCategories();
         $levels = Course::getLevels();
         $deliveryMethods = Course::getDeliveryMethods();
+        $statuses = Course::getStatuses();
 
         // Get users with teacher role
         $teachers = User::role('teacher')->orderBy('name')->get();
 
-        return view('courses.edit', compact('course', 'categories', 'levels', 'deliveryMethods', 'teachers'));
+        return view('courses.edit', compact('course', 'categories', 'levels', 'deliveryMethods', 'statuses', 'teachers'));
     }
 
     public function update(Request $request, Course $course): RedirectResponse
@@ -136,6 +139,7 @@ class CoursesController extends Controller
             'max_participants' => 'nullable|integer|min:1',
             'is_active' => 'boolean',
             'is_mandatory' => 'boolean',
+            'status' => 'required|string|in:active,inactive,ongoing,done',
             'available_from' => 'nullable|date',
             'available_until' => 'nullable|date|after_or_equal:available_from',
         ]);

@@ -26,8 +26,13 @@
                                             <p class="text-muted small">{{ $course->course_code }}</p>
                                             <p class="card-text">{{ Str::limit($course->description, 100) }}</p>
                                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <span class="badge bg-{{ $course->is_active ? 'success' : 'secondary' }}">
-                                                    {{ $course->is_active ? __('courses.active') : __('courses.inactive') }}
+                                                @php
+                                                    $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
+                                                    $statusIcon = dataVaultIcon('course_status', $course->status) ?? 'fas fa-circle';
+                                                    $statusLabel = dataVaultLabel('course_status', $course->status) ?? ucfirst($course->status);
+                                                @endphp
+                                                <span class="badge bg-{{ $statusColor }}">
+                                                    <i class="{{ $statusIcon }}"></i> {{ $statusLabel }}
                                                 </span>
                                                 <span class="badge bg-info">
                                                     {{ $course->enrolled_students_count }} {{ __('teacher.students') }}

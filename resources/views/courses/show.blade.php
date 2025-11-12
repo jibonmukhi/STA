@@ -220,11 +220,14 @@
                     <div class="row mb-3">
                         <div class="col-12">
                             <small class="text-muted d-block">Status</small>
-                            @if($course->is_active)
-                                <span class="badge bg-success">Active</span>
-                            @else
-                                <span class="badge bg-secondary">Inactive</span>
-                            @endif
+                            @php
+                                $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
+                                $statusIcon = dataVaultIcon('course_status', $course->status) ?? 'fas fa-circle';
+                                $statusLabel = dataVaultLabel('course_status', $course->status) ?? ucfirst($course->status);
+                            @endphp
+                            <span class="badge bg-{{ $statusColor }}">
+                                <i class="{{ $statusIcon }}"></i> {{ $statusLabel }}
+                            </span>
 
                             @if($course->is_mandatory)
                                 <span class="badge bg-warning">Mandatory</span>
@@ -244,6 +247,67 @@
                                 @endif
                             </div>
                         </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrolled Students Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users"></i> Enrolled Students
+                        <span class="badge bg-primary ms-2">{{ $course->enrollments->count() }}</span>
+                    </h5>
+                    @can('manageStudents', $course)
+                    <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-cog"></i> Manage All
+                    </a>
+                    @endcan
+                </div>
+                <div class="card-body">
+                    @if($course->enrollments->count() > 0)
+                        <div class="row">
+                            @foreach($course->enrollments->take(8) as $enrollment)
+                            <div class="col-md-3 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ $enrollment->user->photo_url }}"
+                                         alt="{{ $enrollment->user->full_name }}"
+                                         class="rounded-circle me-2"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold small">{{ $enrollment->user->name }}</div>
+                                        <div class="small text-muted">
+                                            @php
+                                                $statusColors = [
+                                                    'enrolled' => 'secondary',
+                                                    'in_progress' => 'info',
+                                                    'completed' => 'success',
+                                                    'dropped' => 'warning',
+                                                    'failed' => 'danger'
+                                                ];
+                                                $color = $statusColors[$enrollment->status] ?? 'secondary';
+                                            @endphp
+                                            <span class="badge badge-sm bg-{{ $color }}">{{ ucfirst(str_replace('_', ' ', $enrollment->status)) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+
+                        @if($course->enrollments->count() > 8)
+                        <div class="text-center mt-3">
+                            <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-ellipsis-h"></i> View All {{ $course->enrollments->count() }} Students
+                            </a>
+                        </div>
+                        @endif
+                    @else
+                        <p class="text-muted text-center py-4 mb-0">No students enrolled yet.</p>
                     @endif
                 </div>
             </div>
