@@ -30,20 +30,30 @@ class CourseEnrollmentController extends Controller
         return view('courses.enrollments.index', compact('course', 'enrollments', 'stats'));
     }
 
-    public function create(Course $course)
+    public function create(Request $request, Course $course)
     {
         $this->authorize('manageStudents', $course);
 
+        // Get all companies for the filter dropdown
+        $companies = \App\Models\Company::orderBy('name')->get();
+
         // Get users who are not already enrolled
         $enrolledUserIds = $course->enrollments()->pluck('user_id')->toArray();
-        $availableUsers = User::whereNotIn('id', $enrolledUserIds)
-            ->whereDoesntHave('roles', function($query) {
-                $query->where('name', 'admin');
-            })
-            ->orderBy('name')
-            ->get();
+        $query = User::whereNotIn('id', $enrolledUserIds)
+            ->whereDoesntHave('roles', function($q) {
+                $q->where('name', 'admin');
+            });
 
-        return view('courses.enrollments.create', compact('course', 'availableUsers'));
+        // Filter by company if selected
+        if ($request->has('company_id') && $request->company_id) {
+            $query->whereHas('companies', function($q) use ($request) {
+                $q->where('companies.id', $request->company_id);
+            });
+        }
+
+        $availableUsers = $query->orderBy('name')->get();
+
+        return view('courses.enrollments.create', compact('course', 'availableUsers', 'companies'));
     }
 
     public function store(Request $request, Course $course)
@@ -69,7 +79,7 @@ class CourseEnrollmentController extends Controller
                 CourseEnrollment::create([
                     'course_id' => $course->id,
                     'user_id' => $userId,
-                    'company_id' => $user->company_id,
+                    'company_id' => $user->primary_company?->id,
                     'status' => $request->status,
                     'enrolled_at' => now(),
                     'progress_percentage' => 0,

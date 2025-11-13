@@ -45,23 +45,58 @@
                             </div>
 
                             <div class="mb-3">
+                                <label class="form-label">Filter by Company</label>
+                                <select class="form-select" id="companyFilter" onchange="filterByCompany(this.value)">
+                                    <option value="">All Companies</option>
+                                    @foreach($companies as $company)
+                                        <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                            {{ $company->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">Filter users by their company</small>
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label">Select Users <span class="text-danger">*</span></label>
                                 <div class="mb-2">
                                     <button type="button" class="btn btn-sm btn-outline-primary" id="selectAll">Select All</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAll">Deselect All</button>
+                                    @if(request('company_id'))
+                                        <span class="badge bg-info ms-2">
+                                            Showing users from: {{ $companies->find(request('company_id'))?->name }}
+                                        </span>
+                                    @else
+                                        <span class="badge bg-secondary ms-2">
+                                            Showing: All users ({{ $availableUsers->count() }})
+                                        </span>
+                                    @endif
                                 </div>
                                 <div class="border rounded p-3" style="max-height: 400px; overflow-y: auto;">
-                                    @foreach($availableUsers as $user)
-                                        <div class="form-check">
-                                            <input class="form-check-input user-checkbox" type="checkbox" name="user_ids[]" value="{{ $user->id }}" id="user{{ $user->id }}">
-                                            <label class="form-check-label" for="user{{ $user->id }}">
-                                                <strong>{{ $user->name }}</strong> ({{ $user->email }})
-                                                @if($user->company)
-                                                    <br><small class="text-muted">{{ $user->company->name }}</small>
-                                                @endif
-                                            </label>
-                                        </div>
-                                    @endforeach
+                                    @if($availableUsers->count() > 0)
+                                        @foreach($availableUsers as $user)
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input user-checkbox" type="checkbox" name="user_ids[]" value="{{ $user->id }}" id="user{{ $user->id }}">
+                                                <label class="form-check-label w-100" for="user{{ $user->id }}">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <strong>{{ $user->name }}</strong>
+                                                            <br><small class="text-muted">{{ $user->email }}</small>
+                                                        </div>
+                                                        @if($user->primary_company)
+                                                            <span class="badge bg-info">{{ $user->primary_company->name }}</span>
+                                                        @else
+                                                            <span class="badge bg-secondary">No Company</span>
+                                                        @endif
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p class="text-muted text-center py-3 mb-0">
+                                            <i class="fas fa-info-circle"></i> No users available from the selected company.
+                                        </p>
+                                    @endif
                                 </div>
                                 @error('user_ids')
                                     <div class="text-danger mt-1">{{ $message }}</div>
@@ -119,6 +154,16 @@
             checkbox.checked = false;
         });
     });
+
+    function filterByCompany(companyId) {
+        const currentUrl = new URL(window.location.href);
+        if (companyId) {
+            currentUrl.searchParams.set('company_id', companyId);
+        } else {
+            currentUrl.searchParams.delete('company_id');
+        }
+        window.location.href = currentUrl.toString();
+    }
 </script>
 @endpush
 @endsection
