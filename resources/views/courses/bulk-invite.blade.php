@@ -1,4 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.advanced-dashboard')
+
+@section('title', 'Send Bulk Invitation - ' . $course->title)
 
 @section('content')
 <div class="container-fluid">
