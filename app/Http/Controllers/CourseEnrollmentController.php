@@ -95,6 +95,25 @@ class CourseEnrollmentController extends Controller
                 // Send enrollment notification email
                 $user->notify(new \App\Notifications\CourseEnrollmentNotification($course, $enrollment));
 
+                // Add course calendar event for this user if course has schedule
+                if ($course->start_date && $course->end_date) {
+                    \App\Models\CourseEvent::updateOrCreate(
+                        [
+                            'course_id' => $course->id,
+                            'user_id' => $userId,
+                        ],
+                        [
+                            'title' => $course->title,
+                            'description' => $course->description ?? 'Course: ' . $course->title,
+                            'start_date' => $course->start_date,
+                            'start_time' => $course->start_time,
+                            'end_date' => $course->end_date,
+                            'end_time' => $course->end_time,
+                            'status' => 'scheduled',
+                        ]
+                    );
+                }
+
                 $enrolled++;
             }
         }
@@ -270,6 +289,25 @@ class CourseEnrollmentController extends Controller
 
         // Send enrollment notification email
         $user->notify(new \App\Notifications\CourseEnrollmentNotification($course, $enrollment));
+
+        // Add course calendar event for this user if course has schedule
+        if ($course->start_date && $course->end_date) {
+            \App\Models\CourseEvent::updateOrCreate(
+                [
+                    'course_id' => $course->id,
+                    'user_id' => $user->id,
+                ],
+                [
+                    'title' => $course->title,
+                    'description' => $course->description ?? 'Course: ' . $course->title,
+                    'start_date' => $course->start_date,
+                    'start_time' => $course->start_time,
+                    'end_date' => $course->end_date,
+                    'end_time' => $course->end_time,
+                    'status' => 'scheduled',
+                ]
+            );
+        }
 
         return redirect()->route('my-courses')->with('success', 'Successfully enrolled in the course!');
     }

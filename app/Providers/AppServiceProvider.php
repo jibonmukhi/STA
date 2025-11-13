@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Setting;
 use App\Models\Certificate;
 use App\Models\Course;
+use App\Observers\CourseObserver;
 use App\Policies\CertificatePolicy;
 use App\Policies\CoursePolicy;
 use Illuminate\Support\Facades\App;
@@ -31,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register observers
+        Course::observe(CourseObserver::class);
+
         // Register policies
         Gate::policy(Certificate::class, CertificatePolicy::class);
         Gate::policy(Course::class, CoursePolicy::class);
