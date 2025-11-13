@@ -34,7 +34,7 @@ class CourseCompanyAssignmentController extends Controller
                                                  ->exists();
 
                 if (!$exists) {
-                    CourseCompanyAssignment::create([
+                    $assignment = CourseCompanyAssignment::create([
                         'course_id' => $courseId,
                         'company_id' => $companyId,
                         'assigned_by' => auth()->id(),
@@ -43,6 +43,19 @@ class CourseCompanyAssignmentController extends Controller
                         'is_mandatory' => $validated['is_mandatory'] ?? false,
                         'notes' => $validated['notes'] ?? null,
                     ]);
+
+                    // Send notifications to all users in the company
+                    $course = Course::find($courseId);
+                    $company = Company::find($companyId);
+
+                    // Get all users associated with this company
+                    $companyUsers = $company->users()->get();
+
+                    foreach ($companyUsers as $user) {
+                        // Send notification email to each user
+                        $user->notify(new \App\Notifications\CourseAssignedNotification($course, $assignment));
+                    }
+
                     $assignedCount++;
                 } else {
                     $skippedCount++;

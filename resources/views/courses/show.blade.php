@@ -50,6 +50,11 @@
                                 <i class="fas fa-calendar-alt"></i> Manage Events
                             </a>
                         </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('courses.bulk-invite', $course) }}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-envelope"></i> Send Invitations
+                            </a>
+                        </div>
                         @endcan
                         <div class="col-md-3">
                             <a href="{{ route('courses.schedule', $course) }}" class="btn btn-outline-success w-100">

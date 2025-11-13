@@ -88,6 +88,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('courses', CoursesController::class);
     Route::get('/courses/planning/overview', [CoursesController::class, 'planning'])->name('courses.planning');
     Route::get('/courses/{course}/schedule', [CoursesController::class, 'schedule'])->name('courses.schedule');
+    Route::get('/courses/{course}/bulk-invite', [CoursesController::class, 'showBulkInvite'])->name('courses.bulk-invite');
+    Route::post('/courses/{course}/bulk-invite', [CoursesController::class, 'sendBulkInvite'])->name('courses.send-bulk-invite');
 
     // Course Materials Routes
     Route::get('/courses/{course}/materials/create', [\App\Http\Controllers\CourseMaterialController::class, 'create'])->name('course-materials.create');

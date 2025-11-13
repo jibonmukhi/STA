@@ -76,7 +76,7 @@ class CourseEnrollmentController extends Controller
 
             if (!$exists) {
                 $user = User::find($userId);
-                CourseEnrollment::create([
+                $enrollment = CourseEnrollment::create([
                     'course_id' => $course->id,
                     'user_id' => $userId,
                     'company_id' => $user->primary_company?->id,
@@ -91,6 +91,9 @@ class CourseEnrollmentController extends Controller
                     'user_name' => $user->name,
                     'user_id' => $userId,
                 ]);
+
+                // Send enrollment notification email
+                $user->notify(new \App\Notifications\CourseEnrollmentNotification($course, $enrollment));
 
                 $enrolled++;
             }
@@ -251,10 +254,10 @@ class CourseEnrollmentController extends Controller
             }
         }
 
-        CourseEnrollment::create([
+        $enrollment = CourseEnrollment::create([
             'course_id' => $course->id,
             'user_id' => $user->id,
-            'company_id' => $user->company_id,
+            'company_id' => $user->primary_company?->id,
             'status' => 'enrolled',
             'enrolled_at' => now(),
             'progress_percentage' => 0,
@@ -264,6 +267,9 @@ class CourseEnrollmentController extends Controller
             'course_title' => $course->title,
             'user_name' => $user->name,
         ]);
+
+        // Send enrollment notification email
+        $user->notify(new \App\Notifications\CourseEnrollmentNotification($course, $enrollment));
 
         return redirect()->route('my-courses')->with('success', 'Successfully enrolled in the course!');
     }
