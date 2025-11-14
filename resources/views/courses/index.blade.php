@@ -225,7 +225,7 @@
                             <div class="row align-items-center">
                                 <div class="col-md-3">
                                     <div class="d-flex align-items-center">
-                                        <label class="me-2 mb-0 text-nowrap">Rows per page:</label>
+                                        <label class="me-2 mb-0 text-nowrap">{{ trans('courses.rows_per_page') }}:</label>
                                         <select class="form-select form-select-sm" id="perPageSelect" style="width: auto;">
                                             <option value="10" {{ request('per_page', 25) == 10 ? 'selected' : '' }}>10</option>
                                             <option value="25" {{ request('per_page', 25) == 25 ? 'selected' : '' }}>25</option>
@@ -236,7 +236,11 @@
                                 </div>
                                 <div class="col-md-6 text-center my-2 my-md-0">
                                     <small class="text-muted">
-                                        Showing {{ $courses->firstItem() ?? 0 }} to {{ $courses->lastItem() ?? 0 }} of {{ $courses->total() }} entries
+                                        {{ trans('courses.showing_entries', [
+                                            'from' => $courses->firstItem() ?? 0,
+                                            'to' => $courses->lastItem() ?? 0,
+                                            'total' => $courses->total()
+                                        ]) }}
                                     </small>
                                 </div>
                                 <div class="col-md-3">

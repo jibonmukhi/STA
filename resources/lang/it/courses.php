@@ -58,15 +58,9 @@ return [
 
     // Categories
     'categories' => [
-        'programming' => 'Programmazione',
-        'web_development' => 'Sviluppo Web',
-        'mobile_development' => 'Sviluppo Mobile',
-        'data_science' => 'Data Science',
-        'cybersecurity' => 'Cybersecurity',
-        'project_management' => 'Gestione Progetti',
-        'design' => 'Design',
-        'business' => 'Business',
-        'marketing' => 'Marketing',
+        'alimentaristi' => 'Alimentaristi',
+        'antincendio' => 'Antincendio',
+        'altri_corsi' => 'Altri Corsi',
         'other' => 'Altro'
     ],
 
@@ -166,4 +160,10 @@ return [
     'no_events_message' => 'Non ci sono sessioni programmate per questo corso.',
     'view_scheduled_courses' => 'Visualizza i tuoi corsi programmati ed eventi di formazione',
     'close' => 'Chiudi',
+
+    // Table
+    'teacher' => 'Docente',
+    'actions' => 'Azioni',
+    'rows_per_page' => 'Righe per pagina',
+    'showing_entries' => 'Mostrando da :from a :to di :total risultati',
 ];

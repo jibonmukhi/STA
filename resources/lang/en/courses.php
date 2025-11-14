@@ -58,15 +58,9 @@ return [
 
     // Categories
     'categories' => [
-        'programming' => 'Programming',
-        'web_development' => 'Web Development',
-        'mobile_development' => 'Mobile Development',
-        'data_science' => 'Data Science',
-        'cybersecurity' => 'Cybersecurity',
-        'project_management' => 'Project Management',
-        'design' => 'Design',
-        'business' => 'Business',
-        'marketing' => 'Marketing',
+        'alimentaristi' => 'Food Handlers',
+        'antincendio' => 'Fire Safety',
+        'altri_corsi' => 'Other Courses',
         'other' => 'Other'
     ],
 
@@ -166,4 +160,10 @@ return [
     'no_events_message' => 'There are no scheduled sessions for this course.',
     'view_scheduled_courses' => 'View your scheduled courses and training events',
     'close' => 'Close',
+
+    // Table
+    'teacher' => 'Teacher',
+    'actions' => 'Actions',
+    'rows_per_page' => 'Rows per page',
+    'showing_entries' => 'Showing :from to :to of :total entries',
 ];
