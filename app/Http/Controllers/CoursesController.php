@@ -42,7 +42,16 @@ class CoursesController extends Controller
             $query->active();
         }
 
-        $courses = $query->with('teacher')->orderBy('title')->paginate(12);
+        // Get per_page value from request, default to 25
+        $perPage = $request->input('per_page', 25);
+
+        // Validate per_page value (only allow specific values)
+        $allowedPerPage = [10, 25, 50, 100];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 25;
+        }
+
+        $courses = $query->with('teacher')->orderBy('title')->paginate($perPage);
 
         $categories = Course::getCategories();
         $levels = Course::getLevels();

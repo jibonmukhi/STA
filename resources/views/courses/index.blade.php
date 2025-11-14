@@ -103,141 +103,207 @@
     </div>
 
     <div class="row">
-        @forelse($courses as $course)
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 course-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h5 class="card-title">{{ $course->title }}</h5>
-                            <div class="text-end">
-                                @php
-                                    $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
-                                    $statusIcon = dataVaultIcon('course_status', $course->status) ?? 'fas fa-circle';
-                                    $statusLabel = dataVaultLabel('course_status', $course->status) ?? ucfirst($course->status);
-                                @endphp
-                                <span class="badge bg-{{ $statusColor }} mb-1">
-                                    <i class="{{ $statusIcon }}"></i> {{ $statusLabel }}
-                                </span><br>
-                                <span class="badge bg-primary">{{ trans('courses.levels.' . $course->level, [], null, ucfirst($course->level)) }}</span>
-                            </div>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body p-0">
+                    @if($courses->isEmpty())
+                        <div class="text-center py-5">
+                            <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">{{ trans('courses.no_courses_found') }}</h4>
+                            <p class="text-muted">{{ trans('courses.no_courses_message') }}</p>
+                            @can('create', App\Models\Course::class)
+                            <a href="{{ route('courses.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> {{ trans('courses.create_first_course') }}
+                            </a>
+                            @endcan
+                        </div>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{{ trans('courses.course_code') }}</th>
+                                        <th>{{ trans('courses.title') }}</th>
+                                        <th>{{ trans('courses.category') }}</th>
+                                        <th>{{ trans('courses.level') }}</th>
+                                        <th>{{ trans('courses.teacher') }}</th>
+                                        <th>{{ trans('courses.duration') }}</th>
+                                        <th>{{ trans('courses.delivery_method') }}</th>
+                                        <th>{{ trans('courses.price') }}</th>
+                                        <th>{{ trans('courses.status') }}</th>
+                                        <th class="text-end">{{ trans('courses.actions') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($courses as $course)
+                                        <tr class="course-row">
+                                            <td>
+                                                <strong class="text-primary">{{ $course->course_code }}</strong>
+                                            </td>
+                                            <td>
+                                                <strong>{{ $course->title }}</strong>
+                                                @if($course->is_mandatory)
+                                                    <span class="badge bg-warning ms-1">{{ trans('courses.mandatory') }}</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    {{ trans('courses.categories.' . $course->category, [], null, $categories[$course->category] ?? $course->category) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">
+                                                    {{ trans('courses.levels.' . $course->level, [], null, ucfirst($course->level)) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if($course->teacher)
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ $course->teacher->photo_url }}" alt="{{ $course->teacher->full_name }}"
+                                                             class="rounded-circle me-2" style="object-fit: cover;">
+                                                        <span>{{ $course->teacher->full_name }}</span>
+                                                    </div>
+                                                @elseif($course->instructor)
+                                                    <span class="text-muted">{{ $course->instructor }}</span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <strong>{{ $course->duration_hours }}</strong>h
+                                                @if($course->credits)
+                                                    <span class="text-muted ms-1">({{ $course->credits }} cr)</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    {{ trans('courses.delivery_methods.' . $course->delivery_method, [], null, $deliveryMethods[$course->delivery_method] ?? $course->delivery_method) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <strong>${{ number_format($course->price, 2) }}</strong>
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
+                                                    $statusIcon = dataVaultIcon('course_status', $course->status) ?? 'fas fa-circle';
+                                                    $statusLabel = dataVaultLabel('course_status', $course->status) ?? ucfirst($course->status);
+                                                @endphp
+                                                <span class="badge bg-{{ $statusColor }}">
+                                                    <i class="{{ $statusIcon }}"></i> {{ $statusLabel }}
+                                                </span>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="btn-group" role="group">
+                                                    <a href="{{ route('courses.show', $course) }}" class="btn btn-sm btn-outline-info" title="{{ trans('courses.view') }}">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    @can('update', $course)
+                                                    <a href="{{ route('courses.edit', $course) }}" class="btn btn-sm btn-outline-primary" title="{{ trans('courses.edit') }}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    @endcan
+                                                    @can('delete', $course)
+                                                    <form action="{{ route('courses.destroy', $course) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ trans('courses.delete') }}"
+                                                                onclick="return confirm('{{ trans('courses.confirm_delete') }}');">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                    @endcan
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
 
-                        <div class="mb-3">
-                            <small class="text-muted">{{ trans('courses.course_code') }}: <strong>{{ $course->course_code }}</strong></small>
-                        </div>
-
-                        @if($course->description)
-                            <p class="card-text text-muted small">
-                                {{ Str::limit($course->description, 120) }}
-                            </p>
-                        @endif
-
-                        <div class="row mb-3 text-center">
-                            <div class="col-4">
-                                <small class="text-muted d-block">{{ trans('courses.duration') }}</small>
-                                <strong>{{ $course->duration_hours }}h</strong>
-                            </div>
-                            <div class="col-4">
-                                <small class="text-muted d-block">{{ trans('courses.credits') }}</small>
-                                <strong>{{ $course->credits ?: trans('courses.n_a') }}</strong>
-                            </div>
-                            <div class="col-4">
-                                <small class="text-muted d-block">{{ trans('courses.price') }}</small>
-                                <strong>${{ number_format($course->price, 2) }}</strong>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <span class="badge bg-info">{{ trans('courses.categories.' . $course->category, [], null, $categories[$course->category] ?? $course->category) }}</span>
-                            <span class="badge bg-secondary">{{ trans('courses.delivery_methods.' . $course->delivery_method, [], null, $deliveryMethods[$course->delivery_method] ?? $course->delivery_method) }}</span>
-                            @if($course->is_mandatory)
-                                <span class="badge bg-warning">{{ trans('courses.mandatory') }}</span>
-                            @endif
-                        </div>
-
-                        @if($course->teacher)
-                            <div class="mb-2">
-                                <div class="d-flex align-items-center">
-                                    <img src="{{ $course->teacher->photo_url }}" alt="{{ $course->teacher->full_name }}"
-                                         class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover;">
-                                    <div>
-                                        <small class="text-muted d-block" style="line-height: 1.2;">
-                                            <i class="fas fa-chalkboard-teacher"></i> Teacher
-                                        </small>
-                                        <small><strong>{{ $course->teacher->full_name }}</strong></small>
+                        <div class="card-footer bg-light">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center">
+                                        <label class="me-2 mb-0 text-nowrap">Rows per page:</label>
+                                        <select class="form-select form-select-sm" id="perPageSelect" style="width: auto;">
+                                            <option value="10" {{ request('per_page', 25) == 10 ? 'selected' : '' }}>10</option>
+                                            <option value="25" {{ request('per_page', 25) == 25 ? 'selected' : '' }}>25</option>
+                                            <option value="50" {{ request('per_page', 25) == 50 ? 'selected' : '' }}>50</option>
+                                            <option value="100" {{ request('per_page', 25) == 100 ? 'selected' : '' }}>100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 text-center my-2 my-md-0">
+                                    <small class="text-muted">
+                                        Showing {{ $courses->firstItem() ?? 0 }} to {{ $courses->lastItem() ?? 0 }} of {{ $courses->total() }} entries
+                                    </small>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex justify-content-end">
+                                        {{ $courses->withQueryString()->links('pagination::bootstrap-4') }}
                                     </div>
                                 </div>
                             </div>
-                        @elseif($course->instructor)
-                            <p class="card-text mb-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-user-tie"></i> {{ trans('courses.instructor') }}: {{ $course->instructor }}
-                                </small>
-                            </p>
-                        @endif
-                    </div>
-
-                    <div class="card-footer bg-transparent">
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('courses.show', $course) }}" class="btn btn-sm btn-outline-info flex-fill">
-                                <i class="fas fa-eye"></i> {{ trans('courses.view') }}
-                            </a>
-                            @can('update', $course)
-                            <a href="{{ route('courses.edit', $course) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-edit"></i> {{ trans('courses.edit') }}
-                            </a>
-                            @endcan
-                            @can('delete', $course)
-                            <form action="{{ route('courses.destroy', $course) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('{{ trans('courses.confirm_delete') }}');">>
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                            @endcan
                         </div>
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
-                        <h4 class="text-muted">{{ trans('courses.no_courses_found') }}</h4>
-                        <p class="text-muted">{{ trans('courses.no_courses_message') }}</p>
-                        @can('create', App\Models\Course::class)
-                        <a href="{{ route('courses.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> {{ trans('courses.create_first_course') }}
-                        </a>
-                        @endcan
-                    </div>
-                </div>
-            </div>
-        @endforelse
-    </div>
-
-    @if($courses->hasPages())
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-center">
-                    {{ $courses->withQueryString()->links() }}
+                    @endif
                 </div>
             </div>
         </div>
-    @endif
+    </div>
 </div>
 
 <style>
-.course-card {
-    transition: transform 0.2s, box-shadow 0.2s;
+.course-row {
+    transition: background-color 0.2s;
 }
 
-.course-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+.course-row:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.table thead th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #dee2e6;
+    padding: 0.5rem;
+}
+
+.table tbody td {
+    vertical-align: middle;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.table tbody td img {
+    width: 28px;
+    height: 28px;
+}
+
+.table .badge {
+    font-size: 0.75rem;
+    padding: 0.25em 0.5em;
+}
+
+.pagination {
+    margin-bottom: 0;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const perPageSelect = document.getElementById('perPageSelect');
+
+    if (perPageSelect) {
+        perPageSelect.addEventListener('change', function() {
+            const url = new URL(window.location.href);
+            url.searchParams.set('per_page', this.value);
+            url.searchParams.delete('page'); // Reset to first page when changing per_page
+            window.location.href = url.toString();
+        });
+    }
+});
+</script>
 @endsection
