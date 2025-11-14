@@ -32,15 +32,9 @@ class DataVaultSeeder extends Seeder
 
         // 3. Course Category
         $this->createCategory('course_category', 'Course Category', 'Categoria Corso', [
-            ['code' => 'programming', 'label_en' => 'Programming', 'label_it' => 'Programmazione'],
-            ['code' => 'web_development', 'label_en' => 'Web Development', 'label_it' => 'Sviluppo Web'],
-            ['code' => 'mobile_development', 'label_en' => 'Mobile Development', 'label_it' => 'Sviluppo Mobile'],
-            ['code' => 'data_science', 'label_en' => 'Data Science', 'label_it' => 'Data Science'],
-            ['code' => 'cybersecurity', 'label_en' => 'Cybersecurity', 'label_it' => 'Sicurezza Informatica'],
-            ['code' => 'project_management', 'label_en' => 'Project Management', 'label_it' => 'Gestione Progetti'],
-            ['code' => 'design', 'label_en' => 'Design', 'label_it' => 'Design'],
-            ['code' => 'business', 'label_en' => 'Business', 'label_it' => 'Business'],
-            ['code' => 'marketing', 'label_en' => 'Marketing', 'label_it' => 'Marketing'],
+            ['code' => 'alimentaristi', 'label_en' => 'Food Handlers', 'label_it' => 'Alimentaristi'],
+            ['code' => 'antincendio', 'label_en' => 'Fire Safety', 'label_it' => 'Antincendio'],
+            ['code' => 'altri_corsi', 'label_en' => 'Other Courses', 'label_it' => 'Altri Corsi'],
             ['code' => 'other', 'label_en' => 'Other', 'label_it' => 'Altro'],
         ]);
 
@@ -143,7 +137,7 @@ class DataVaultSeeder extends Seeder
                     'color' => $item['color'] ?? null,
                     'icon' => $item['icon'] ?? null,
                     'is_default' => $item['is_default'] ?? false,
-                    'is_system' => true,
+                    'is_system' => $item['is_system'] ?? false,
                     'is_active' => true,
                     'sort_order' => $index + 1,
                 ]
