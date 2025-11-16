@@ -30,7 +30,7 @@ class UpdateUserRequest extends FormRequest
             'date_of_birth' => 'required|date|before:today',
             'place_of_birth' => 'required|string|max:255',
             'country' => 'required|string|size:2|in:IT,US,GB,FR,DE,ES',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $userId,
+            'email' => 'required|string|email|max:255',
             'phone' => 'nullable|string|max:20',
             'mobile' => 'nullable|string|max:20', // Keep for backward compatibility
             'gender' => 'required|in:male,female,other',
