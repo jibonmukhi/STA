@@ -23,6 +23,7 @@ return [
     'email_address' => 'Indirizzo Email',
     'username' => 'Nome Utente',
     'username_hint' => 'Caratteri alfanumerici, punti, trattini e underscore consentiti',
+    'use_email_as_username' => 'Usa email come nome utente',
     'allow_edit_username' => 'Consenti modifica nome utente',
     'mobile' => 'Cellulare',
     'phone_number' => 'Numero di Telefono',

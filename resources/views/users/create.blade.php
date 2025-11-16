@@ -229,6 +229,12 @@
                                        id="username" name="username" value="{{ old('username') }}" maxlength="50"
                                        autocomplete="off" required readonly>
                                 <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="use_email_as_username">
+                                    <label class="form-check-label" for="use_email_as_username">
+                                        {{ __('users.use_email_as_username') }}
+                                    </label>
+                                </div>
+                                <div class="form-check mt-1">
                                     <input class="form-check-input" type="checkbox" id="edit_username_checkbox">
                                     <label class="form-check-label" for="edit_username_checkbox">
                                         {{ __('users.allow_edit_username') }}
@@ -935,14 +941,58 @@ function calculateCheckDigit(cf15) {
     return checkChars.charAt(sum % 26);
 }
 
-// Handle username readonly toggle
+// Handle username readonly toggle and email copy
 document.addEventListener('DOMContentLoaded', function() {
     const usernameField = document.getElementById('username');
     const editUsernameCheckbox = document.getElementById('edit_username_checkbox');
+    const useEmailCheckbox = document.getElementById('use_email_as_username');
+    const emailField = document.getElementById('email');
 
+    // Handle "Use email as username" checkbox
+    if (useEmailCheckbox && usernameField && emailField) {
+        useEmailCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Copy full email address to username
+                const emailValue = emailField.value.trim();
+                if (emailValue) {
+                    // Use full email address
+                    usernameField.value = emailValue;
+                }
+                // Uncheck edit checkbox
+                if (editUsernameCheckbox) {
+                    editUsernameCheckbox.checked = false;
+                }
+                // Keep readonly
+                usernameField.setAttribute('readonly', 'readonly');
+            } else {
+                // Restore CF value when unchecked
+                const cfField = document.getElementById('cf');
+                if (cfField && cfField.value) {
+                    usernameField.value = cfField.value.toUpperCase();
+                }
+            }
+        });
+
+        // Update username when email changes (if checkbox is checked)
+        emailField.addEventListener('input', function() {
+            if (useEmailCheckbox.checked) {
+                const emailValue = this.value.trim();
+                if (emailValue) {
+                    // Use full email address
+                    usernameField.value = emailValue;
+                }
+            }
+        });
+    }
+
+    // Handle "Allow editing username" checkbox
     if (editUsernameCheckbox && usernameField) {
         editUsernameCheckbox.addEventListener('change', function() {
             if (this.checked) {
+                // Uncheck use email checkbox
+                if (useEmailCheckbox) {
+                    useEmailCheckbox.checked = false;
+                }
                 usernameField.removeAttribute('readonly');
                 usernameField.focus();
             } else {
