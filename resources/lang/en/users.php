@@ -23,6 +23,7 @@ return [
     'email_address' => 'Email Address',
     'username' => 'Username',
     'username_hint' => 'Alphanumeric characters, dots, hyphens, and underscores allowed',
+    'allow_edit_username' => 'Allow editing username',
     'mobile' => 'Mobile',
     'phone_number' => 'Phone Number',
     'role' => 'Role',

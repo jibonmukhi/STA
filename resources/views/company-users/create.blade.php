@@ -85,7 +85,13 @@
                                 <label for="username" class="form-label">{{ __('users.username') }} <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('username') is-invalid @enderror"
                                        id="username" name="username" value="{{ old('username') }}" maxlength="50"
-                                       autocomplete="off" required>
+                                       autocomplete="off" required readonly>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="edit_username_checkbox">
+                                    <label class="form-check-label" for="edit_username_checkbox">
+                                        {{ __('users.allow_edit_username') }}
+                                    </label>
+                                </div>
                                 <div class="form-text">{{ __('users.username_hint') }}</div>
                                 @error('username')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -498,7 +504,22 @@
         return checkChars.charAt(sum % 26);
     }
 
-    // Attach event listeners to all relevant fields
+    // Handle username readonly toggle
+    const usernameField = document.getElementById('username');
+    const editUsernameCheckbox = document.getElementById('edit_username_checkbox');
+
+    if (editUsernameCheckbox && usernameField) {
+        editUsernameCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                usernameField.removeAttribute('readonly');
+                usernameField.focus();
+            } else {
+                usernameField.setAttribute('readonly', 'readonly');
+            }
+        });
+    }
+
+    // Attach event listeners to all relevant fields for CF generation
     const fieldsToWatch = ['surname', 'name', 'gender', 'date_of_birth', 'place_of_birth', 'country'];
 
     fieldsToWatch.forEach(fieldId => {
