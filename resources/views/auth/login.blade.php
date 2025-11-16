@@ -5,11 +5,11 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Address -->
+        <!-- Codice Fiscale -->
         <div>
-            <x-input-label for="email" :value="__('auth.email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-input-label for="cf" value="Codice Fiscale" />
+            <x-text-input id="cf" class="block mt-1 w-full" type="text" name="cf" :value="old('cf')" required autofocus autocomplete="username" maxlength="16" placeholder="RSSMRA80A01H501U" style="text-transform: uppercase;" />
+            <x-input-error :messages="$errors->get('cf')" class="mt-2" />
         </div>
 
         <!-- Password -->
