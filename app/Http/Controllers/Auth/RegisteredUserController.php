@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use App\Services\AuditLogService;
+use App\Rules\ValidCodiceFiscale;
 
 class RegisteredUserController extends Controller
 {
@@ -32,14 +33,38 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'surname' => ['required', 'string', 'max:255'],
+            'date_of_birth' => ['required', 'date', 'before:today'],
+            'place_of_birth' => ['required', 'string', 'max:255'],
+            'gender' => ['required', 'in:male,female,other'],
+            'cf' => [
+                'required',
+                'string',
+                'size:16',
+                'unique:users',
+                'regex:/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/',
+                new ValidCodiceFiscale([
+                    'name' => $request->name,
+                    'surname' => $request->surname,
+                    'date_of_birth' => $request->date_of_birth,
+                    'gender' => $request->gender,
+                ])
+            ],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'surname' => $request->surname,
+            'date_of_birth' => $request->date_of_birth,
+            'place_of_birth' => $request->place_of_birth,
+            'gender' => $request->gender,
+            'cf' => strtoupper($request->cf),
+            'country' => 'IT', // Default to Italy for self-registration
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'status' => 'pending_approval', // Require approval for self-registered users
         ]);
 
         // Log user registration

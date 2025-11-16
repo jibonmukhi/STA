@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\ValidCodiceFiscale;
 
 class StoreUserRequest extends FormRequest
 {
@@ -34,7 +35,19 @@ class StoreUserRequest extends FormRequest
             'phone' => 'nullable|string|max:20',
             'mobile' => 'nullable|string|max:20', // Keep for backward compatibility
             'gender' => 'required|in:male,female,other',
-            'cf' => 'required|string|size:16|unique:users|regex:/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/',
+            'cf' => [
+                'required',
+                'string',
+                'size:16',
+                'unique:users',
+                'regex:/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/',
+                new ValidCodiceFiscale([
+                    'name' => $this->name,
+                    'surname' => $this->surname,
+                    'date_of_birth' => $this->date_of_birth,
+                    'gender' => $this->gender,
+                ])
+            ],
             'photo' => 'nullable|file|max:2048',
             'address' => 'nullable|string|max:500',
             'status' => 'nullable|in:active,inactive,parked',
