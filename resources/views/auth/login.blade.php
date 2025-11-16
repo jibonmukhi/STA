@@ -7,7 +7,7 @@
 
         <!-- Username -->
         <div>
-            <x-input-label for="username" value="Username" />
+            <x-input-label for="username" :value="__('auth.username')" />
             <x-text-input id="username" class="block mt-1 w-full" type="text" name="username" :value="old('username')" required autofocus autocomplete="username" maxlength="50" />
             <x-input-error :messages="$errors->get('username')" class="mt-2" />
         </div>

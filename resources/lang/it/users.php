@@ -21,6 +21,8 @@ return [
     'surname' => 'Cognome',
     'email' => 'Email',
     'email_address' => 'Indirizzo Email',
+    'username' => 'Nome Utente',
+    'username_hint' => 'Caratteri alfanumerici, punti, trattini e underscore consentiti',
     'mobile' => 'Cellulare',
     'phone_number' => 'Numero di Telefono',
     'role' => 'Ruolo',

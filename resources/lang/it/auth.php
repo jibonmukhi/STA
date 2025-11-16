@@ -11,6 +11,7 @@ return [
     'verify_email_title' => 'Verifica indirizzo email',
     'confirm_password_title' => 'Conferma password',
     'email' => 'Indirizzo Email',
+    'username' => 'Nome Utente',
     'password' => 'Password',
     'confirm_password' => 'Conferma Password',
     'remember_me' => 'Ricordami',
