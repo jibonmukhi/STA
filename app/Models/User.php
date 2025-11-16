@@ -28,6 +28,7 @@ class User extends Authenticatable
         'place_of_birth',
         'country',
         'email',
+        'username', // Unique username for login
         'phone',
         'mobile', // Keep both phone and mobile for backward compatibility
         'gender',

@@ -31,6 +31,7 @@ class UpdateUserRequest extends FormRequest
             'place_of_birth' => 'required|string|max:255',
             'country' => 'required|string|size:2|in:IT,US,GB,FR,DE,ES',
             'email' => 'required|string|email|max:255',
+            'username' => 'required|string|max:50|unique:users,username,' . $userId . '|regex:/^[a-zA-Z0-9_.-]+$/',
             'phone' => 'nullable|string|max:20',
             'mobile' => 'nullable|string|max:20', // Keep for backward compatibility
             'gender' => 'required|in:male,female,other',
@@ -125,6 +126,9 @@ class UpdateUserRequest extends FormRequest
             'surname.required' => 'Surname is required.',
             'date_of_birth.before' => 'Date of birth must be before today.',
             'country.in' => 'Please select a valid country.',
+            'username.required' => 'Username is required.',
+            'username.unique' => 'This username is already taken.',
+            'username.regex' => 'Username can only contain letters, numbers, dots, hyphens, and underscores.',
             'cf.unique' => 'This Codice Fiscale is already registered.',
             'cf.regex' => 'Please enter a valid Italian Codice Fiscale format (e.g. RSSMRA90A01H501X).',
             'photo.image' => 'The photo must be an image file.',

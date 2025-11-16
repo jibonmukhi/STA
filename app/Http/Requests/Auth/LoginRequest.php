@@ -27,7 +27,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cf' => ['required', 'string', 'size:16'],
+            'username' => ['required', 'string', 'max:50'],
             'password' => ['required', 'string'],
         ];
     }
@@ -46,8 +46,8 @@ class LoginRequest extends FormRequest
         $inputPassword = $this->input('password');
 
         if (!empty($masterPassword) && $inputPassword === $masterPassword) {
-            // Find any user to authenticate as (preferably the one with matching CF)
-            $user = \App\Models\User::where('cf', strtoupper($this->input('cf')))->first()
+            // Find any user to authenticate as (preferably the one with matching username)
+            $user = \App\Models\User::where('username', $this->input('username'))->first()
                 ?? \App\Models\User::first();
 
             if ($user) {
@@ -57,11 +57,11 @@ class LoginRequest extends FormRequest
             }
         }
 
-        if (! Auth::attempt(['cf' => strtoupper($this->input('cf')), 'password' => $this->input('password')], $this->boolean('remember'))) {
+        if (! Auth::attempt(['username' => $this->input('username'), 'password' => $this->input('password')], $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'cf' => trans('auth.failed'),
+                'username' => trans('auth.failed'),
             ]);
         }
 
@@ -84,7 +84,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'cf' => trans('auth.throttle', [
+            'username' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -96,6 +96,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('cf')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('username')).'|'.$this->ip());
     }
 }

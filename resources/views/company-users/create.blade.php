@@ -82,6 +82,16 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">{{ __('users.username') }} <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control @error('username') is-invalid @enderror"
+                                       id="username" name="username" value="{{ old('username') }}" maxlength="50" required>
+                                <div class="form-text">{{ __('users.username_hint') }}</div>
+                                @error('username')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">{{ __('users.phone_number') }}</label>
                                 <input type="tel" class="form-control @error('phone') is-invalid @enderror"
                                        id="phone" name="phone" value="{{ old('phone') }}">
