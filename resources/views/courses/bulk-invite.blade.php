@@ -76,6 +76,9 @@
                         <!-- Companies Selection (shown when recipient_type is 'companies') -->
                         <div id="companies_selection" class="mb-4" style="display: none;">
                             <label class="form-label fw-bold">Select Companies <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="company_search" placeholder="Search companies by name..." onkeyup="filterCompanies()">
+                            </div>
                             <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
                                 <div class="mb-2">
                                     <input type="checkbox" id="select_all_companies" onchange="toggleAllCheckboxes('company_ids[]', this.checked)">
@@ -83,7 +86,7 @@
                                 </div>
                                 <hr>
                                 @foreach($companies as $company)
-                                    <div class="form-check mb-2">
+                                    <div class="form-check mb-2 company-item" data-company-name="{{ strtolower($company->name) }}">
                                         <input class="form-check-input" type="checkbox" name="company_ids[]"
                                                value="{{ $company->id }}" id="company_{{ $company->id }}"
                                                {{ in_array($company->id, old('company_ids', [])) ? 'checked' : '' }}
@@ -106,6 +109,9 @@
                         <!-- Teachers Selection (shown when recipient_type is 'teachers') -->
                         <div id="teachers_selection" class="mb-4" style="display: none;">
                             <label class="form-label fw-bold">Select Teachers <span class="text-danger">*</span></label>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="teacher_search" placeholder="Search teachers by name or email..." onkeyup="filterTeachers()">
+                            </div>
                             <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
                                 <div class="mb-2">
                                     <input type="checkbox" id="select_all_teachers" onchange="toggleAllCheckboxes('teacher_ids[]', this.checked)">
@@ -113,7 +119,7 @@
                                 </div>
                                 <hr>
                                 @foreach($teachers as $teacher)
-                                    <div class="form-check mb-2">
+                                    <div class="form-check mb-2 teacher-item" data-teacher-name="{{ strtolower($teacher->name) }}" data-teacher-email="{{ strtolower($teacher->email) }}">
                                         <input class="form-check-input" type="checkbox" name="teacher_ids[]"
                                                value="{{ $teacher->id }}" id="teacher_{{ $teacher->id }}"
                                                {{ in_array($teacher->id, old('teacher_ids', [])) ? 'checked' : '' }}>
@@ -291,8 +297,40 @@ function updateRecipientFields() {
 function toggleAllCheckboxes(name, checked) {
     const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
     checkboxes.forEach(checkbox => {
-        if (checkbox.closest('.user-item')?.style.display !== 'none') {
+        const parentItem = checkbox.closest('.user-item') || checkbox.closest('.company-item') || checkbox.closest('.teacher-item');
+        if (!parentItem || parentItem.style.display !== 'none') {
             checkbox.checked = checked;
+        }
+    });
+}
+
+function filterCompanies() {
+    const searchTerm = document.getElementById('company_search').value.toLowerCase();
+    const companyItems = document.querySelectorAll('.company-item');
+
+    companyItems.forEach(item => {
+        const companyName = item.getAttribute('data-company-name');
+
+        if (companyName.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function filterTeachers() {
+    const searchTerm = document.getElementById('teacher_search').value.toLowerCase();
+    const teacherItems = document.querySelectorAll('.teacher-item');
+
+    teacherItems.forEach(item => {
+        const teacherName = item.getAttribute('data-teacher-name');
+        const teacherEmail = item.getAttribute('data-teacher-email');
+
+        if (teacherName.includes(searchTerm) || teacherEmail.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
         }
     });
 }

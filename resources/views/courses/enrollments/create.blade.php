@@ -60,6 +60,9 @@
                             <div class="mb-3">
                                 <label class="form-label">Select Users <span class="text-danger">*</span></label>
                                 <div class="mb-2">
+                                    <input type="text" class="form-control" id="user_search" placeholder="Search users by name or email..." onkeyup="filterUsers()">
+                                </div>
+                                <div class="mb-2">
                                     <button type="button" class="btn btn-sm btn-outline-primary" id="selectAll">Select All</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAll">Deselect All</button>
                                     @if(request('company_id'))
@@ -75,7 +78,7 @@
                                 <div class="border rounded p-3" style="max-height: 400px; overflow-y: auto;">
                                     @if($availableUsers->count() > 0)
                                         @foreach($availableUsers as $user)
-                                            <div class="form-check mb-2">
+                                            <div class="form-check mb-2 user-item" data-user-name="{{ strtolower($user->name) }}" data-user-email="{{ strtolower($user->email) }}">
                                                 <input class="form-check-input user-checkbox" type="checkbox" name="user_ids[]" value="{{ $user->id }}" id="user{{ $user->id }}">
                                                 <label class="form-check-label w-100" for="user{{ $user->id }}">
                                                     <div class="d-flex justify-content-between align-items-start">
@@ -145,15 +148,37 @@
 <script>
     document.getElementById('selectAll').addEventListener('click', function() {
         document.querySelectorAll('.user-checkbox').forEach(function(checkbox) {
-            checkbox.checked = true;
+            const parentItem = checkbox.closest('.user-item');
+            if (!parentItem || parentItem.style.display !== 'none') {
+                checkbox.checked = true;
+            }
         });
     });
 
     document.getElementById('deselectAll').addEventListener('click', function() {
         document.querySelectorAll('.user-checkbox').forEach(function(checkbox) {
-            checkbox.checked = false;
+            const parentItem = checkbox.closest('.user-item');
+            if (!parentItem || parentItem.style.display !== 'none') {
+                checkbox.checked = false;
+            }
         });
     });
+
+    function filterUsers() {
+        const searchTerm = document.getElementById('user_search').value.toLowerCase();
+        const userItems = document.querySelectorAll('.user-item');
+
+        userItems.forEach(item => {
+            const userName = item.getAttribute('data-user-name');
+            const userEmail = item.getAttribute('data-user-email');
+
+            if (userName.includes(searchTerm) || userEmail.includes(searchTerm)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
 
     function filterByCompany(companyId) {
         const currentUrl = new URL(window.location.href);
