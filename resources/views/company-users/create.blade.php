@@ -160,7 +160,8 @@
                                     {{ __('users.codice_fiscale') }} <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control @error('cf') is-invalid @enderror"
-                                       id="cf" name="cf" value="{{ old('cf') }}" maxlength="16" placeholder="e.g. RSSMRA90A01H501X" required>
+                                       id="cf" name="cf" value="{{ old('cf') }}" maxlength="16" placeholder="e.g. RSSMRA90A01H501X" required
+                                       oninput="updateUsernameFromCF(this.value)">
                                 @error('cf')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -326,6 +327,185 @@
         if (!confirm('{{ __('users.confirm_user_creation') }}')) {
             e.preventDefault();
             return false;
+        }
+    });
+
+    // Update username from CF field
+    function updateUsernameFromCF(cfValue) {
+        const usernameField = document.getElementById('username');
+        if (usernameField) {
+            // Convert to uppercase and update username field
+            usernameField.value = cfValue.toUpperCase();
+        }
+    }
+
+    // Generate CF from personal information
+    function generateCF() {
+        const surname = document.getElementById('surname')?.value || '';
+        const name = document.getElementById('name')?.value || '';
+        const gender = document.getElementById('gender')?.value || '';
+        const dateOfBirth = document.getElementById('date_of_birth')?.value || '';
+        const placeOfBirth = document.getElementById('place_of_birth')?.value || '';
+        const country = document.getElementById('country')?.value || 'IT';
+
+        if (!surname && !name && !gender && !dateOfBirth && !placeOfBirth) {
+            return; // No data to generate from
+        }
+
+        let cf = '';
+
+        // Extract consonants and vowels
+        function getConsonants(str) {
+            return str.toUpperCase().replace(/[^BCDFGHJKLMNPQRSTVWXYZ]/g, '');
+        }
+
+        function getVowels(str) {
+            return str.toUpperCase().replace(/[^AEIOU]/g, '');
+        }
+
+        function padString(str, length) {
+            return (str + 'XXX').substring(0, length);
+        }
+
+        // 1. Surname (3 chars)
+        if (surname) {
+            const consonants = getConsonants(surname);
+            const vowels = getVowels(surname);
+            cf += padString(consonants + vowels, 3);
+        } else {
+            cf += 'XXX';
+        }
+
+        // 2. Name (3 chars) - Special rule: if 4+ consonants, skip the 2nd
+        if (name) {
+            const consonants = getConsonants(name);
+            const vowels = getVowels(name);
+            if (consonants.length >= 4) {
+                // Take 1st, 3rd, 4th consonants
+                cf += consonants.charAt(0) + consonants.charAt(2) + consonants.charAt(3);
+            } else {
+                cf += padString(consonants + vowels, 3);
+            }
+        } else {
+            cf += 'XXX';
+        }
+
+        // 3. Year of birth (2 chars)
+        if (dateOfBirth) {
+            const date = new Date(dateOfBirth);
+            const year = date.getFullYear().toString().substring(2);
+            cf += year;
+        } else {
+            cf += 'XX';
+        }
+
+        // 4. Month of birth (1 char) - Official month codes
+        if (dateOfBirth) {
+            const date = new Date(dateOfBirth);
+            const monthCodes = ['A', 'B', 'C', 'D', 'E', 'H', 'L', 'M', 'P', 'R', 'S', 'T'];
+            cf += monthCodes[date.getMonth()];
+        } else {
+            cf += 'X';
+        }
+
+        // 5. Day of birth and gender (2 chars)
+        if (dateOfBirth) {
+            const date = new Date(dateOfBirth);
+            let day = date.getDate();
+            // For females, add 40 to day
+            if (gender === 'female') {
+                day += 40;
+            }
+            cf += day.toString().padStart(2, '0');
+        } else {
+            cf += 'XX';
+        }
+
+        // 6. Place code (4 chars)
+        if (placeOfBirth && country) {
+            // For foreign countries, use special codes starting with Z
+            // Official Belfiore codes for foreign countries
+            const foreignCountryCodes = {
+                'US': 'Z404', 'GB': 'Z114', 'FR': 'Z110', 'DE': 'Z112', 'ES': 'Z131', 'CH': 'Z133',
+                'AR': 'Z600', 'BR': 'Z602', 'CA': 'Z401', 'AU': 'Z700', 'NZ': 'Z719',
+                'CN': 'Z210', 'IN': 'Z222', 'JP': 'Z219', 'KR': 'Z230', 'RU': 'Z154',
+                'AL': 'Z100', 'AT': 'Z102', 'BE': 'Z103', 'NL': 'Z126', 'GR': 'Z115',
+                'PL': 'Z127', 'PT': 'Z128', 'RO': 'Z129', 'SE': 'Z132', 'TR': 'Z134',
+                'EG': 'Z336', 'MA': 'Z330', 'ZA': 'Z359', 'AE': 'Z255', 'IL': 'Z219',
+                'MX': 'Z514', 'VE': 'Z523', 'CL': 'Z506', 'CO': 'Z508',
+            };
+
+            if (country !== 'IT' && foreignCountryCodes[country]) {
+                cf += foreignCountryCodes[country];
+            } else if (country !== 'IT') {
+                // Generic foreign place code
+                cf += 'Z999';
+            } else {
+                // Italian cities - simplified placeholder
+                // In real implementation, this would look up the Belfiore code
+                const place = placeOfBirth.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                cf += padString(place, 4).substring(0, 4);
+            }
+        } else {
+            cf += 'XXXX';
+        }
+
+        // 7. Check digit (1 char) - Calculate using official algorithm
+        cf += calculateCheckDigit(cf);
+
+        // Update CF field
+        const cfField = document.getElementById('cf');
+        if (cfField) {
+            cfField.value = cf.substring(0, 16);
+            // Also update username
+            updateUsernameFromCF(cf.substring(0, 16));
+        }
+    }
+
+    // Calculate check digit using official Italian algorithm
+    function calculateCheckDigit(cf15) {
+        // Odd position values (1st, 3rd, 5th, etc.)
+        const oddValues = {
+            '0': 1, '1': 0, '2': 5, '3': 7, '4': 9, '5': 13, '6': 15, '7': 17, '8': 19, '9': 21,
+            'A': 1, 'B': 0, 'C': 5, 'D': 7, 'E': 9, 'F': 13, 'G': 15, 'H': 17, 'I': 19, 'J': 21,
+            'K': 2, 'L': 4, 'M': 18, 'N': 20, 'O': 11, 'P': 3, 'Q': 6, 'R': 8, 'S': 12, 'T': 14,
+            'U': 16, 'V': 10, 'W': 22, 'X': 25, 'Y': 24, 'Z': 23
+        };
+
+        // Even position values (2nd, 4th, 6th, etc.)
+        const evenValues = {
+            '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+            'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7, 'I': 8, 'J': 9,
+            'K': 10, 'L': 11, 'M': 12, 'N': 13, 'O': 14, 'P': 15, 'Q': 16, 'R': 17, 'S': 18, 'T': 19,
+            'U': 20, 'V': 21, 'W': 22, 'X': 23, 'Y': 24, 'Z': 25
+        };
+
+        // Remainder to check character mapping
+        const checkChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        let sum = 0;
+        for (let i = 0; i < 15; i++) {
+            const char = cf15.charAt(i);
+            if (i % 2 === 0) {
+                // Odd position (0-indexed, so 0, 2, 4... are actually 1st, 3rd, 5th...)
+                sum += oddValues[char] || 0;
+            } else {
+                // Even position
+                sum += evenValues[char] || 0;
+            }
+        }
+
+        return checkChars.charAt(sum % 26);
+    }
+
+    // Attach event listeners to all relevant fields
+    const fieldsToWatch = ['surname', 'name', 'gender', 'date_of_birth', 'place_of_birth', 'country'];
+
+    fieldsToWatch.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('input', generateCF);
+            field.addEventListener('change', generateCF);
         }
     });
 </script>

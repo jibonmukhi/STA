@@ -29,7 +29,7 @@ class UpdateUserRequest extends FormRequest
             'surname' => 'required|string|max:255',
             'date_of_birth' => 'required|date|before:today',
             'place_of_birth' => 'required|string|max:255',
-            'country' => 'required|string|size:2|in:IT,US,GB,FR,DE,ES',
+            'country' => 'required|string|size:2',
             'email' => 'required|string|email|max:255',
             'username' => 'required|string|max:50|unique:users,username,' . $userId . '|regex:/^[a-zA-Z0-9_.-]+$/',
             'phone' => 'nullable|string|max:20',
