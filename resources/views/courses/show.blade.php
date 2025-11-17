@@ -121,34 +121,36 @@
                         </div>
                     </div>
 
-                    @if($course->teacher)
+                    @if($course->teachers->count() > 0)
                         <div class="row mb-3">
                             <div class="col-sm-3">
-                                <strong>Assigned Teacher:</strong>
+                                <strong>Assigned Teachers:</strong>
                             </div>
                             <div class="col-sm-9">
-                                <div class="card bg-light border-0">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{ $course->teacher->photo_url }}" alt="{{ $course->teacher->full_name }}"
-                                                 class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex align-items-center mb-1">
-                                                    <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
-                                                    <strong class="mb-0">{{ $course->teacher->full_name }}</strong>
-                                                </div>
-                                                <small class="text-muted d-block">
-                                                    <i class="fas fa-envelope me-1"></i>{{ $course->teacher->email }}
-                                                </small>
-                                                @if($course->teacher->phone)
+                                @foreach($course->teachers as $teacher)
+                                    <div class="card bg-light border-0 mb-2">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ $teacher->photo_url }}" alt="{{ $teacher->full_name }}"
+                                                     class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
+                                                        <strong class="mb-0">{{ $teacher->full_name }}</strong>
+                                                    </div>
                                                     <small class="text-muted d-block">
-                                                        <i class="fas fa-phone me-1"></i>{{ $course->teacher->phone }}
+                                                        <i class="fas fa-envelope me-1"></i>{{ $teacher->email }}
                                                     </small>
-                                                @endif
+                                                    @if($teacher->phone)
+                                                        <small class="text-muted d-block">
+                                                            <i class="fas fa-phone me-1"></i>{{ $teacher->phone }}
+                                                        </small>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                @endforeach
                             </div>
                         </div>
                     @endif

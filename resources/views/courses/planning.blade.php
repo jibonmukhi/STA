@@ -10,6 +10,10 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h2>{{ trans('courses.course_planning') }}</h2>
+                    <p class="text-muted mb-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Assign training courses to companies and track their progress
+                    </p>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ trans('courses.dashboard') }}</a></li>
@@ -17,7 +21,10 @@
                         </ol>
                     </nav>
                 </div>
-                <div>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('calendar') }}" class="btn btn-outline-info">
+                        <i class="fas fa-calendar"></i> {{ trans('courses.view_calendar') }}
+                    </a>
                     <a href="{{ route('courses.index') }}" class="btn btn-outline-primary">
                         <i class="fas fa-list"></i> {{ trans('courses.all_courses') }}
                     </a>
@@ -37,18 +44,33 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-tasks me-2"></i>
-                        Assign Courses to Companies
-                    </h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">
+                                <i class="fas fa-tasks me-2"></i>
+                                Bulk Course Assignment
+                            </h5>
+                            <small class="opacity-75">Assign multiple courses to multiple companies at once</small>
+                        </div>
+                        <a href="{{ route('calendar') }}" class="btn btn-light btn-sm">
+                            <i class="fas fa-calendar me-1"></i>
+                            View Calendar
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('course-company-assignments.store') }}" method="POST" id="assignmentForm">
                         @csrf
 
                         <div class="alert alert-info mb-4">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Instructions:</strong> Use the search boxes to find courses and companies, then check the items you want to select.
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>How it works:</strong>
+                            <ol class="mb-0 mt-2 ps-3">
+                                <li>Select one or more courses from the left panel</li>
+                                <li>Select one or more companies from the right panel</li>
+                                <li>Optionally set a due date and mark as mandatory</li>
+                                <li>Click "Assign Courses" to complete the assignment</li>
+                            </ol>
                         </div>
 
                         <div class="row">

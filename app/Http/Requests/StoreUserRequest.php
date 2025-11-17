@@ -41,7 +41,7 @@ class StoreUserRequest extends FormRequest
                 'string',
                 'size:16',
                 'unique:users',
-                'regex:/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/',
+                'regex:/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9A-Z]{3}[A-Z]$/',
                 new ValidCodiceFiscale([
                     'name' => $this->name,
                     'surname' => $this->surname,

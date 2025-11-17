@@ -143,7 +143,18 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                @if($course->teacher)
+                                                @if($course->teachers && $course->teachers->count() > 0)
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        @foreach($course->teachers as $teacher)
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{{ $teacher->photo_url }}" alt="{{ $teacher->full_name }}"
+                                                                     class="rounded-circle me-1" style="object-fit: cover; width: 24px; height: 24px;">
+                                                                <span class="small">{{ $teacher->full_name }}</span>
+                                                                @if(!$loop->last)<span class="text-muted mx-1">|</span>@endif
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @elseif($course->teacher)
                                                     <div class="d-flex align-items-center">
                                                         <img src="{{ $course->teacher->photo_url }}" alt="{{ $course->teacher->full_name }}"
                                                              class="rounded-circle me-2" style="object-fit: cover;">

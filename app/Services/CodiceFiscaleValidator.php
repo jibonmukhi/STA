@@ -56,8 +56,8 @@ class CodiceFiscaleValidator
             return false;
         }
 
-        // Pattern: 6 letters + 2 digits + 1 letter + 2 digits + 1 letter + 3 alphanumeric + 1 letter
-        $pattern = '/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/';
+        // Pattern: 6 letters + 2 digits + 1 letter + 2 digits + 1 letter + 3 alphanumeric (including letters for place codes) + 1 letter
+        $pattern = '/^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9A-Z]{3}[A-Z]$/';
         return preg_match($pattern, strtoupper($cf)) === 1;
     }
 
@@ -282,6 +282,17 @@ class CodiceFiscaleValidator
     }
 
     /**
+     * Check if CF contains X placeholders (indicates incomplete/auto-generated CF)
+     *
+     * @param string $cf
+     * @return bool
+     */
+    private function hasPlaceholders(string $cf): bool
+    {
+        return strpos(strtoupper($cf), 'X') !== false;
+    }
+
+    /**
      * Perform full validation of Codice Fiscale
      *
      * @param string $cf
@@ -297,6 +308,12 @@ class CodiceFiscaleValidator
         if (!$this->validateFormat($cf)) {
             $errors[] = 'Invalid Codice Fiscale format. Expected format: RSSMRA80A01H501U';
             return ['valid' => false, 'errors' => $errors];
+        }
+
+        // If CF contains X placeholders, skip strict validations
+        // This allows auto-generated CFs during form filling
+        if ($this->hasPlaceholders($cf)) {
+            return ['valid' => true, 'errors' => []];
         }
 
         // 2. Checksum validation

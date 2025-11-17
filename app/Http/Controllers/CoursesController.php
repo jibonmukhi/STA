@@ -51,7 +51,7 @@ class CoursesController extends Controller
             $perPage = 25;
         }
 
-        $courses = $query->with('teacher')->orderBy('title')->paginate($perPage);
+        $courses = $query->with(['teacher', 'teachers'])->orderBy('title')->paginate($perPage);
 
         $categories = Course::getCategories();
         $levels = Course::getLevels();
@@ -91,6 +91,8 @@ class CoursesController extends Controller
             'price' => 'nullable|numeric|min:0',
             'instructor' => 'nullable|string|max:255',
             'teacher_id' => 'nullable|exists:users,id',
+            'teacher_ids' => 'nullable|array',
+            'teacher_ids.*' => 'exists:users,id',
             'prerequisites' => 'nullable|string',
             'delivery_method' => 'required|string|in:online,offline,hybrid',
             'max_participants' => 'nullable|integer|min:1',
@@ -107,13 +109,18 @@ class CoursesController extends Controller
 
         $course = Course::create($validated);
 
+        // Sync multiple teachers
+        if (!empty($validated['teacher_ids'])) {
+            $course->teachers()->sync($validated['teacher_ids']);
+        }
+
         return redirect()->route('courses.show', $course)
                         ->with('success', 'Course created successfully.');
     }
 
     public function show(Course $course): View
     {
-        $course->load(['materials.uploader', 'teacher']);
+        $course->load(['materials.uploader', 'teacher', 'teachers']);
         return view('courses.show', compact('course'));
     }
 
@@ -148,6 +155,8 @@ class CoursesController extends Controller
             'price' => 'nullable|numeric|min:0',
             'instructor' => 'nullable|string|max:255',
             'teacher_id' => 'nullable|exists:users,id',
+            'teacher_ids' => 'nullable|array',
+            'teacher_ids.*' => 'exists:users,id',
             'prerequisites' => 'nullable|string',
             'delivery_method' => 'required|string|in:online,offline,hybrid',
             'max_participants' => 'nullable|integer|min:1',
@@ -181,6 +190,14 @@ class CoursesController extends Controller
         }
 
         $course->update($validated);
+
+        // Sync multiple teachers
+        if (isset($validated['teacher_ids'])) {
+            $course->teachers()->sync($validated['teacher_ids']);
+        } else {
+            // If no teachers selected, clear all
+            $course->teachers()->sync([]);
+        }
 
         return redirect()->route('courses.show', $course)
                         ->with('success', 'Course updated successfully.');

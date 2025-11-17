@@ -108,17 +108,26 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Assigned Teacher</label>
-                            <select class="form-select @error('teacher_id') is-invalid @enderror" name="teacher_id">
-                                <option value="">Select Teacher</option>
+                            <label class="form-label">Assigned Teachers</label>
+                            <div class="mb-2">
+                                <input type="text" class="form-control form-control-sm" id="teacherSearch" placeholder="Search teachers..." onkeyup="filterTeachers()">
+                            </div>
+                            <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto; background: white;">
+                                <div class="mb-2">
+                                    <small class="text-muted">Select one or more teachers (check to assign)</small>
+                                </div>
                                 @foreach($teachers as $teacher)
-                                    <option value="{{ $teacher->id }}" {{ old('teacher_id') == $teacher->id ? 'selected' : '' }}>
-                                        {{ $teacher->full_name }} ({{ $teacher->email }})
-                                    </option>
+                                    <div class="form-check mb-2 teacher-search-item" data-teacher-name="{{ strtolower($teacher->full_name) }}" data-teacher-email="{{ strtolower($teacher->email) }}">
+                                        <input class="form-check-input" type="checkbox" name="teacher_ids[]" value="{{ $teacher->id }}" id="teacher_{{ $teacher->id }}"
+                                               {{ in_array($teacher->id, old('teacher_ids', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="teacher_{{ $teacher->id }}">
+                                            {{ $teacher->full_name }} ({{ $teacher->email }})
+                                        </label>
+                                    </div>
                                 @endforeach
-                            </select>
-                            @error('teacher_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                            </div>
+                            @error('teacher_ids')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
@@ -211,4 +220,22 @@
         </div>
     </form>
 </div>
+
+<script>
+function filterTeachers() {
+    const searchTerm = document.getElementById('teacherSearch').value.toLowerCase();
+    const teacherItems = document.querySelectorAll('.teacher-search-item');
+
+    teacherItems.forEach(item => {
+        const teacherName = item.getAttribute('data-teacher-name');
+        const teacherEmail = item.getAttribute('data-teacher-email');
+
+        if (teacherName.includes(searchTerm) || teacherEmail.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+</script>
 @endsection

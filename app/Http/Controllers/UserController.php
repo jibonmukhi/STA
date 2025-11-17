@@ -295,6 +295,7 @@ class UserController extends Controller
             $userData = [
                 'name' => $validated['name'],
                 'surname' => $validated['surname'] ?? null,
+                'username' => $validated['username'],
                 'date_of_birth' => $validated['date_of_birth'] ?? null,
                 'place_of_birth' => $validated['place_of_birth'] ?? null,
                 'country' => $validated['country'] ?? 'IT',
