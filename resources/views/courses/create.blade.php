@@ -149,16 +149,6 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Max Participants</label>
-                            <input type="number" class="form-control @error('max_participants') is-invalid @enderror"
-                                   name="max_participants" value="{{ old('max_participants') }}" min="1">
-                            <small class="form-text text-muted">Leave empty for unlimited</small>
-                            @error('max_participants')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
                         <h5 class="mt-4 mb-3">Course Schedule (Start to End Time)</h5>
 
                         <div class="row mb-3">

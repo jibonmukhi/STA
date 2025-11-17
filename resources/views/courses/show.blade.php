@@ -198,13 +198,9 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-6">
+                        <div class="col-12">
                             <small class="text-muted d-block">Duration</small>
                             <strong>{{ $course->duration_hours }} hours</strong>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted d-block">Max Participants</small>
-                            <strong>{{ $course->max_participants ?: 'Unlimited' }}</strong>
                         </div>
                     </div>
 
