@@ -43,16 +43,20 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
+                            <strong>{{ trans('courses.category') }}:</strong><br>
+                            @php
+                                $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
+                                $categoryLabel = dataVaultLabel('course_category', $course->category) ?? (App\Models\Course::getCategories()[$course->category] ?? $course->category);
+                            @endphp
+                            <span class="badge bg-{{ $categoryColor }}">{{ $categoryLabel }}</span>
+                        </div>
+                        <div class="col-md-3">
                             <strong>{{ trans('courses.instructor') }}:</strong><br>
                             {{ $course->instructor ?: trans('courses.n_a') }}
                         </div>
                         <div class="col-md-3">
                             <strong>{{ trans('courses.duration') }}:</strong><br>
                             {{ $course->duration_hours }} {{ trans('courses.hours') }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>{{ trans('courses.level') }}:</strong><br>
-                            {{ trans('courses.levels.' . $course->level) }}
                         </div>
                         <div class="col-md-3">
                             <strong>{{ trans('courses.delivery_method') }}:</strong><br>

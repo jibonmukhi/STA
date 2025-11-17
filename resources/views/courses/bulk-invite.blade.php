@@ -227,10 +227,12 @@
                     <hr>
 
                     <div class="mb-2">
-                        <strong>Category:</strong> {{ \App\Models\Course::getCategories()[$course->category] ?? $course->category }}
-                    </div>
-                    <div class="mb-2">
-                        <strong>Level:</strong> {{ ucfirst($course->level) }}
+                        <strong>Category:</strong>
+                        @php
+                            $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
+                            $categoryLabel = dataVaultLabel('course_category', $course->category) ?? (\App\Models\Course::getCategories()[$course->category] ?? $course->category);
+                        @endphp
+                        <span class="badge bg-{{ $categoryColor }}">{{ $categoryLabel }}</span>
                     </div>
                     <div class="mb-2">
                         <strong>Duration:</strong> {{ $course->duration_hours }} hours

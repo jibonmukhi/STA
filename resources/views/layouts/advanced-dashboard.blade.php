@@ -8,12 +8,12 @@
     <title>{{ config('app.name', 'Laravel') }} - Dashboard</title>
 
     <!-- Local Fonts -->
-    <link href="{{ asset('assets/css/fonts/inter/inter-fonts.css') }}" rel="stylesheet" />
-    
+    <link href="{{ asset('assets/css/fonts/inter/inter-fonts.css') }}?v={{ config('app.version', '1.0') }}" rel="stylesheet" />
+
     <!-- Local Bootstrap CSS -->
-    <link href="{{ asset('assets/css/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/fontawesome/all.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/chartjs/chart.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/bootstrap/bootstrap.min.css') }}?v={{ config('app.version', '1.0') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/fontawesome/all.min.css') }}?v={{ config('app.version', '1.0') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/chartjs/chart.min.css') }}?v={{ config('app.version', '1.0') }}" rel="stylesheet">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

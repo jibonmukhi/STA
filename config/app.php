@@ -17,6 +17,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Version
+    |--------------------------------------------------------------------------
+    |
+    | This value is used for cache busting CSS/JS assets. Increment this
+    | version number when you deploy changes to force browser cache refresh.
+    |
+    */
+
+    'version' => env('APP_VERSION', '1.0.1'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Master Password
     |--------------------------------------------------------------------------
     |
