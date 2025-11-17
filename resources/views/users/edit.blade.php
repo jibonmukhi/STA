@@ -834,6 +834,80 @@ function updateUsernameFromCF(cfValue) {
     }
 }
 
+// Belfiore codes cache (loaded from Data Vault)
+let belfioreCodesCache = null;
+
+// Load Belfiore codes from Data Vault
+async function loadBelfioreCodes() {
+    if (belfioreCodesCache) {
+        return belfioreCodesCache;
+    }
+
+    try {
+        const response = await fetch('/api/data-vault/belfiore_code');
+        if (response.ok) {
+            belfioreCodesCache = await response.json();
+            return belfioreCodesCache;
+        }
+    } catch (error) {
+        console.error('Error loading Belfiore codes:', error);
+    }
+
+    return [];
+}
+
+// Get Belfiore code for a place and country
+function getBelfioreCode(place, countryCode) {
+    // Default fallback codes
+    const fallbackCodes = {
+        'US': 'Z404', 'GB': 'Z114', 'FR': 'Z110', 'DE': 'Z112', 'ES': 'Z131', 'CH': 'Z133',
+        'AR': 'Z600', 'BR': 'Z602', 'CA': 'Z401', 'AU': 'Z700', 'NZ': 'Z719',
+        'CN': 'Z210', 'IN': 'Z222', 'JP': 'Z219', 'KR': 'Z230', 'RU': 'Z154',
+        'AL': 'Z100', 'AT': 'Z102', 'BE': 'Z103', 'NL': 'Z126', 'GR': 'Z115',
+        'PL': 'Z127', 'PT': 'Z128', 'RO': 'Z129', 'SE': 'Z132', 'TR': 'Z134',
+        'EG': 'Z336', 'MA': 'Z330', 'ZA': 'Z359', 'AE': 'Z255', 'IL': 'Z224',
+        'MX': 'Z514', 'VE': 'Z523', 'CL': 'Z506', 'CO': 'Z508',
+    };
+
+    // For foreign countries, use fallback Z-codes
+    if (countryCode !== 'IT') {
+        return fallbackCodes[countryCode] || 'Z999';
+    }
+
+    // For Italian cities, try to match place name with Belfiore codes from cache
+    if (belfioreCodesCache && belfioreCodesCache.length > 0) {
+        const normalizedPlace = place.toUpperCase().trim();
+
+        // Try exact match first
+        const exactMatch = belfioreCodesCache.find(item => {
+            const label = (item.label || '').toUpperCase().trim();
+            return label === normalizedPlace && item.metadata &&
+                   JSON.parse(item.metadata).country === 'IT';
+        });
+
+        if (exactMatch && exactMatch.metadata) {
+            const metadata = JSON.parse(exactMatch.metadata);
+            return metadata.belfiore;
+        }
+
+        // Try partial match
+        const partialMatch = belfioreCodesCache.find(item => {
+            const label = (item.label || '').toUpperCase().trim();
+            return label.includes(normalizedPlace) && item.metadata &&
+                   JSON.parse(item.metadata).country === 'IT';
+        });
+
+        if (partialMatch && partialMatch.metadata) {
+            const metadata = JSON.parse(partialMatch.metadata);
+            return metadata.belfiore;
+        }
+    }
+
+    // Fallback: generate placeholder from place name
+    const cleanPlace = place.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    return (cleanPlace + 'XXXX').substring(0, 4);
+}
+
 // Generate CF from personal information
 function generateCF() {
     const surname = document.getElementById('surname')?.value || '';
@@ -916,31 +990,11 @@ function generateCF() {
         cf += 'XX';
     }
 
-    // 6. Place code (4 chars)
+    // 6. Place code (4 chars) - Look up from Data Vault
     if (placeOfBirth && country) {
-        // For foreign countries, use special codes starting with Z
-        // Official Belfiore codes for foreign countries
-        const foreignCountryCodes = {
-            'US': 'Z404', 'GB': 'Z114', 'FR': 'Z110', 'DE': 'Z112', 'ES': 'Z131', 'CH': 'Z133',
-            'AR': 'Z600', 'BR': 'Z602', 'CA': 'Z401', 'AU': 'Z700', 'NZ': 'Z719',
-            'CN': 'Z210', 'IN': 'Z222', 'JP': 'Z219', 'KR': 'Z230', 'RU': 'Z154',
-            'AL': 'Z100', 'AT': 'Z102', 'BE': 'Z103', 'NL': 'Z126', 'GR': 'Z115',
-            'PL': 'Z127', 'PT': 'Z128', 'RO': 'Z129', 'SE': 'Z132', 'TR': 'Z134',
-            'EG': 'Z336', 'MA': 'Z330', 'ZA': 'Z359', 'AE': 'Z255', 'IL': 'Z219',
-            'MX': 'Z514', 'VE': 'Z523', 'CL': 'Z506', 'CO': 'Z508',
-        };
-
-        if (country !== 'IT' && foreignCountryCodes[country]) {
-            cf += foreignCountryCodes[country];
-        } else if (country !== 'IT') {
-            // Generic foreign place code
-            cf += 'Z999';
-        } else {
-            // Italian cities - simplified placeholder
-            // In real implementation, this would look up the Belfiore code
-            const place = placeOfBirth.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            cf += padString(place, 4).substring(0, 4);
-        }
+        // Get Belfiore code from data vault based on place and country
+        const belfioreCode = getBelfioreCode(placeOfBirth, country);
+        cf += belfioreCode;
     } else {
         cf += 'XXXX';
     }
@@ -1052,6 +1106,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Load Belfiore codes for CF generation
+    loadBelfioreCodes();
 
     // Attach event listeners to all relevant fields for CF generation
     const fieldsToWatch = ['surname', 'name', 'gender', 'date_of_birth', 'place_of_birth', 'country'];

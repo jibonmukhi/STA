@@ -70,6 +70,11 @@ Route::middleware('auth')->group(function () {
     // Public settings API
     Route::get('/api/settings/public', [SettingsController::class, 'getPublicSettings'])->name('settings.public');
 
+    // Data Vault API (available to authenticated users)
+    Route::get('/api/data-vault/{categoryCode}', function($categoryCode) {
+        return response()->json(dataVaultItems($categoryCode));
+    })->name('api.data-vault');
+
     // Notification Routes (available to all authenticated users)
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');

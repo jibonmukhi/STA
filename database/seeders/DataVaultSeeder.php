@@ -105,6 +105,9 @@ class DataVaultSeeder extends Seeder
         // 11. Country - All countries
         $this->createCategory('country', 'Country', 'Paese', $this->getAllCountries());
 
+        // 12. Belfiore Codes - For CF calculation
+        $this->createCategory('belfiore_code', 'Belfiore Code', 'Codice Belfiore', $this->getAllBelfioreCodes());
+
         $this->command->info('Data Vault seeded successfully!');
     }
 
@@ -360,5 +363,163 @@ class DataVaultSeeder extends Seeder
         }
 
         return $countries;
+    }
+
+    /**
+     * Get all Belfiore codes for Italian cities and foreign countries
+     */
+    private function getAllBelfioreCodes(): array
+    {
+        $codes = [];
+
+        // MAJOR ITALIAN CITIES (most common)
+        // Using code as unique identifier: BELFIORE_CODE|COUNTRY_CODE
+        $italianCities = [
+            // Major cities
+            ['code' => 'H501|IT', 'label_en' => 'Rome', 'label_it' => 'Roma', 'metadata' => json_encode(['belfiore' => 'H501', 'country' => 'IT'])],
+            ['code' => 'F205|IT', 'label_en' => 'Milan', 'label_it' => 'Milano', 'metadata' => json_encode(['belfiore' => 'F205', 'country' => 'IT'])],
+            ['code' => 'F839|IT', 'label_en' => 'Naples', 'label_it' => 'Napoli', 'metadata' => json_encode(['belfiore' => 'F839', 'country' => 'IT'])],
+            ['code' => 'L219|IT', 'label_en' => 'Turin', 'label_it' => 'Torino', 'metadata' => json_encode(['belfiore' => 'L219', 'country' => 'IT'])],
+            ['code' => 'G273|IT', 'label_en' => 'Palermo', 'label_it' => 'Palermo', 'metadata' => json_encode(['belfiore' => 'G273', 'country' => 'IT'])],
+            ['code' => 'D969|IT', 'label_en' => 'Genoa', 'label_it' => 'Genova', 'metadata' => json_encode(['belfiore' => 'D969', 'country' => 'IT'])],
+            ['code' => 'A944|IT', 'label_en' => 'Bologna', 'label_it' => 'Bologna', 'metadata' => json_encode(['belfiore' => 'A944', 'country' => 'IT'])],
+            ['code' => 'D612|IT', 'label_en' => 'Florence', 'label_it' => 'Firenze', 'metadata' => json_encode(['belfiore' => 'D612', 'country' => 'IT'])],
+            ['code' => 'A662|IT', 'label_en' => 'Bari', 'label_it' => 'Bari', 'metadata' => json_encode(['belfiore' => 'A662', 'country' => 'IT'])],
+            ['code' => 'C351|IT', 'label_en' => 'Catania', 'label_it' => 'Catania', 'metadata' => json_encode(['belfiore' => 'C351', 'country' => 'IT'])],
+            ['code' => 'L736|IT', 'label_en' => 'Venice', 'label_it' => 'Venezia', 'metadata' => json_encode(['belfiore' => 'L736', 'country' => 'IT'])],
+            ['code' => 'L781|IT', 'label_en' => 'Verona', 'label_it' => 'Verona', 'metadata' => json_encode(['belfiore' => 'L781', 'country' => 'IT'])],
+            ['code' => 'F158|IT', 'label_en' => 'Messina', 'label_it' => 'Messina', 'metadata' => json_encode(['belfiore' => 'F158', 'country' => 'IT'])],
+            ['code' => 'G224|IT', 'label_en' => 'Padua', 'label_it' => 'Padova', 'metadata' => json_encode(['belfiore' => 'G224', 'country' => 'IT'])],
+            ['code' => 'L424|IT', 'label_en' => 'Trieste', 'label_it' => 'Trieste', 'metadata' => json_encode(['belfiore' => 'L424', 'country' => 'IT'])],
+            ['code' => 'B157|IT', 'label_en' => 'Brescia', 'label_it' => 'Brescia', 'metadata' => json_encode(['belfiore' => 'B157', 'country' => 'IT'])],
+            ['code' => 'G337|IT', 'label_en' => 'Parma', 'label_it' => 'Parma', 'metadata' => json_encode(['belfiore' => 'G337', 'country' => 'IT'])],
+            ['code' => 'G999|IT', 'label_en' => 'Prato', 'label_it' => 'Prato', 'metadata' => json_encode(['belfiore' => 'G999', 'country' => 'IT'])],
+            ['code' => 'L049|IT', 'label_en' => 'Taranto', 'label_it' => 'Taranto', 'metadata' => json_encode(['belfiore' => 'L049', 'country' => 'IT'])],
+            ['code' => 'F257|IT', 'label_en' => 'Modena', 'label_it' => 'Modena', 'metadata' => json_encode(['belfiore' => 'F257', 'country' => 'IT'])],
+            ['code' => 'H224|IT', 'label_en' => 'Reggio Calabria', 'label_it' => 'Reggio Calabria', 'metadata' => json_encode(['belfiore' => 'H224', 'country' => 'IT'])],
+            ['code' => 'H223|IT', 'label_en' => 'Reggio Emilia', 'label_it' => 'Reggio Emilia', 'metadata' => json_encode(['belfiore' => 'H223', 'country' => 'IT'])],
+            ['code' => 'G478|IT', 'label_en' => 'Perugia', 'label_it' => 'Perugia', 'metadata' => json_encode(['belfiore' => 'G478', 'country' => 'IT'])],
+            ['code' => 'E625|IT', 'label_en' => 'Livorno', 'label_it' => 'Livorno', 'metadata' => json_encode(['belfiore' => 'E625', 'country' => 'IT'])],
+            ['code' => 'B354|IT', 'label_en' => 'Cagliari', 'label_it' => 'Cagliari', 'metadata' => json_encode(['belfiore' => 'B354', 'country' => 'IT'])],
+            ['code' => 'D643|IT', 'label_en' => 'Foggia', 'label_it' => 'Foggia', 'metadata' => json_encode(['belfiore' => 'D643', 'country' => 'IT'])],
+            ['code' => 'H294|IT', 'label_en' => 'Rimini', 'label_it' => 'Rimini', 'metadata' => json_encode(['belfiore' => 'H294', 'country' => 'IT'])],
+            ['code' => 'I452|IT', 'label_en' => 'Salerno', 'label_it' => 'Salerno', 'metadata' => json_encode(['belfiore' => 'I452', 'country' => 'IT'])],
+            ['code' => 'D390|IT', 'label_en' => 'Ferrara', 'label_it' => 'Ferrara', 'metadata' => json_encode(['belfiore' => 'D390', 'country' => 'IT'])],
+            ['code' => 'I754|IT', 'label_en' => 'Sassari', 'label_it' => 'Sassari', 'metadata' => json_encode(['belfiore' => 'I754', 'country' => 'IT'])],
+
+            // Additional municipalities (Province capitals and common cities)
+            ['code' => 'H517|IT', 'label_en' => 'Romeno', 'label_it' => 'Romeno', 'metadata' => json_encode(['belfiore' => 'H517', 'country' => 'IT'])],
+            ['code' => 'B352|IT', 'label_en' => 'Trento', 'label_it' => 'Trento', 'metadata' => json_encode(['belfiore' => 'L378', 'country' => 'IT'])],
+            ['code' => 'A794|IT', 'label_en' => 'Ancona', 'label_it' => 'Ancona', 'metadata' => json_encode(['belfiore' => 'A271', 'country' => 'IT'])],
+            ['code' => 'C933|IT', 'label_en' => 'Pescara', 'label_it' => 'Pescara', 'metadata' => json_encode(['belfiore' => 'G482', 'country' => 'IT'])],
+            ['code' => 'E690|IT', 'label_en' => "L'Aquila", 'label_it' => "L'Aquila", 'metadata' => json_encode(['belfiore' => 'A345', 'country' => 'IT'])],
+            ['code' => 'A783|IT', 'label_en' => 'Aosta', 'label_it' => 'Aosta', 'metadata' => json_encode(['belfiore' => 'A326', 'country' => 'IT'])],
+            ['code' => 'H211|IT', 'label_en' => 'Potenza', 'label_it' => 'Potenza', 'metadata' => json_encode(['belfiore' => 'G942', 'country' => 'IT'])],
+            ['code' => 'C752|IT', 'label_en' => 'Catanzaro', 'label_it' => 'Catanzaro', 'metadata' => json_encode(['belfiore' => 'C352', 'country' => 'IT'])],
+            ['code' => 'F152|IT', 'label_en' => 'Campobasso', 'label_it' => 'Campobasso', 'metadata' => json_encode(['belfiore' => 'B402', 'country' => 'IT'])],
+        ];
+
+        // FOREIGN COUNTRIES - Official Italian Belfiore Z-codes
+        $foreignCountries = [
+            // Europe
+            ['code' => 'Z100|AL', 'label_en' => 'Albania', 'label_it' => 'Albania', 'metadata' => json_encode(['belfiore' => 'Z100', 'country' => 'AL'])],
+            ['code' => 'Z101|AD', 'label_en' => 'Andorra', 'label_it' => 'Andorra', 'metadata' => json_encode(['belfiore' => 'Z101', 'country' => 'AD'])],
+            ['code' => 'Z102|AT', 'label_en' => 'Austria', 'label_it' => 'Austria', 'metadata' => json_encode(['belfiore' => 'Z102', 'country' => 'AT'])],
+            ['code' => 'Z103|BE', 'label_en' => 'Belgium', 'label_it' => 'Belgio', 'metadata' => json_encode(['belfiore' => 'Z103', 'country' => 'BE'])],
+            ['code' => 'Z104|BG', 'label_en' => 'Bulgaria', 'label_it' => 'Bulgaria', 'metadata' => json_encode(['belfiore' => 'Z104', 'country' => 'BG'])],
+            ['code' => 'Z105|BY', 'label_en' => 'Belarus', 'label_it' => 'Bielorussia', 'metadata' => json_encode(['belfiore' => 'Z105', 'country' => 'BY'])],
+            ['code' => 'Z106|HR', 'label_en' => 'Croatia', 'label_it' => 'Croazia', 'metadata' => json_encode(['belfiore' => 'Z106', 'country' => 'HR'])],
+            ['code' => 'Z107|DK', 'label_en' => 'Denmark', 'label_it' => 'Danimarca', 'metadata' => json_encode(['belfiore' => 'Z107', 'country' => 'DK'])],
+            ['code' => 'Z108|EE', 'label_en' => 'Estonia', 'label_it' => 'Estonia', 'metadata' => json_encode(['belfiore' => 'Z108', 'country' => 'EE'])],
+            ['code' => 'Z109|FI', 'label_en' => 'Finland', 'label_it' => 'Finlandia', 'metadata' => json_encode(['belfiore' => 'Z109', 'country' => 'FI'])],
+            ['code' => 'Z110|FR', 'label_en' => 'France', 'label_it' => 'Francia', 'metadata' => json_encode(['belfiore' => 'Z110', 'country' => 'FR'])],
+            ['code' => 'Z112|DE', 'label_en' => 'Germany', 'label_it' => 'Germania', 'metadata' => json_encode(['belfiore' => 'Z112', 'country' => 'DE'])],
+            ['code' => 'Z115|GR', 'label_en' => 'Greece', 'label_it' => 'Grecia', 'metadata' => json_encode(['belfiore' => 'Z115', 'country' => 'GR'])],
+            ['code' => 'Z114|GB', 'label_en' => 'United Kingdom', 'label_it' => 'Regno Unito', 'metadata' => json_encode(['belfiore' => 'Z114', 'country' => 'GB'])],
+            ['code' => 'Z116|IE', 'label_en' => 'Ireland', 'label_it' => 'Irlanda', 'metadata' => json_encode(['belfiore' => 'Z116', 'country' => 'IE'])],
+            ['code' => 'Z117|IS', 'label_en' => 'Iceland', 'label_it' => 'Islanda', 'metadata' => json_encode(['belfiore' => 'Z117', 'country' => 'IS'])],
+            ['code' => 'Z118|LV', 'label_en' => 'Latvia', 'label_it' => 'Lettonia', 'metadata' => json_encode(['belfiore' => 'Z118', 'country' => 'LV'])],
+            ['code' => 'Z119|LI', 'label_en' => 'Liechtenstein', 'label_it' => 'Liechtenstein', 'metadata' => json_encode(['belfiore' => 'Z119', 'country' => 'LI'])],
+            ['code' => 'Z120|LT', 'label_en' => 'Lithuania', 'label_it' => 'Lituania', 'metadata' => json_encode(['belfiore' => 'Z120', 'country' => 'LT'])],
+            ['code' => 'Z121|LU', 'label_en' => 'Luxembourg', 'label_it' => 'Lussemburgo', 'metadata' => json_encode(['belfiore' => 'Z121', 'country' => 'LU'])],
+            ['code' => 'Z122|MT', 'label_en' => 'Malta', 'label_it' => 'Malta', 'metadata' => json_encode(['belfiore' => 'Z122', 'country' => 'MT'])],
+            ['code' => 'Z123|MD', 'label_en' => 'Moldova', 'label_it' => 'Moldavia', 'metadata' => json_encode(['belfiore' => 'Z123', 'country' => 'MD'])],
+            ['code' => 'Z124|MC', 'label_en' => 'Monaco', 'label_it' => 'Monaco', 'metadata' => json_encode(['belfiore' => 'Z124', 'country' => 'MC'])],
+            ['code' => 'Z125|NO', 'label_en' => 'Norway', 'label_it' => 'Norvegia', 'metadata' => json_encode(['belfiore' => 'Z125', 'country' => 'NO'])],
+            ['code' => 'Z126|NL', 'label_en' => 'Netherlands', 'label_it' => 'Paesi Bassi', 'metadata' => json_encode(['belfiore' => 'Z126', 'country' => 'NL'])],
+            ['code' => 'Z127|PL', 'label_en' => 'Poland', 'label_it' => 'Polonia', 'metadata' => json_encode(['belfiore' => 'Z127', 'country' => 'PL'])],
+            ['code' => 'Z128|PT', 'label_en' => 'Portugal', 'label_it' => 'Portogallo', 'metadata' => json_encode(['belfiore' => 'Z128', 'country' => 'PT'])],
+            ['code' => 'Z129|RO', 'label_en' => 'Romania', 'label_it' => 'Romania', 'metadata' => json_encode(['belfiore' => 'Z129', 'country' => 'RO'])],
+            ['code' => 'Z154|RU', 'label_en' => 'Russia', 'label_it' => 'Russia', 'metadata' => json_encode(['belfiore' => 'Z154', 'country' => 'RU'])],
+            ['code' => 'Z130|SM', 'label_en' => 'San Marino', 'label_it' => 'San Marino', 'metadata' => json_encode(['belfiore' => 'Z130', 'country' => 'SM'])],
+            ['code' => 'Z131|ES', 'label_en' => 'Spain', 'label_it' => 'Spagna', 'metadata' => json_encode(['belfiore' => 'Z131', 'country' => 'ES'])],
+            ['code' => 'Z132|SE', 'label_en' => 'Sweden', 'label_it' => 'Svezia', 'metadata' => json_encode(['belfiore' => 'Z132', 'country' => 'SE'])],
+            ['code' => 'Z133|CH', 'label_en' => 'Switzerland', 'label_it' => 'Svizzera', 'metadata' => json_encode(['belfiore' => 'Z133', 'country' => 'CH'])],
+            ['code' => 'Z134|TR', 'label_en' => 'Turkey', 'label_it' => 'Turchia', 'metadata' => json_encode(['belfiore' => 'Z134', 'country' => 'TR'])],
+            ['code' => 'Z135|UA', 'label_en' => 'Ukraine', 'label_it' => 'Ucraina', 'metadata' => json_encode(['belfiore' => 'Z135', 'country' => 'UA'])],
+            ['code' => 'Z153|HU', 'label_en' => 'Hungary', 'label_it' => 'Ungheria', 'metadata' => json_encode(['belfiore' => 'Z153', 'country' => 'HU'])],
+            ['code' => 'Z138|VA', 'label_en' => 'Vatican City', 'label_it' => 'Città del Vaticano', 'metadata' => json_encode(['belfiore' => 'Z138', 'country' => 'VA'])],
+            ['code' => 'Z160|RS', 'label_en' => 'Serbia', 'label_it' => 'Serbia', 'metadata' => json_encode(['belfiore' => 'Z160', 'country' => 'RS'])],
+            ['code' => 'Z161|ME', 'label_en' => 'Montenegro', 'label_it' => 'Montenegro', 'metadata' => json_encode(['belfiore' => 'Z161', 'country' => 'ME'])],
+            ['code' => 'Z140|CZ', 'label_en' => 'Czech Republic', 'label_it' => 'Repubblica Ceca', 'metadata' => json_encode(['belfiore' => 'Z140', 'country' => 'CZ'])],
+            ['code' => 'Z141|SK', 'label_en' => 'Slovakia', 'label_it' => 'Slovacchia', 'metadata' => json_encode(['belfiore' => 'Z141', 'country' => 'SK'])],
+            ['code' => 'Z142|SI', 'label_en' => 'Slovenia', 'label_it' => 'Slovenia', 'metadata' => json_encode(['belfiore' => 'Z142', 'country' => 'SI'])],
+            ['code' => 'Z144|BA', 'label_en' => 'Bosnia and Herzegovina', 'label_it' => 'Bosnia ed Erzegovina', 'metadata' => json_encode(['belfiore' => 'Z144', 'country' => 'BA'])],
+            ['code' => 'Z145|MK', 'label_en' => 'North Macedonia', 'label_it' => 'Macedonia del Nord', 'metadata' => json_encode(['belfiore' => 'Z145', 'country' => 'MK'])],
+            ['code' => 'Z139|CY', 'label_en' => 'Cyprus', 'label_it' => 'Cipro', 'metadata' => json_encode(['belfiore' => 'Z139', 'country' => 'CY'])],
+
+            // Americas
+            ['code' => 'Z401|CA', 'label_en' => 'Canada', 'label_it' => 'Canada', 'metadata' => json_encode(['belfiore' => 'Z401', 'country' => 'CA'])],
+            ['code' => 'Z404|US', 'label_en' => 'United States', 'label_it' => 'Stati Uniti', 'metadata' => json_encode(['belfiore' => 'Z404', 'country' => 'US'])],
+            ['code' => 'Z514|MX', 'label_en' => 'Mexico', 'label_it' => 'Messico', 'metadata' => json_encode(['belfiore' => 'Z514', 'country' => 'MX'])],
+            ['code' => 'Z600|AR', 'label_en' => 'Argentina', 'label_it' => 'Argentina', 'metadata' => json_encode(['belfiore' => 'Z600', 'country' => 'AR'])],
+            ['code' => 'Z602|BR', 'label_en' => 'Brazil', 'label_it' => 'Brasile', 'metadata' => json_encode(['belfiore' => 'Z602', 'country' => 'BR'])],
+            ['code' => 'Z506|CL', 'label_en' => 'Chile', 'label_it' => 'Cile', 'metadata' => json_encode(['belfiore' => 'Z506', 'country' => 'CL'])],
+            ['code' => 'Z508|CO', 'label_en' => 'Colombia', 'label_it' => 'Colombia', 'metadata' => json_encode(['belfiore' => 'Z508', 'country' => 'CO'])],
+            ['code' => 'Z511|PE', 'label_en' => 'Peru', 'label_it' => 'Perù', 'metadata' => json_encode(['belfiore' => 'Z511', 'country' => 'PE'])],
+            ['code' => 'Z523|VE', 'label_en' => 'Venezuela', 'label_it' => 'Venezuela', 'metadata' => json_encode(['belfiore' => 'Z523', 'country' => 'VE'])],
+            ['code' => 'Z609|UY', 'label_en' => 'Uruguay', 'label_it' => 'Uruguay', 'metadata' => json_encode(['belfiore' => 'Z609', 'country' => 'UY'])],
+            ['code' => 'Z529|EC', 'label_en' => 'Ecuador', 'label_it' => 'Ecuador', 'metadata' => json_encode(['belfiore' => 'Z529', 'country' => 'EC'])],
+            ['code' => 'Z603|BO', 'label_en' => 'Bolivia', 'label_it' => 'Bolivia', 'metadata' => json_encode(['belfiore' => 'Z603', 'country' => 'BO'])],
+            ['code' => 'Z527|PY', 'label_en' => 'Paraguay', 'label_it' => 'Paraguay', 'metadata' => json_encode(['belfiore' => 'Z527', 'country' => 'PY'])],
+
+            // Asia
+            ['code' => 'Z210|CN', 'label_en' => 'China', 'label_it' => 'Cina', 'metadata' => json_encode(['belfiore' => 'Z210', 'country' => 'CN'])],
+            ['code' => 'Z222|IN', 'label_en' => 'India', 'label_it' => 'India', 'metadata' => json_encode(['belfiore' => 'Z222', 'country' => 'IN'])],
+            ['code' => 'Z219|JP', 'label_en' => 'Japan', 'label_it' => 'Giappone', 'metadata' => json_encode(['belfiore' => 'Z219', 'country' => 'JP'])],
+            ['code' => 'Z230|KR', 'label_en' => 'South Korea', 'label_it' => 'Corea del Sud', 'metadata' => json_encode(['belfiore' => 'Z230', 'country' => 'KR'])],
+            ['code' => 'Z236|TH', 'label_en' => 'Thailand', 'label_it' => 'Thailandia', 'metadata' => json_encode(['belfiore' => 'Z236', 'country' => 'TH'])],
+            ['code' => 'Z223|ID', 'label_en' => 'Indonesia', 'label_it' => 'Indonesia', 'metadata' => json_encode(['belfiore' => 'Z223', 'country' => 'ID'])],
+            ['code' => 'Z215|PH', 'label_en' => 'Philippines', 'label_it' => 'Filippine', 'metadata' => json_encode(['belfiore' => 'Z215', 'country' => 'PH'])],
+            ['code' => 'Z239|VN', 'label_en' => 'Vietnam', 'label_it' => 'Vietnam', 'metadata' => json_encode(['belfiore' => 'Z239', 'country' => 'VN'])],
+            ['code' => 'Z232|MY', 'label_en' => 'Malaysia', 'label_it' => 'Malesia', 'metadata' => json_encode(['belfiore' => 'Z232', 'country' => 'MY'])],
+            ['code' => 'Z237|SG', 'label_en' => 'Singapore', 'label_it' => 'Singapore', 'metadata' => json_encode(['belfiore' => 'Z237', 'country' => 'SG'])],
+            ['code' => 'Z224|IL', 'label_en' => 'Israel', 'label_it' => 'Israele', 'metadata' => json_encode(['belfiore' => 'Z224', 'country' => 'IL'])],
+            ['code' => 'Z255|AE', 'label_en' => 'United Arab Emirates', 'label_it' => 'Emirati Arabi Uniti', 'metadata' => json_encode(['belfiore' => 'Z255', 'country' => 'AE'])],
+            ['code' => 'Z253|SA', 'label_en' => 'Saudi Arabia', 'label_it' => 'Arabia Saudita', 'metadata' => json_encode(['belfiore' => 'Z253', 'country' => 'SA'])],
+            ['code' => 'Z249|IQ', 'label_en' => 'Iraq', 'label_it' => 'Iraq', 'metadata' => json_encode(['belfiore' => 'Z249', 'country' => 'IQ'])],
+            ['code' => 'Z250|IR', 'label_en' => 'Iran', 'label_it' => 'Iran', 'metadata' => json_encode(['belfiore' => 'Z250', 'country' => 'IR'])],
+            ['code' => 'Z246|PK', 'label_en' => 'Pakistan', 'label_it' => 'Pakistan', 'metadata' => json_encode(['belfiore' => 'Z246', 'country' => 'PK'])],
+            ['code' => 'Z245|BD', 'label_en' => 'Bangladesh', 'label_it' => 'Bangladesh', 'metadata' => json_encode(['belfiore' => 'Z245', 'country' => 'BD'])],
+
+            // Africa
+            ['code' => 'Z336|EG', 'label_en' => 'Egypt', 'label_it' => 'Egitto', 'metadata' => json_encode(['belfiore' => 'Z336', 'country' => 'EG'])],
+            ['code' => 'Z359|ZA', 'label_en' => 'South Africa', 'label_it' => 'Sudafrica', 'metadata' => json_encode(['belfiore' => 'Z359', 'country' => 'ZA'])],
+            ['code' => 'Z330|MA', 'label_en' => 'Morocco', 'label_it' => 'Marocco', 'metadata' => json_encode(['belfiore' => 'Z330', 'country' => 'MA'])],
+            ['code' => 'Z301|DZ', 'label_en' => 'Algeria', 'label_it' => 'Algeria', 'metadata' => json_encode(['belfiore' => 'Z301', 'country' => 'DZ'])],
+            ['code' => 'Z341|TN', 'label_en' => 'Tunisia', 'label_it' => 'Tunisia', 'metadata' => json_encode(['belfiore' => 'Z341', 'country' => 'TN'])],
+            ['code' => 'Z319|KE', 'label_en' => 'Kenya', 'label_it' => 'Kenya', 'metadata' => json_encode(['belfiore' => 'Z319', 'country' => 'KE'])],
+            ['code' => 'Z338|ET', 'label_en' => 'Ethiopia', 'label_it' => 'Etiopia', 'metadata' => json_encode(['belfiore' => 'Z338', 'country' => 'ET'])],
+            ['code' => 'Z335|NG', 'label_en' => 'Nigeria', 'label_it' => 'Nigeria', 'metadata' => json_encode(['belfiore' => 'Z335', 'country' => 'NG'])],
+
+            // Oceania
+            ['code' => 'Z700|AU', 'label_en' => 'Australia', 'label_it' => 'Australia', 'metadata' => json_encode(['belfiore' => 'Z700', 'country' => 'AU'])],
+            ['code' => 'Z719|NZ', 'label_en' => 'New Zealand', 'label_it' => 'Nuova Zelanda', 'metadata' => json_encode(['belfiore' => 'Z719', 'country' => 'NZ'])],
+        ];
+
+        // Merge Italian cities and foreign countries
+        $codes = array_merge($italianCities, $foreignCountries);
+
+        return $codes;
     }
 }
