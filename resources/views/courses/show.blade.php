@@ -99,17 +99,6 @@
                         </div>
                     @endif
 
-                    @if($course->objectives)
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <strong>Objectives:</strong>
-                            </div>
-                            <div class="col-sm-9">
-                                <p>{{ $course->objectives }}</p>
-                            </div>
-                        </div>
-                    @endif
-
                     <div class="row mb-3">
                         <div class="col-sm-3">
                             <strong>Category:</strong>
@@ -160,28 +149,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    @if($course->instructor)
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <strong>Instructor:</strong>
-                            </div>
-                            <div class="col-sm-9">
-                                {{ $course->instructor }}
-                            </div>
-                        </div>
-                    @endif
-
-                    @if($course->prerequisites)
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <strong>Prerequisites:</strong>
-                            </div>
-                            <div class="col-sm-9">
-                                <p>{{ $course->prerequisites }}</p>
                             </div>
                         </div>
                     @endif
@@ -250,26 +217,8 @@
                             <span class="badge bg-{{ $statusColor }}">
                                 <i class="{{ $statusIcon }}"></i> {{ $statusLabel }}
                             </span>
-
-                            @if($course->is_mandatory)
-                                <span class="badge bg-warning">Mandatory</span>
-                            @endif
                         </div>
                     </div>
-
-                    @if($course->available_from || $course->available_until)
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <small class="text-muted d-block">Availability</small>
-                                @if($course->available_from)
-                                    <small>From: {{ $course->available_from->format('M d, Y') }}</small><br>
-                                @endif
-                                @if($course->available_until)
-                                    <small>Until: {{ $course->available_until->format('M d, Y') }}</small>
-                                @endif
-                            </div>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>

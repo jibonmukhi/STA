@@ -110,48 +110,18 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Objectives</label>
-                            <textarea class="form-control @error('objectives') is-invalid @enderror"
-                                      name="objectives" rows="3">{{ old('objectives', $course->objectives) }}</textarea>
-                            @error('objectives')
+                            <label class="form-label">Assigned Teacher</label>
+                            <select class="form-select @error('teacher_id') is-invalid @enderror" name="teacher_id">
+                                <option value="">Select Teacher</option>
+                                @foreach($teachers as $teacher)
+                                    <option value="{{ $teacher->id }}" {{ old('teacher_id', $course->teacher_id) == $teacher->id ? 'selected' : '' }}>
+                                        {{ $teacher->full_name }} ({{ $teacher->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('teacher_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Prerequisites</label>
-                            <textarea class="form-control @error('prerequisites') is-invalid @enderror"
-                                      name="prerequisites" rows="2">{{ old('prerequisites', $course->prerequisites) }}</textarea>
-                            @error('prerequisites')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Assigned Teacher</label>
-                                <select class="form-select @error('teacher_id') is-invalid @enderror" name="teacher_id">
-                                    <option value="">Select Teacher</option>
-                                    @foreach($teachers as $teacher)
-                                        <option value="{{ $teacher->id }}" {{ old('teacher_id', $course->teacher_id) == $teacher->id ? 'selected' : '' }}>
-                                            {{ $teacher->full_name }} ({{ $teacher->email }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <small class="form-text text-muted">Select a teacher from the system</small>
-                                @error('teacher_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Instructor Name</label>
-                                <input type="text" class="form-control @error('instructor') is-invalid @enderror"
-                                       name="instructor" value="{{ old('instructor', $course->instructor) }}">
-                                <small class="form-text text-muted">Or enter instructor name manually</small>
-                                @error('instructor')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -180,25 +150,6 @@
                             @error('max_participants')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label">Available From</label>
-                                <input type="date" class="form-control @error('available_from') is-invalid @enderror"
-                                       name="available_from" value="{{ old('available_from', $course->available_from?->format('Y-m-d')) }}">
-                                @error('available_from')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Available Until</label>
-                                <input type="date" class="form-control @error('available_until') is-invalid @enderror"
-                                       name="available_until" value="{{ old('available_until', $course->available_until?->format('Y-m-d')) }}">
-                                @error('available_until')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
                         </div>
 
                         <h5 class="mt-4 mb-3">Course Schedule (Start to End Time)</h5>
@@ -247,16 +198,6 @@
                                        {{ old('is_active', $course->is_active) ? 'checked' : '' }}>
                                 <label class="form-check-label">
                                     Active Course
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="is_mandatory" value="1"
-                                       {{ old('is_mandatory', $course->is_mandatory) ? 'checked' : '' }}>
-                                <label class="form-check-label">
-                                    Mandatory Course
                                 </label>
                             </div>
                         </div>

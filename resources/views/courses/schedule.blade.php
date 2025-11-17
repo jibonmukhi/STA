@@ -51,8 +51,8 @@
                             <span class="badge bg-{{ $categoryColor }}">{{ $categoryLabel }}</span>
                         </div>
                         <div class="col-md-3">
-                            <strong>{{ trans('courses.instructor') }}:</strong><br>
-                            {{ $course->instructor ?: trans('courses.n_a') }}
+                            <strong>{{ trans('courses.teacher') }}:</strong><br>
+                            {{ $course->teacher?->name ?: trans('courses.n_a') }}
                         </div>
                         <div class="col-md-3">
                             <strong>{{ trans('courses.duration') }}:</strong><br>
