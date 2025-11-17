@@ -91,7 +91,15 @@
                                                                class="form-check-input me-2 course-checkbox">
                                                         <strong>{{ $course->title }}</strong>
                                                         <br>
-                                                        <small class="text-muted ms-4">{{ $course->course_code }} - {{ $course->duration_hours }}h - {{ $deliveryMethods[$course->delivery_method] ?? ucfirst($course->delivery_method) }}</small>
+                                                        <small class="text-muted ms-4">
+                                                            {{ $course->course_code }} -
+                                                            @php
+                                                                $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
+                                                                $categoryLabel = dataVaultLabel('course_category', $course->category) ?? ucfirst($course->category);
+                                                            @endphp
+                                                            <span class="badge bg-{{ $categoryColor }}" style="font-size: 0.75rem;">{{ $categoryLabel }}</span> -
+                                                            {{ $course->duration_hours }}h
+                                                        </small>
                                                     </label>
                                                 </div>
                                             @endforeach

@@ -29,6 +29,7 @@ return [
     'cancel' => 'Cancel',
 
     // Form Labels
+    'title' => 'Title',
     'course_title' => 'Course Title',
     'course_code' => 'Course Code',
     'description' => 'Description',

@@ -52,18 +52,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label">{{ trans('courses.level') }}</label>
-                                <select class="form-select" name="level">
-                                    <option value="">{{ trans('courses.all_levels') }}</option>
-                                    @foreach($levels as $key => $value)
-                                        <option value="{{ $key }}" {{ request('level') == $key ? 'selected' : '' }}>
-                                            {{ trans('courses.levels.' . $key, [], null, $value) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label class="form-label">{{ trans('courses.delivery_method') }}</label>
                                 <select class="form-select" name="delivery_method">
                                     <option value="">{{ trans('courses.all_methods') }}</option>
@@ -125,11 +114,9 @@
                                         <th>{{ trans('courses.course_code') }}</th>
                                         <th>{{ trans('courses.title') }}</th>
                                         <th>{{ trans('courses.category') }}</th>
-                                        <th>{{ trans('courses.level') }}</th>
                                         <th>{{ trans('courses.teacher') }}</th>
                                         <th>{{ trans('courses.duration') }}</th>
                                         <th>{{ trans('courses.delivery_method') }}</th>
-                                        <th>{{ trans('courses.price') }}</th>
                                         <th>{{ trans('courses.status') }}</th>
                                         <th class="text-end">{{ trans('courses.actions') }}</th>
                                     </tr>
@@ -147,13 +134,12 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <span class="badge bg-info">
-                                                    {{ trans('courses.categories.' . $course->category, [], null, $categories[$course->category] ?? $course->category) }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-primary">
-                                                    {{ trans('courses.levels.' . $course->level, [], null, ucfirst($course->level)) }}
+                                                @php
+                                                    $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
+                                                    $categoryLabel = dataVaultLabel('course_category', $course->category) ?? ($categories[$course->category] ?? $course->category);
+                                                @endphp
+                                                <span class="badge bg-{{ $categoryColor }}">
+                                                    {{ $categoryLabel }}
                                                 </span>
                                             </td>
                                             <td>
@@ -171,17 +157,11 @@
                                             </td>
                                             <td>
                                                 <strong>{{ $course->duration_hours }}</strong>h
-                                                @if($course->credits)
-                                                    <span class="text-muted ms-1">({{ $course->credits }} cr)</span>
-                                                @endif
                                             </td>
                                             <td>
                                                 <span class="badge bg-secondary">
                                                     {{ trans('courses.delivery_methods.' . $course->delivery_method, [], null, $deliveryMethods[$course->delivery_method] ?? $course->delivery_method) }}
                                                 </span>
-                                            </td>
-                                            <td>
-                                                <strong>${{ number_format($course->price, 2) }}</strong>
                                             </td>
                                             <td>
                                                 @php

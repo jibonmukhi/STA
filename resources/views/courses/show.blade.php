@@ -115,16 +115,11 @@
                             <strong>Category:</strong>
                         </div>
                         <div class="col-sm-9">
-                            <span class="badge bg-info">{{ App\Models\Course::getCategories()[$course->category] ?? $course->category }}</span>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-sm-3">
-                            <strong>Level:</strong>
-                        </div>
-                        <div class="col-sm-9">
-                            <span class="badge bg-primary">{{ ucfirst($course->level) }}</span>
+                            @php
+                                $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
+                                $categoryLabel = dataVaultLabel('course_category', $course->category) ?? (App\Models\Course::getCategories()[$course->category] ?? $course->category);
+                            @endphp
+                            <span class="badge bg-{{ $categoryColor }}">{{ $categoryLabel }}</span>
                         </div>
                     </div>
 
@@ -237,17 +232,6 @@
                         <div class="col-6">
                             <small class="text-muted d-block">Duration</small>
                             <strong>{{ $course->duration_hours }} hours</strong>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted d-block">Credits</small>
-                            <strong>{{ $course->credits ?: 'N/A' }}</strong>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-6">
-                            <small class="text-muted d-block">Price</small>
-                            <strong>${{ number_format($course->price, 2) }}</strong>
                         </div>
                         <div class="col-6">
                             <small class="text-muted d-block">Max Participants</small>

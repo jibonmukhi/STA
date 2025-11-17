@@ -29,6 +29,7 @@ return [
     'cancel' => 'Annulla',
 
     // Form Labels
+    'title' => 'Titolo',
     'course_title' => 'Titolo del Corso',
     'course_code' => 'Codice Corso',
     'description' => 'Descrizione',

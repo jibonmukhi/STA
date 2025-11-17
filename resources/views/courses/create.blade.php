@@ -70,19 +70,6 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Level *</label>
-                                <select class="form-select @error('level') is-invalid @enderror" name="level" required>
-                                    @foreach($levels as $key => $value)
-                                        <option value="{{ $key }}" {{ old('level', 'beginner') == $key ? 'selected' : '' }}>
-                                            {{ $value }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('level')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-3">
                                 <label class="form-label">Delivery Method *</label>
                                 <select class="form-select @error('delivery_method') is-invalid @enderror" name="delivery_method" required>
                                     <option value="">Select Method</option>
@@ -96,7 +83,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Status *</label>
                                 <select class="form-select @error('status') is-invalid @enderror" name="status" required>
                                     @foreach($statuses as $key => $value)
@@ -174,34 +161,13 @@
                         <h5 class="mb-0">Course Settings</h5>
                     </div>
                     <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label class="form-label">Duration (Hours) *</label>
-                                <input type="number" class="form-control @error('duration_hours') is-invalid @enderror"
-                                       name="duration_hours" value="{{ old('duration_hours') }}" min="1" required>
-                                @error('duration_hours')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label">Credits</label>
-                                <input type="number" step="0.01" class="form-control @error('credits') is-invalid @enderror"
-                                       name="credits" value="{{ old('credits') }}" min="0">
-                                @error('credits')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Price *</label>
-                                <input type="number" step="0.01" class="form-control @error('price') is-invalid @enderror"
-                                       name="price" value="{{ old('price') }}" min="0" required>
-                                @error('price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Duration (Hours) *</label>
+                            <input type="number" class="form-control @error('duration_hours') is-invalid @enderror"
+                                   name="duration_hours" value="{{ old('duration_hours') }}" min="1" required>
+                            @error('duration_hours')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-3">

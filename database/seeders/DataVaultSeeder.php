@@ -32,10 +32,10 @@ class DataVaultSeeder extends Seeder
 
         // 3. Course Category
         $this->createCategory('course_category', 'Course Category', 'Categoria Corso', [
-            ['code' => 'alimentaristi', 'label_en' => 'Food Handlers', 'label_it' => 'Alimentaristi'],
-            ['code' => 'antincendio', 'label_en' => 'Fire Safety', 'label_it' => 'Antincendio'],
-            ['code' => 'altri_corsi', 'label_en' => 'Other Courses', 'label_it' => 'Altri Corsi'],
-            ['code' => 'other', 'label_en' => 'Other', 'label_it' => 'Altro'],
+            ['code' => 'alimentaristi', 'label_en' => 'Food Handlers', 'label_it' => 'Alimentaristi', 'color' => 'success'],
+            ['code' => 'antincendio', 'label_en' => 'Fire Safety', 'label_it' => 'Antincendio', 'color' => 'danger'],
+            ['code' => 'altri_corsi', 'label_en' => 'Other Courses', 'label_it' => 'Altri Corsi', 'color' => 'primary'],
+            ['code' => 'other', 'label_en' => 'Other', 'label_it' => 'Altro', 'color' => 'info'],
         ]);
 
         // 4. Course Level
