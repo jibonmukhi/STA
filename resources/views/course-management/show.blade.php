@@ -12,18 +12,18 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('courses.index') }}">Courses</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('course-management.index') }}">Course Management</a></li>
                             <li class="breadcrumb-item active">{{ $course->title }}</li>
                         </ol>
                     </nav>
                 </div>
                 <div>
                     @can('update', $course)
-                    <a href="{{ route('courses.edit', $course) }}" class="btn btn-primary">
+                    <a href="{{ route('course-management.edit', $course) }}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edit Course
                     </a>
                     @endcan
-                    <a href="{{ route('courses.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('course-management.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Back to List
                     </a>
                 </div>
@@ -35,25 +35,33 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Master Course Template - No Direct Enrollments</h6>
-                </div>
                 <div class="card-body">
-                    <p class="text-muted mb-3">This is a master course template. To enroll students, create a course instance from this template.</p>
                     <div class="row g-3">
-                        @can('create', App\Models\Course::class)
-                        <div class="col-md-4">
-                            <a href="{{ route('course-management.create') }}" class="btn btn-success w-100">
-                                <i class="fas fa-play"></i> Start New Course Instance
+                        @can('manageStudents', $course)
+                        <div class="col-md-3">
+                            <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-users"></i> Manage Enrollments
                             </a>
                         </div>
                         @endcan
-                        <div class="col-md-4">
-                            <a href="{{ route('course-management.index') }}" class="btn btn-outline-info w-100">
-                                <i class="fas fa-list"></i> View Course Instances
+                        @can('update', $course)
+                        <div class="col-md-3">
+                            <a href="{{ route('courses.events.index', $course) }}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-calendar-alt"></i> Manage Events
                             </a>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <a href="{{ route('course-management.bulk-invite', $course) }}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-envelope"></i> Send Invitations
+                            </a>
+                        </div>
+                        @endcan
+                        <div class="col-md-3">
+                            <a href="{{ route('courses.schedule', $course) }}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-clock"></i> View Schedule
+                            </a>
+                        </div>
+                        <div class="col-md-3">
                             <a href="{{ route('courses.planning') }}" class="btn btn-outline-secondary w-100">
                                 <i class="fas fa-project-diagram"></i> Course Planning
                             </a>
@@ -113,37 +121,71 @@
                         </div>
                     </div>
 
-                    @if($course->level)
+                    @if($course->teachers->count() > 0)
                         <div class="row mb-3">
                             <div class="col-sm-3">
-                                <strong>Level:</strong>
+                                <strong>Assigned Teachers:</strong>
                             </div>
                             <div class="col-sm-9">
-                                <span class="badge bg-info">{{ ucfirst($course->level) }}</span>
+                                @foreach($course->teachers as $teacher)
+                                    <div class="card bg-light border-0 mb-2">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ $teacher->photo_url }}" alt="{{ $teacher->full_name }}"
+                                                     class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
+                                                        <strong class="mb-0">{{ $teacher->full_name }}</strong>
+                                                    </div>
+                                                    <small class="text-muted d-block">
+                                                        <i class="fas fa-envelope me-1"></i>{{ $teacher->email }}
+                                                    </small>
+                                                    @if($teacher->phone)
+                                                        <small class="text-muted d-block">
+                                                            <i class="fas fa-phone me-1"></i>{{ $teacher->phone }}
+                                                        </small>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     @endif
 
-                    @if($course->objectives)
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <strong>Objectives:</strong>
-                            </div>
-                            <div class="col-sm-9">
-                                <p>{{ $course->objectives }}</p>
-                            </div>
-                        </div>
-                    @endif
+                    @if($course->start_date || $course->end_date)
+                        <hr class="my-4">
+                        <h6 class="mb-3"><i class="fas fa-clock"></i> Course Schedule</h6>
 
-                    @if($course->prerequisites)
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <strong>Prerequisites:</strong>
+                        @if($course->start_date)
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <strong>Start:</strong>
+                                </div>
+                                <div class="col-sm-9">
+                                    {{ $course->start_date->format('M d, Y') }}
+                                    @if($course->start_time)
+                                        at {{ \Carbon\Carbon::parse($course->start_time)->format('g:i A') }}
+                                    @endif
+                                </div>
                             </div>
-                            <div class="col-sm-9">
-                                <p>{{ $course->prerequisites }}</p>
+                        @endif
+
+                        @if($course->end_date)
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <strong>End:</strong>
+                                </div>
+                                <div class="col-sm-9">
+                                    {{ $course->end_date->format('M d, Y') }}
+                                    @if($course->end_time)
+                                        at {{ \Carbon\Carbon::parse($course->end_time)->format('g:i A') }}
+                                    @endif
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -180,84 +222,61 @@
         </div>
     </div>
 
-    <!-- Course Instances Section -->
+    <!-- Enrolled Students Section -->
     <div class="row mt-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
-                        <i class="fas fa-copy"></i> Course Instances
-                        <span class="badge bg-primary ms-2">{{ $course->instances->count() }}</span>
+                        <i class="fas fa-users"></i> Enrolled Students
+                        <span class="badge bg-primary ms-2">{{ $course->enrollments->count() }}</span>
                     </h5>
-                    @can('create', App\Models\Course::class)
-                    <a href="{{ route('course-management.create') }}" class="btn btn-sm btn-success">
-                        <i class="fas fa-play"></i> Start New Instance
+                    @can('manageStudents', $course)
+                    <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-cog"></i> Manage All
                     </a>
                     @endcan
                 </div>
                 <div class="card-body">
-                    @if($course->instances->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-hover table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Course Code</th>
-                                        <th>Title</th>
-                                        <th>Teachers</th>
-                                        <th>Start Date</th>
-                                        <th>Status</th>
-                                        <th>Enrollments</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($course->instances as $instance)
-                                    <tr>
-                                        <td><strong>{{ $instance->course_code }}</strong></td>
-                                        <td>{{ $instance->title }}</td>
-                                        <td>
-                                            @if($instance->teachers && $instance->teachers->count() > 0)
-                                                <small>{{ $instance->teachers->pluck('name')->join(', ') }}</small>
-                                            @else
-                                                <small class="text-muted">-</small>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($instance->start_date)
-                                                <small>{{ $instance->start_date->format('M d, Y') }}</small>
-                                            @else
-                                                <small class="text-muted">-</small>
-                                            @endif
-                                        </td>
-                                        <td>
+                    @if($course->enrollments->count() > 0)
+                        <div class="row">
+                            @foreach($course->enrollments->take(8) as $enrollment)
+                            <div class="col-md-3 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ $enrollment->user->photo_url }}"
+                                         alt="{{ $enrollment->user->full_name }}"
+                                         class="rounded-circle me-2"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold small">{{ $enrollment->user->name }}</div>
+                                        <div class="small text-muted">
                                             @php
-                                                $statusColor = dataVaultColor('course_status', $instance->status) ?? 'secondary';
-                                                $statusLabel = dataVaultLabel('course_status', $instance->status) ?? ucfirst($instance->status);
+                                                $statusColors = [
+                                                    'enrolled' => 'secondary',
+                                                    'in_progress' => 'info',
+                                                    'completed' => 'success',
+                                                    'dropped' => 'warning',
+                                                    'failed' => 'danger'
+                                                ];
+                                                $color = $statusColors[$enrollment->status] ?? 'secondary';
                                             @endphp
-                                            <span class="badge badge-sm bg-{{ $statusColor }}">{{ $statusLabel }}</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info">{{ $instance->enrollments->count() }}</span>
-                                        </td>
-                                        <td>
-                                            <a href="{{ route('course-management.show', $instance) }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                            <span class="badge badge-sm bg-{{ $color }}">{{ ucfirst(str_replace('_', ' ', $enrollment->status)) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
                         </div>
-                    @else
-                        <p class="text-muted text-center py-4 mb-0">
-                            No course instances created yet.
-                            @can('create', App\Models\Course::class)
-                            <a href="{{ route('course-management.create') }}" class="btn btn-sm btn-success mt-2">
-                                <i class="fas fa-play"></i> Start First Instance
+
+                        @if($course->enrollments->count() > 8)
+                        <div class="text-center mt-3">
+                            <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-ellipsis-h"></i> View All {{ $course->enrollments->count() }} Students
                             </a>
-                            @endcan
-                        </p>
+                        </div>
+                        @endif
+                    @else
+                        <p class="text-muted text-center py-4 mb-0">No students enrolled yet.</p>
                     @endif
                 </div>
             </div>

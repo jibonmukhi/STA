@@ -89,12 +89,15 @@ Route::middleware('auth')->group(function () {
     Route::resource('certificates', CertificateController::class);
     Route::get('/certificates/{certificate}/download/{type?}', [CertificateController::class, 'download'])->name('certificates.download');
 
-    // Course Management Routes (accessible to all authenticated users with role-based filtering)
+    // Course Management Routes - Master Courses (Templates)
     Route::resource('courses', CoursesController::class);
     Route::get('/courses/planning/overview', [CoursesController::class, 'planning'])->name('courses.planning');
     Route::get('/courses/{course}/schedule', [CoursesController::class, 'schedule'])->name('courses.schedule');
-    Route::get('/courses/{course}/bulk-invite', [CoursesController::class, 'showBulkInvite'])->name('courses.bulk-invite');
-    Route::post('/courses/{course}/bulk-invite', [CoursesController::class, 'sendBulkInvite'])->name('courses.send-bulk-invite');
+
+    // Course Management Routes - Course Instances (Started Courses)
+    Route::resource('course-management', \App\Http\Controllers\CourseManagementController::class);
+    Route::get('/course-management/{courseManagement}/bulk-invite', [\App\Http\Controllers\CourseManagementController::class, 'showBulkInvite'])->name('course-management.bulk-invite');
+    Route::post('/course-management/{courseManagement}/bulk-invite', [\App\Http\Controllers\CourseManagementController::class, 'sendBulkInvite'])->name('course-management.send-bulk-invite');
 
     // Course Materials Routes
     Route::get('/courses/{course}/materials/create', [\App\Http\Controllers\CourseMaterialController::class, 'create'])->name('course-materials.create');

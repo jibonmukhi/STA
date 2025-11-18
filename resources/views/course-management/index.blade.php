@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('title', trans('courses.course_list'))
+@section('title', 'Course Management')
 
 @section('content')
 <div class="container-fluid">
@@ -8,24 +8,19 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2>{{ trans('courses.course_list') }}</h2>
+                    <h2>Course Management</h2>
+                    <p class="text-muted">All started courses and their instances</p>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ trans('courses.dashboard') }}</a></li>
-                            <li class="breadcrumb-item active">{{ trans('courses.course_list') }}</li>
+                            <li class="breadcrumb-item active">Course Management</li>
                         </ol>
                     </nav>
                 </div>
                 <div>
-                    <a href="{{ route('courses.planning') }}" class="btn btn-outline-info">
-                        <i class="fas fa-calendar-alt"></i> {{ trans('courses.course_planning') }}
-                    </a>
                     @can('create', App\Models\Course::class)
-                    <a href="{{ route('course-management.create') }}" class="btn btn-success">
-                        <i class="fas fa-play"></i> Start New Course
-                    </a>
-                    <a href="{{ route('courses.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> {{ trans('courses.add_course') }}
+                    <a href="{{ route('course-management.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Start New
                     </a>
                     @endcan
                 </div>
@@ -37,7 +32,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('courses.index') }}">
+                    <form method="GET" action="{{ route('course-management.index') }}">
                         <div class="row g-3">
                             <div class="col-md-3">
                                 <label class="form-label">{{ trans('courses.search') }}</label>
@@ -71,7 +66,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-search"></i>
                                     </button>
-                                    <a href="{{ route('courses.index') }}" class="btn btn-outline-secondary">
+                                    <a href="{{ route('course-management.index') }}" class="btn btn-outline-secondary">
                                         <i class="fas fa-times"></i>
                                     </a>
                                 </div>
@@ -104,8 +99,8 @@
                             <h4 class="text-muted">{{ trans('courses.no_courses_found') }}</h4>
                             <p class="text-muted">{{ trans('courses.no_courses_message') }}</p>
                             @can('create', App\Models\Course::class)
-                            <a href="{{ route('courses.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> {{ trans('courses.create_first_course') }}
+                            <a href="{{ route('course-management.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Start New Course
                             </a>
                             @endcan
                         </div>
@@ -189,16 +184,16 @@
                                             </td>
                                             <td class="text-end">
                                                 <div class="btn-group" role="group">
-                                                    <a href="{{ route('courses.show', $course) }}" class="btn btn-sm btn-outline-info" title="{{ trans('courses.view') }}">
+                                                    <a href="{{ route('course-management.show', $course) }}" class="btn btn-sm btn-outline-info" title="{{ trans('courses.view') }}">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     @can('update', $course)
-                                                    <a href="{{ route('courses.edit', $course) }}" class="btn btn-sm btn-outline-primary" title="{{ trans('courses.edit') }}">
+                                                    <a href="{{ route('course-management.edit', $course) }}" class="btn btn-sm btn-outline-primary" title="{{ trans('courses.edit') }}">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     @endcan
                                                     @can('delete', $course)
-                                                    <form action="{{ route('courses.destroy', $course) }}" method="POST" class="d-inline">
+                                                    <form action="{{ route('course-management.destroy', $course) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ trans('courses.delete') }}"

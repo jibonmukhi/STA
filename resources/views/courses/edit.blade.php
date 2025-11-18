@@ -109,32 +109,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Assigned Teachers</label>
-                            <div class="mb-2">
-                                <input type="text" class="form-control form-control-sm" id="teacherSearch" placeholder="Search teachers..." onkeyup="filterTeachers()">
-                            </div>
-                            <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto; background: white;">
-                                <div class="mb-2">
-                                    <small class="text-muted">Select one or more teachers (check to assign)</small>
-                                </div>
-                                @php
-                                    $assignedTeacherIds = $course->teachers->pluck('id')->toArray();
-                                @endphp
-                                @foreach($teachers as $teacher)
-                                    <div class="form-check mb-2 teacher-search-item" data-teacher-name="{{ strtolower($teacher->full_name) }}" data-teacher-email="{{ strtolower($teacher->email) }}">
-                                        <input class="form-check-input" type="checkbox" name="teacher_ids[]" value="{{ $teacher->id }}" id="teacher_{{ $teacher->id }}"
-                                               {{ in_array($teacher->id, old('teacher_ids', $assignedTeacherIds)) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="teacher_{{ $teacher->id }}">
-                                            {{ $teacher->full_name }} ({{ $teacher->email }})
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                            @error('teacher_ids')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        <!-- Master courses are templates - teachers will be assigned when starting course instances -->
                     </div>
                 </div>
             </div>
@@ -154,45 +129,7 @@
                             @enderror
                         </div>
 
-                        <h5 class="mt-4 mb-3">Course Schedule (Start to End Time)</h5>
-
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label">Start Date</label>
-                                <input type="date" class="form-control @error('start_date') is-invalid @enderror"
-                                       name="start_date" value="{{ old('start_date', $course->start_date?->format('Y-m-d')) }}">
-                                @error('start_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Start Time</label>
-                                <input type="time" class="form-control @error('start_time') is-invalid @enderror"
-                                       name="start_time" value="{{ old('start_time', $course->start_time) }}">
-                                @error('start_time')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label">End Date</label>
-                                <input type="date" class="form-control @error('end_date') is-invalid @enderror"
-                                       name="end_date" value="{{ old('end_date', $course->end_date?->format('Y-m-d')) }}">
-                                @error('end_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">End Time</label>
-                                <input type="time" class="form-control @error('end_time') is-invalid @enderror"
-                                       name="end_time" value="{{ old('end_time', $course->end_time) }}">
-                                @error('end_time')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+                        <!-- Master courses are templates - dates will be set when starting course instances -->
 
                         <div class="mb-3">
                             <div class="form-check">
@@ -215,22 +152,4 @@
         </div>
     </form>
 </div>
-
-<script>
-function filterTeachers() {
-    const searchTerm = document.getElementById('teacherSearch').value.toLowerCase();
-    const teacherItems = document.querySelectorAll('.teacher-search-item');
-
-    teacherItems.forEach(item => {
-        const teacherName = item.getAttribute('data-teacher-name');
-        const teacherEmail = item.getAttribute('data-teacher-email');
-
-        if (teacherName.includes(searchTerm) || teacherEmail.includes(searchTerm)) {
-            item.style.display = 'block';
-        } else {
-            item.style.display = 'none';
-        }
-    });
-}
-</script>
 @endsection

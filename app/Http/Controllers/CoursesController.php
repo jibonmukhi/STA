@@ -12,9 +12,15 @@ use App\Services\AuditLogService;
 
 class CoursesController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
-        $query = Course::query();
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index');
+        }
+
+        // Only show master courses (templates)
+        $query = Course::query()->masters();
 
         if ($request->has('category') && $request->category) {
             $query->byCategory($request->category);
@@ -51,7 +57,8 @@ class CoursesController extends Controller
             $perPage = 25;
         }
 
-        $courses = $query->with(['teacher', 'teachers'])->orderBy('title')->paginate($perPage);
+        // Master courses don't need teacher relationships loaded (they're templates)
+        $courses = $query->orderBy('title')->paginate($perPage);
 
         $categories = Course::getCategories();
         $levels = Course::getLevels();
@@ -60,8 +67,14 @@ class CoursesController extends Controller
         return view('courses.index', compact('courses', 'categories', 'levels', 'deliveryMethods'));
     }
 
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index')
+                           ->with('error', 'You do not have permission to create master course templates.');
+        }
+
         $this->authorize('create', Course::class);
 
         $categories = Course::getCategories();
@@ -69,16 +82,21 @@ class CoursesController extends Controller
         $deliveryMethods = Course::getDeliveryMethods();
         $statuses = Course::getStatuses();
 
-        // Get users with teacher role
-        $teachers = User::role('teacher')->orderBy('name')->get();
-
-        return view('courses.create', compact('categories', 'levels', 'deliveryMethods', 'statuses', 'teachers'));
+        // Master courses don't have teachers - they're templates
+        return view('courses.create', compact('categories', 'levels', 'deliveryMethods', 'statuses'));
     }
 
     public function store(Request $request): RedirectResponse
     {
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index')
+                           ->with('error', 'You do not have permission to create master course templates.');
+        }
+
         $this->authorize('create', Course::class);
 
+        // Master courses are templates - no teachers, no dates
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'course_code' => 'required|string|max:255|unique:courses',
@@ -89,43 +107,42 @@ class CoursesController extends Controller
             'duration_hours' => 'required|integer|min:1',
             'credits' => 'nullable|numeric|min:0',
             'price' => 'nullable|numeric|min:0',
-            'instructor' => 'nullable|string|max:255',
-            'teacher_id' => 'nullable|exists:users,id',
-            'teacher_ids' => 'nullable|array',
-            'teacher_ids.*' => 'exists:users,id',
             'prerequisites' => 'nullable|string',
             'delivery_method' => 'required|string|in:online,offline,hybrid',
-            'max_participants' => 'nullable|integer|min:1',
             'is_active' => 'boolean',
-            'is_mandatory' => 'boolean',
             'status' => 'required|string|in:active,inactive,ongoing,done',
-            'available_from' => 'nullable|date',
-            'available_until' => 'nullable|date|after_or_equal:available_from',
-            'start_date' => 'nullable|date',
-            'start_time' => 'nullable',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'end_time' => 'nullable',
         ]);
 
-        $course = Course::create($validated);
+        // Ensure parent_course_id is null for master courses
+        $validated['parent_course_id'] = null;
 
-        // Sync multiple teachers
-        if (!empty($validated['teacher_ids'])) {
-            $course->teachers()->sync($validated['teacher_ids']);
-        }
+        $course = Course::create($validated);
 
         return redirect()->route('courses.show', $course)
                         ->with('success', 'Course created successfully.');
     }
 
-    public function show(Course $course): View
+    public function show(Course $course): View|RedirectResponse
     {
-        $course->load(['materials.uploader', 'teacher', 'teachers']);
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index')
+                           ->with('error', 'You do not have permission to view master course templates.');
+        }
+
+        // Load course instances (started courses) for this master
+        $course->load(['materials.uploader', 'instances']);
         return view('courses.show', compact('course'));
     }
 
-    public function edit(Course $course): View
+    public function edit(Course $course): View|RedirectResponse
     {
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index')
+                           ->with('error', 'You do not have permission to edit master course templates.');
+        }
+
         $this->authorize('update', $course);
 
         $categories = Course::getCategories();
@@ -133,16 +150,21 @@ class CoursesController extends Controller
         $deliveryMethods = Course::getDeliveryMethods();
         $statuses = Course::getStatuses();
 
-        // Get users with teacher role
-        $teachers = User::role('teacher')->orderBy('name')->get();
-
-        return view('courses.edit', compact('course', 'categories', 'levels', 'deliveryMethods', 'statuses', 'teachers'));
+        // Master courses don't have teachers - they're templates
+        return view('courses.edit', compact('course', 'categories', 'levels', 'deliveryMethods', 'statuses'));
     }
 
     public function update(Request $request, Course $course): RedirectResponse
     {
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index')
+                           ->with('error', 'You do not have permission to edit master course templates.');
+        }
+
         $this->authorize('update', $course);
 
+        // Master courses are templates - no teachers, no dates
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'course_code' => 'required|string|max:255|unique:courses,course_code,' . $course->id,
@@ -153,22 +175,10 @@ class CoursesController extends Controller
             'duration_hours' => 'required|integer|min:1',
             'credits' => 'nullable|numeric|min:0',
             'price' => 'nullable|numeric|min:0',
-            'instructor' => 'nullable|string|max:255',
-            'teacher_id' => 'nullable|exists:users,id',
-            'teacher_ids' => 'nullable|array',
-            'teacher_ids.*' => 'exists:users,id',
             'prerequisites' => 'nullable|string',
             'delivery_method' => 'required|string|in:online,offline,hybrid',
-            'max_participants' => 'nullable|integer|min:1',
             'is_active' => 'boolean',
-            'is_mandatory' => 'boolean',
             'status' => 'required|string|in:active,inactive,ongoing,done',
-            'available_from' => 'nullable|date',
-            'available_until' => 'nullable|date|after_or_equal:available_from',
-            'start_date' => 'nullable|date',
-            'start_time' => 'nullable',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'end_time' => 'nullable',
         ]);
 
         // Log course status change if applicable
@@ -191,20 +201,18 @@ class CoursesController extends Controller
 
         $course->update($validated);
 
-        // Sync multiple teachers
-        if (isset($validated['teacher_ids'])) {
-            $course->teachers()->sync($validated['teacher_ids']);
-        } else {
-            // If no teachers selected, clear all
-            $course->teachers()->sync([]);
-        }
-
         return redirect()->route('courses.show', $course)
                         ->with('success', 'Course updated successfully.');
     }
 
     public function destroy(Course $course): RedirectResponse
     {
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index')
+                           ->with('error', 'You do not have permission to delete master course templates.');
+        }
+
         $this->authorize('delete', $course);
 
         // Log course deletion (before actual deletion)
@@ -228,8 +236,14 @@ class CoursesController extends Controller
                         ->with('success', 'Course deleted successfully.');
     }
 
-    public function planning(): View
+    public function planning(): View|RedirectResponse
     {
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index')
+                           ->with('error', 'You do not have permission to view master course planning.');
+        }
+
         $courses = Course::active()->with('companyAssignments.company')->get();
         $categories = Course::getCategories();
         $levels = Course::getLevels();
@@ -244,8 +258,14 @@ class CoursesController extends Controller
         return view('courses.planning', compact('courses', 'coursesByCategory', 'categories', 'levels', 'deliveryMethods', 'companies'));
     }
 
-    public function schedule(Course $course): View
+    public function schedule(Course $course): View|RedirectResponse
     {
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index')
+                           ->with('error', 'You do not have permission to view master course schedules.');
+        }
+
         $events = $course->courseEvents()
                          ->orderBy('start_date', 'asc')
                          ->orderBy('start_time', 'asc')
@@ -254,8 +274,14 @@ class CoursesController extends Controller
         return view('courses.schedule', compact('course', 'events'));
     }
 
-    public function showBulkInvite(Course $course): View
+    public function showBulkInvite(Course $course): View|RedirectResponse
     {
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index')
+                           ->with('error', 'You do not have permission to send bulk invites for master courses.');
+        }
+
         $this->authorize('update', $course);
 
         // Get all active companies
@@ -275,6 +301,12 @@ class CoursesController extends Controller
 
     public function sendBulkInvite(Request $request, Course $course): RedirectResponse
     {
+        // Redirect company managers to course-management instead
+        if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
+            return redirect()->route('course-management.index')
+                           ->with('error', 'You do not have permission to send bulk invites for master courses.');
+        }
+
         $this->authorize('update', $course);
 
         $validated = $request->validate([

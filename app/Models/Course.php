@@ -14,6 +14,7 @@ class Course extends Model
     use HasFactory, HasAuditLog;
 
     protected $fillable = [
+        'parent_course_id',
         'title',
         'course_code',
         'description',
@@ -65,6 +66,22 @@ class Course extends Model
         return $query->where('level', $level);
     }
 
+    /**
+     * Scope to get only master courses (templates)
+     */
+    public function scopeMasters($query)
+    {
+        return $query->whereNull('parent_course_id');
+    }
+
+    /**
+     * Scope to get only course instances (started courses)
+     */
+    public function scopeInstances($query)
+    {
+        return $query->whereNotNull('parent_course_id');
+    }
+
     public static function getCategories(): array
     {
         return dataVaultArray('course_category');
@@ -110,6 +127,38 @@ class Course extends Model
     public function primaryTeacher()
     {
         return $this->teachers()->wherePivot('is_primary', true)->first();
+    }
+
+    /**
+     * Parent course (master/template) relationship
+     */
+    public function parentCourse(): BelongsTo
+    {
+        return $this->belongsTo(Course::class, 'parent_course_id');
+    }
+
+    /**
+     * Course instances (started courses) relationship
+     */
+    public function instances(): HasMany
+    {
+        return $this->hasMany(Course::class, 'parent_course_id');
+    }
+
+    /**
+     * Check if this is a master course (template)
+     */
+    public function isMaster(): bool
+    {
+        return $this->parent_course_id === null;
+    }
+
+    /**
+     * Check if this is a course instance (started course)
+     */
+    public function isInstance(): bool
+    {
+        return $this->parent_course_id !== null;
     }
 
     public function enrollments(): HasMany

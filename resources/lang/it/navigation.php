@@ -47,6 +47,7 @@ return [
     'course_management' => 'Corsi',
     'all_courses' => 'Tutti i Corsi',
     'add_course' => 'Aggiungi Corso',
+    'my_company_courses' => 'Corsi della Mia Azienda',
     'course_planning' => 'Pianificazione Corsi',
     'course_catalog' => 'Catalogo Corsi',
     'my_learning' => 'Il Mio Apprendimento',
