@@ -86,11 +86,8 @@
                             <div class="col-md-4">
                                 <label class="form-label">Status *</label>
                                 <select class="form-select @error('status') is-invalid @enderror" name="status" required>
-                                    @foreach($statuses as $key => $value)
-                                        <option value="{{ $key }}" {{ old('status', 'active') == $key ? 'selected' : '' }}>
-                                            {{ $value }}
-                                        </option>
-                                    @endforeach
+                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="inactive" {{ old('status', 'active') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>

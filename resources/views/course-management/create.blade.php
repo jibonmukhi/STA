@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('title', 'Start New Course')
+@section('title', trans('courses.start_new_course'))
 
 @section('content')
 <style>
@@ -58,13 +58,13 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2>Start New Course</h2>
-                    <p class="text-muted">Create a course instance from a template</p>
+                    <h2>{{ trans('courses.start_new_course') }}</h2>
+                    <p class="text-muted">{{ trans('courses.all_started_courses') }}</p>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ trans('courses.dashboard') }}</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('course-management.index') }}">Course Management</a></li>
-                            <li class="breadcrumb-item active">Start New</li>
+                            <li class="breadcrumb-item"><a href="{{ route('course-management.index') }}">{{ trans('courses.course_management') }}</a></li>
+                            <li class="breadcrumb-item active">{{ trans('courses.start_new') }}</li>
                         </ol>
                     </nav>
                 </div>
@@ -84,15 +84,15 @@
                 <!-- Master Course Selection -->
                 <div class="card mb-4">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-book"></i> Select Master Course Template</h5>
+                        <h5 class="mb-0"><i class="fas fa-book"></i> {{ trans('courses.select_master_course') }}</h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label">Master Course *</label>
+                            <label class="form-label">{{ trans('courses.master_course') }} *</label>
                             <div class="master-course-wrapper">
                                 <input type="text" class="form-control @error('parent_course_id') is-invalid @enderror"
                                        id="masterCourseSearch"
-                                       placeholder="Search for a course template..."
+                                       placeholder="{{ trans('courses.search_course_template') }}"
                                        autocomplete="off">
                                 <input type="hidden" name="parent_course_id" id="masterCourseSelect" value="{{ old('parent_course_id') }}" required>
 

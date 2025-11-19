@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('title', 'Edit Course')
+@section('title', trans('courses.edit_course'))
 
 @section('content')
 <div class="container-fluid">
@@ -8,19 +8,19 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2>Edit Course: {{ $course->title }}</h2>
+                    <h2>{{ trans('courses.edit_course') }}: {{ $course->title }}</h2>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('course-management.index') }}">Course Management</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ trans('courses.dashboard') }}</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('course-management.index') }}">{{ trans('courses.course_management') }}</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('course-management.show', $course) }}">{{ $course->title }}</a></li>
-                            <li class="breadcrumb-item active">Edit</li>
+                            <li class="breadcrumb-item active">{{ trans('courses.edit') }}</li>
                         </ol>
                     </nav>
                 </div>
                 <div>
                     <a href="{{ route('course-management.show', $course) }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Course
+                        <i class="fas fa-arrow-left"></i> {{ trans('courses.back_to_course') }}
                     </a>
                 </div>
             </div>
@@ -36,17 +36,17 @@
                 @if($course->parentCourse)
                 <div class="card mb-4">
                     <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Master Course Template</h5>
+                        <h5 class="mb-0"><i class="fas fa-info-circle"></i> {{ trans('courses.master_course_template') }}</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <p><strong>Template:</strong> <span class="text-muted">{{ $course->parentCourse->title }}</span></p>
-                                <p><strong>Template Code:</strong> <span class="text-muted">{{ $course->parentCourse->course_code }}</span></p>
+                                <p><strong>{{ trans('courses.template') }}:</strong> <span class="text-muted">{{ $course->parentCourse->title }}</span></p>
+                                <p><strong>{{ trans('courses.template_code') }}:</strong> <span class="text-muted">{{ $course->parentCourse->course_code }}</span></p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Category:</strong> <span class="text-muted">{{ $categories[$course->parentCourse->category] ?? $course->parentCourse->category }}</span></p>
-                                <p><strong>Delivery Method:</strong> <span class="text-muted">{{ $deliveryMethods[$course->parentCourse->delivery_method] ?? $course->parentCourse->delivery_method }}</span></p>
+                                <p><strong>{{ trans('courses.category') }}:</strong> <span class="text-muted">{{ $categories[$course->parentCourse->category] ?? $course->parentCourse->category }}</span></p>
+                                <p><strong>{{ trans('courses.delivery_method') }}:</strong> <span class="text-muted">{{ $deliveryMethods[$course->parentCourse->delivery_method] ?? $course->parentCourse->delivery_method }}</span></p>
                             </div>
                         </div>
                     </div>
@@ -56,12 +56,12 @@
                 <!-- Instance Information -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="mb-0">Course Instance Details</h5>
+                        <h5 class="mb-0">{{ trans('courses.course_instance_details') }}</h5>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Instance Title *</label>
+                                <label class="form-label">{{ trans('courses.instance_title') }} *</label>
                                 <input type="text" class="form-control @error('title') is-invalid @enderror"
                                        name="title" value="{{ old('title', $course->title) }}" required>
                                 @error('title')
@@ -69,7 +69,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Instance Code *</label>
+                                <label class="form-label">{{ trans('courses.instance_code') }} *</label>
                                 <input type="text" class="form-control @error('course_code') is-invalid @enderror"
                                        name="course_code" value="{{ old('course_code', $course->course_code) }}" required>
                                 @error('course_code')
@@ -80,9 +80,9 @@
 
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label class="form-label">Category *</label>
+                                <label class="form-label">{{ trans('courses.category') }} *</label>
                                 <select class="form-select @error('category') is-invalid @enderror" name="category" required>
-                                    <option value="">Select Category</option>
+                                    <option value="">{{ trans('courses.select_category') }}</option>
                                     @foreach($categories as $key => $value)
                                         <option value="{{ $key }}" {{ old('category', $course->category) == $key ? 'selected' : '' }}>
                                             {{ $value }}
@@ -94,9 +94,9 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Delivery Method *</label>
+                                <label class="form-label">{{ trans('courses.delivery_method') }} *</label>
                                 <select class="form-select @error('delivery_method') is-invalid @enderror" name="delivery_method" required>
-                                    <option value="">Select Method</option>
+                                    <option value="">{{ trans('courses.select_method') }}</option>
                                     @foreach($deliveryMethods as $key => $value)
                                         <option value="{{ $key }}" {{ old('delivery_method', $course->delivery_method) == $key ? 'selected' : '' }}>
                                             {{ $value }}
@@ -108,7 +108,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Status *</label>
+                                <label class="form-label">{{ trans('courses.status') }} *</label>
                                 <select class="form-select @error('status') is-invalid @enderror" name="status" required>
                                     @foreach($statuses as $key => $value)
                                         <option value="{{ $key }}" {{ old('status', $course->status) == $key ? 'selected' : '' }}>
@@ -123,7 +123,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Description</label>
+                            <label class="form-label">{{ trans('courses.description') }}</label>
                             <textarea class="form-control @error('description') is-invalid @enderror"
                                       name="description" rows="3">{{ old('description', $course->description) }}</textarea>
                             @error('description')
@@ -132,13 +132,13 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Assigned Teachers</label>
+                            <label class="form-label">{{ trans('courses.assign_teachers') }}</label>
                             <div class="mb-2">
-                                <input type="text" class="form-control form-control-sm" id="teacherSearch" placeholder="Search teachers..." onkeyup="filterTeachers()">
+                                <input type="text" class="form-control form-control-sm" id="teacherSearch" placeholder="{{ trans('courses.search') }}..." onkeyup="filterTeachers()">
                             </div>
                             <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto; background: white;">
                                 <div class="mb-2">
-                                    <small class="text-muted">Select one or more teachers to assign to this course instance</small>
+                                    <small class="text-muted">{{ trans('courses.select_teachers') }}</small>
                                 </div>
                                 @php
                                     $assignedTeacherIds = $course->teachers->pluck('id')->toArray();

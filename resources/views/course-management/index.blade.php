@@ -8,19 +8,19 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2>Course Management</h2>
-                    <p class="text-muted">All started courses and their instances</p>
+                    <h2>{{ trans('courses.course_management') }}</h2>
+                    <p class="text-muted">{{ trans('courses.all_started_courses') }}</p>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ trans('courses.dashboard') }}</a></li>
-                            <li class="breadcrumb-item active">Course Management</li>
+                            <li class="breadcrumb-item active">{{ trans('courses.course_management') }}</li>
                         </ol>
                     </nav>
                 </div>
                 <div>
                     @can('create', App\Models\Course::class)
                     <a href="{{ route('course-management.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Start New
+                        <i class="fas fa-plus"></i> {{ trans('courses.start_new') }}
                     </a>
                     @endcan
                 </div>
@@ -100,7 +100,7 @@
                             <p class="text-muted">{{ trans('courses.no_courses_message') }}</p>
                             @can('create', App\Models\Course::class)
                             <a href="{{ route('course-management.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Start New Course
+                                <i class="fas fa-plus"></i> {{ trans('courses.start_new_course') }}
                             </a>
                             @endcan
                         </div>
