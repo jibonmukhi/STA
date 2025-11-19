@@ -39,6 +39,25 @@ class CourseManagementController extends Controller
             $query->where('delivery_method', $request->delivery_method);
         }
 
+        // Filter by status
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by company
+        if ($request->has('company_id') && $request->company_id) {
+            $query->whereHas('assignedCompanies', function($q) use ($request) {
+                $q->where('companies.id', $request->company_id);
+            });
+        }
+
+        // Filter by teacher
+        if ($request->has('teacher_id') && $request->teacher_id) {
+            $query->whereHas('teachers', function($q) use ($request) {
+                $q->where('users.id', $request->teacher_id);
+            });
+        }
+
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -64,8 +83,15 @@ class CourseManagementController extends Controller
         $categories = Course::getCategories();
         $levels = Course::getLevels();
         $deliveryMethods = Course::getDeliveryMethods();
+        $statuses = Course::getStatuses();
 
-        return view('course-management.index', compact('courses', 'categories', 'levels', 'deliveryMethods'));
+        // Get all companies for filter dropdown
+        $companies = Company::where('active', true)->orderBy('name')->get();
+
+        // Get all teachers for filter dropdown
+        $teachers = User::role('teacher')->orderBy('name')->get();
+
+        return view('course-management.index', compact('courses', 'categories', 'levels', 'deliveryMethods', 'statuses', 'companies', 'teachers'));
     }
 
     /**
@@ -123,8 +149,7 @@ class CourseManagementController extends Controller
             'teacher_id' => 'nullable|exists:users,id',
             'teacher_ids' => 'nullable|array',
             'teacher_ids.*' => 'exists:users,id',
-            'company_ids' => 'nullable|array',
-            'company_ids.*' => 'exists:companies,id',
+            'company_id' => 'nullable|exists:companies,id',
             'student_ids' => 'nullable|array',
             'student_ids.*' => 'exists:users,id',
             'prerequisites' => 'nullable|string',
@@ -154,16 +179,14 @@ class CourseManagementController extends Controller
             $course->teachers()->sync($validated['teacher_ids']);
         }
 
-        // Assign companies if selected
-        if (!empty($validated['company_ids'])) {
-            foreach ($validated['company_ids'] as $companyId) {
-                $course->companyAssignments()->create([
-                    'company_id' => $companyId,
-                    'assigned_by' => auth()->id(),
-                    'assigned_date' => now(),
-                    'is_mandatory' => false,
-                ]);
-            }
+        // Assign company if selected
+        if (!empty($validated['company_id'])) {
+            $course->companyAssignments()->create([
+                'company_id' => $validated['company_id'],
+                'assigned_by' => auth()->id(),
+                'assigned_date' => now(),
+                'is_mandatory' => false,
+            ]);
         }
 
         // Enroll students if selected
@@ -252,7 +275,6 @@ class CourseManagementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'course_code' => 'required|string|max:255|unique:courses,course_code,' . $courseManagement->id,
-            'duration_hours' => 'required|integer|min:1',
             'teacher_ids' => 'nullable|array',
             'teacher_ids.*' => 'exists:users,id',
             'student_ids' => 'nullable|array',

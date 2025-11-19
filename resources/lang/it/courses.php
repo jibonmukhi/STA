@@ -202,7 +202,8 @@ return [
     'students_selected' => ':count studenti selezionati',
     'no_students_available' => 'Nessuno studente disponibile',
     'assign_to_companies' => 'Assegna alle Aziende (Opzionale)',
-    'select_companies' => 'Seleziona Aziende',
+    'select_companies' => 'Seleziona Azienda',
     'search_companies' => 'Cerca aziende...',
     'select_companies_to_assign' => 'Seleziona le aziende a cui assegnare questo corso',
+    'select_company_to_assign' => 'Seleziona un\'azienda a cui assegnare questo corso',
 ];

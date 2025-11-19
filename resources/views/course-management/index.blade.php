@@ -64,25 +64,57 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <div class="d-flex gap-2 w-100">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                    <a href="{{ route('course-management.index') }}" class="btn btn-outline-secondary">
-                                        <i class="fas fa-times"></i>
-                                    </a>
-                                </div>
+                            <div class="col-md-3">
+                                <label class="form-label">{{ trans('courses.status') }}</label>
+                                <select class="form-select" name="status">
+                                    <option value="">All Statuses</option>
+                                    @foreach($statuses as $key => $value)
+                                        <option value="{{ $key }}" {{ request('status') == $key ? 'selected' : '' }}>
+                                            {{ dataVaultLabel('course_status', $key) ?? ucfirst($value) }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
-                        <div class="row mt-2">
-                            <div class="col-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="show_inactive" value="1"
-                                           {{ request('show_inactive') ? 'checked' : '' }}>
-                                    <label class="form-check-label">
-                                        {{ trans('courses.show_inactive_courses') }}
-                                    </label>
+                        <div class="row g-3 mt-0">
+                            <div class="col-md-3">
+                                <label class="form-label">Company</label>
+                                <div class="dropdown-wrapper">
+                                    <input type="text" class="form-control" id="companySearch" placeholder="Type to search..." autocomplete="off">
+                                    <input type="hidden" name="company_id" id="companyValue" value="{{ request('company_id') }}">
+                                    <div class="dropdown-list" id="companyList">
+                                        <div class="dropdown-item" data-value="">Select Company</div>
+                                        @foreach($companies as $company)
+                                            <div class="dropdown-item" data-value="{{ $company->id }}" data-label="{{ $company->name }}">
+                                                {{ $company->name }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Teacher</label>
+                                <div class="dropdown-wrapper">
+                                    <input type="text" class="form-control" id="teacherSearch" placeholder="Type to search..." autocomplete="off">
+                                    <input type="hidden" name="teacher_id" id="teacherValue" value="{{ request('teacher_id') }}">
+                                    <div class="dropdown-list" id="teacherList">
+                                        <div class="dropdown-item" data-value="">Select Teacher</div>
+                                        @foreach($teachers as $teacher)
+                                            <div class="dropdown-item" data-value="{{ $teacher->id }}" data-label="{{ $teacher->name }}">
+                                                {{ $teacher->name }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <div class="d-flex gap-2 w-100">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> {{ trans('courses.filter') }}
+                                    </button>
+                                    <a href="{{ route('course-management.index') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> {{ trans('courses.clear_filters') }}
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -286,6 +318,58 @@
 .pagination {
     margin-bottom: 0;
 }
+
+.card {
+    position: unset !important;
+}
+
+.dropdown-wrapper {
+    position: relative;
+}
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    max-height: 250px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+    margin-top: 2px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dropdown-list.show {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-item.selected {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.dropdown-item.hidden {
+    display: none;
+}
+
 </style>
 
 <script>
@@ -300,6 +384,82 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = url.toString();
         });
     }
+
+    // Custom dropdown functionality
+    function initCustomDropdown(searchInputId, valueInputId, listId) {
+        const searchInput = document.getElementById(searchInputId);
+        const valueInput = document.getElementById(valueInputId);
+        const list = document.getElementById(listId);
+
+        if (!searchInput || !valueInput || !list) return;
+
+        const items = list.querySelectorAll('.dropdown-item');
+
+        // Set initial display value if there's a selected value
+        const selectedValue = valueInput.value;
+        if (selectedValue) {
+            items.forEach(item => {
+                if (item.dataset.value === selectedValue) {
+                    searchInput.value = item.dataset.label || item.textContent.trim();
+                    item.classList.add('selected');
+                }
+            });
+        }
+
+        // Show dropdown on focus
+        searchInput.addEventListener('focus', function() {
+            list.classList.add('show');
+        });
+
+        // Filter items on input
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+
+            items.forEach(item => {
+                const label = (item.dataset.label || item.textContent).toLowerCase();
+                if (label.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        });
+
+        // Handle item selection
+        items.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Remove previous selection
+                items.forEach(i => i.classList.remove('selected'));
+
+                // Set new selection
+                this.classList.add('selected');
+                valueInput.value = this.dataset.value;
+                searchInput.value = this.dataset.label || this.textContent.trim();
+
+                // Hide dropdown
+                list.classList.remove('show');
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !list.contains(e.target)) {
+                list.classList.remove('show');
+            }
+        });
+
+        // Prevent dropdown from closing when clicking inside it
+        list.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+
+    // Initialize both dropdowns
+    initCustomDropdown('companySearch', 'companyValue', 'companyList');
+    initCustomDropdown('teacherSearch', 'teacherValue', 'teacherList');
 });
 </script>
 @endsection

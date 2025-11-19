@@ -91,7 +91,7 @@
                     @if($course->description)
                         <div class="row mb-3">
                             <div class="col-sm-3">
-                                <strong>Description:</strong>
+                                <strong>{{ trans('courses.course_programme') }}:</strong>
                             </div>
                             <div class="col-sm-9">
                                 <p>{{ $course->description }}</p>
@@ -339,7 +339,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Description</label>
+                                <label class="form-label">{{ trans('courses.course_programme') }}</label>
                                 <textarea class="form-control form-control-sm" name="description" rows="2"
                                           placeholder="Optional description..."></textarea>
                             </div>

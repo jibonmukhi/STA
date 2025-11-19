@@ -41,51 +41,55 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <p><strong>{{ trans('courses.template') }}:</strong> <span class="text-muted">{{ $course->parentCourse->title }}</span></p>
-                                <p><strong>{{ trans('courses.template_code') }}:</strong> <span class="text-muted">{{ $course->parentCourse->course_code }}</span></p>
+                                <p><strong>Title:</strong> <span class="text-muted">{{ $course->parentCourse->title }}</span></p>
+                                <p><strong>Course Code:</strong> <span class="text-muted">{{ $course->parentCourse->course_code }}</span></p>
+                                <p><strong>Category:</strong> <span class="text-muted">{{ $categories[$course->parentCourse->category] ?? $course->parentCourse->category }}</span></p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>{{ trans('courses.category') }}:</strong> <span class="text-muted">{{ $categories[$course->parentCourse->category] ?? $course->parentCourse->category }}</span></p>
-                                <p><strong>{{ trans('courses.delivery_method') }}:</strong> <span class="text-muted">{{ $deliveryMethods[$course->parentCourse->delivery_method] ?? $course->parentCourse->delivery_method }}</span></p>
+                                <p><strong>Delivery Method:</strong> <span class="text-muted">{{ $deliveryMethods[$course->parentCourse->delivery_method] ?? $course->parentCourse->delivery_method }}</span></p>
+                                <p><strong>Duration:</strong> <span class="text-muted">{{ $course->parentCourse->duration_hours }} hours</span></p>
+                                <p><strong>{{ trans('courses.course_programme') }}:</strong> <span class="text-muted">{{ $course->parentCourse->description ?? '-' }}</span></p>
                             </div>
                         </div>
                     </div>
                 </div>
                 @endif
 
-                <!-- Instance Information -->
+                <!-- Instance Information (Editable) -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="mb-0">{{ trans('courses.course_instance_details') }}</h5>
+                        <h5 class="mb-0">Course Instance Details</h5>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">{{ trans('courses.instance_title') }} *</label>
+                                <label class="form-label">Instance Title *</label>
                                 <input type="text" class="form-control @error('title') is-invalid @enderror"
                                        name="title" value="{{ old('title', $course->title) }}" required>
                                 @error('title')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <small class="text-muted">Customize the title for this instance</small>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">{{ trans('courses.instance_code') }} *</label>
+                                <label class="form-label">Instance Code *</label>
                                 <input type="text" class="form-control @error('course_code') is-invalid @enderror"
                                        name="course_code" value="{{ old('course_code', $course->course_code) }}" required>
                                 @error('course_code')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <small class="text-muted">Unique code for this instance</small>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">{{ trans('courses.assign_teachers') }}</label>
+                            <label class="form-label">Assigned Teachers *</label>
                             <div class="mb-2">
-                                <input type="text" class="form-control form-control-sm" id="teacherSearch" placeholder="{{ trans('courses.search') }}..." onkeyup="filterTeachers()">
+                                <input type="text" class="form-control form-control-sm" id="teacherSearch" placeholder="Search teachers..." onkeyup="filterTeachers()">
                             </div>
                             <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto; background: white;">
                                 <div class="mb-2">
-                                    <small class="text-muted">{{ trans('courses.select_teachers') }}</small>
+                                    <small class="text-muted">Select one or more teachers to assign to this course instance</small>
                                 </div>
                                 @php
                                     $assignedTeacherIds = $course->teachers->pluck('id')->toArray();
@@ -106,9 +110,75 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Assigned Companies (Read-only Display) -->
-                <div class="card mb-4">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Course Schedule</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="mb-3">Schedule (Start to End Time)</h5>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="text" class="form-control datepicker @error('start_date') is-invalid @enderror"
+                                       id="start_date_display" value="{{ old('start_date', $course->start_date?->format('d/m/Y')) }}" placeholder="DD/MM/YYYY" autocomplete="off">
+                                <input type="hidden" name="start_date" id="start_date_hidden" value="{{ old('start_date', $course->start_date?->format('Y-m-d')) }}">
+                                @error('start_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Start Time</label>
+                                <input type="text" class="form-control timepicker @error('start_time') is-invalid @enderror"
+                                       name="start_time" value="{{ old('start_time', $course->start_time) }}" placeholder="HH:MM" autocomplete="off">
+                                @error('start_time')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">End Date</label>
+                                <input type="text" class="form-control datepicker @error('end_date') is-invalid @enderror"
+                                       id="end_date_display" value="{{ old('end_date', $course->end_date?->format('d/m/Y')) }}" placeholder="DD/MM/YYYY" autocomplete="off">
+                                <input type="hidden" name="end_date" id="end_date_hidden" value="{{ old('end_date', $course->end_date?->format('Y-m-d')) }}">
+                                @error('end_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">End Time</label>
+                                <input type="text" class="form-control timepicker @error('end_time') is-invalid @enderror"
+                                       name="end_time" value="{{ old('end_time', $course->end_time) }}" placeholder="HH:MM" autocomplete="off">
+                                @error('end_time')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_active" value="1"
+                                       {{ old('is_active', $course->is_active) ? 'checked' : '' }}>
+                                <label class="form-check-label">
+                                    Active Course
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assigned Companies and Enroll Students Side by Side (Full Width) -->
+        <div class="row mb-4">
+            <!-- Assigned Companies -->
+            <div class="col-lg-6">
+                <div class="card h-100">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-building"></i> Assigned Companies</h5>
                     </div>
@@ -142,9 +212,11 @@
                         @endif
                     </div>
                 </div>
+            </div>
 
-                <!-- Enroll Students -->
-                <div class="card mb-4">
+            <!-- Enroll Students -->
+            <div class="col-lg-6">
+                <div class="card h-100">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-users"></i> {{ trans('courses.enroll_students') }}</h5>
                     </div>
@@ -220,80 +292,18 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Course Settings</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">Duration (Hours) *</label>
-                            <input type="number" class="form-control @error('duration_hours') is-invalid @enderror"
-                                   name="duration_hours" value="{{ old('duration_hours', $course->duration_hours) }}" min="1" required>
-                            @error('duration_hours')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <h5 class="mt-4 mb-3">Course Schedule (Start to End Time)</h5>
-
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label">Start Date</label>
-                                <input type="text" class="form-control datepicker @error('start_date') is-invalid @enderror"
-                                       id="start_date_display" value="{{ old('start_date', $course->start_date?->format('d/m/Y')) }}" placeholder="DD/MM/YYYY" autocomplete="off">
-                                <input type="hidden" name="start_date" id="start_date_hidden" value="{{ old('start_date', $course->start_date?->format('Y-m-d')) }}">
-                                @error('start_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Start Time</label>
-                                <input type="text" class="form-control timepicker @error('start_time') is-invalid @enderror"
-                                       name="start_time" value="{{ old('start_time', $course->start_time) }}" placeholder="HH:MM" autocomplete="off">
-                                @error('start_time')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label">End Date</label>
-                                <input type="text" class="form-control datepicker @error('end_date') is-invalid @enderror"
-                                       id="end_date_display" value="{{ old('end_date', $course->end_date?->format('d/m/Y')) }}" placeholder="DD/MM/YYYY" autocomplete="off">
-                                <input type="hidden" name="end_date" id="end_date_hidden" value="{{ old('end_date', $course->end_date?->format('Y-m-d')) }}">
-                                @error('end_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">End Time</label>
-                                <input type="text" class="form-control timepicker @error('end_time') is-invalid @enderror"
-                                       name="end_time" value="{{ old('end_time', $course->end_time) }}" placeholder="HH:MM" autocomplete="off">
-                                @error('end_time')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="is_active" value="1"
-                                       {{ old('is_active', $course->is_active) ? 'checked' : '' }}>
-                                <label class="form-check-label">
-                                    Active Course
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Update Course
-                            </button>
-                        </div>
-                    </div>
+        <!-- Update Course Button at the end -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-end gap-3">
+                    <a href="{{ route('course-management.show', $course) }}" class="btn btn-secondary px-4 py-2">
+                        <i class="fas fa-times me-2"></i>{{ trans('courses.cancel') }}
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4 py-2">
+                        <i class="fas fa-save me-2"></i>{{ trans('courses.update_course') }}
+                    </button>
                 </div>
             </div>
         </div>

@@ -132,7 +132,7 @@
                             <div class="col-md-6">
                                 <p><strong>Delivery Method:</strong> <span id="template-delivery" class="text-muted">-</span></p>
                                 <p><strong>Duration:</strong> <span id="template-duration" class="text-muted">-</span></p>
-                                <p><strong>Description:</strong> <span id="template-description" class="text-muted">-</span></p>
+                                <p><strong>{{ trans('courses.course_programme') }}:</strong> <span id="template-description" class="text-muted">-</span></p>
                             </div>
                         </div>
                     </div>
@@ -197,9 +197,75 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Assign to Companies -->
-                <div class="card mb-4">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Course Schedule</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="mb-3">Schedule (Start to End Time)</h5>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="text" class="form-control datepicker @error('start_date') is-invalid @enderror"
+                                       id="start_date_display" value="{{ old('start_date') }}" placeholder="DD/MM/YYYY" autocomplete="off">
+                                <input type="hidden" name="start_date" id="start_date_hidden" value="{{ old('start_date') }}">
+                                @error('start_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Start Time</label>
+                                <input type="text" class="form-control timepicker @error('start_time') is-invalid @enderror"
+                                       name="start_time" value="{{ old('start_time') }}" placeholder="HH:MM" autocomplete="off">
+                                @error('start_time')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">End Date</label>
+                                <input type="text" class="form-control datepicker @error('end_date') is-invalid @enderror"
+                                       id="end_date_display" value="{{ old('end_date') }}" placeholder="DD/MM/YYYY" autocomplete="off">
+                                <input type="hidden" name="end_date" id="end_date_hidden" value="{{ old('end_date') }}">
+                                @error('end_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">End Time</label>
+                                <input type="text" class="form-control timepicker @error('end_time') is-invalid @enderror"
+                                       name="end_time" value="{{ old('end_time') }}" placeholder="HH:MM" autocomplete="off">
+                                @error('end_time')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_active" value="1"
+                                       {{ old('is_active', true) ? 'checked' : '' }}>
+                                <label class="form-check-label">
+                                    Active Course
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assign to Companies and Enroll Students Side by Side (Full Width) -->
+        <div class="row mb-4">
+            <!-- Assign to Companies -->
+            <div class="col-lg-6">
+                <div class="card h-100">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-building"></i> {{ trans('courses.assign_to_companies') }}</h5>
                     </div>
@@ -209,14 +275,14 @@
                             <div class="mb-2">
                                 <input type="text" class="form-control form-control-sm" id="companySearch" placeholder="{{ trans('courses.search_companies') }}" onkeyup="filterCompanies()">
                             </div>
-                            <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto; background: white;">
+                            <div class="border rounded p-3" style="max-height: 400px; overflow-y: auto; background: white;">
                                 <div class="mb-2">
-                                    <small class="text-muted">{{ trans('courses.select_companies_to_assign') }}</small>
+                                    <small class="text-muted">{{ trans('courses.select_company_to_assign') }}</small>
                                 </div>
                                 @if(isset($companies))
                                     @foreach($companies as $company)
                                         <div class="form-check mb-2 company-search-item" data-company-name="{{ strtolower($company->name) }}">
-                                            <input class="form-check-input company-checkbox" type="checkbox" name="company_ids[]" value="{{ $company->id }}" id="company_{{ $company->id }}" onchange="filterStudentsByCompanies()">
+                                            <input class="form-check-input company-radio" type="radio" name="company_id" value="{{ $company->id }}" id="company_{{ $company->id }}" onchange="filterStudentsByCompanies()">
                                             <label class="form-check-label" for="company_{{ $company->id }}">
                                                 {{ $company->name }}
                                             </label>
@@ -227,9 +293,11 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Enroll Students -->
-                <div class="card mb-4">
+            <!-- Enroll Students -->
+            <div class="col-lg-6">
+                <div class="card h-100">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-users"></i> {{ trans('courses.enroll_students') }}</h5>
                     </div>
@@ -294,80 +362,18 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Course Settings</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">Duration (Hours) *</label>
-                            <input type="number" class="form-control @error('duration_hours') is-invalid @enderror"
-                                   name="duration_hours" value="{{ old('duration_hours') }}" min="1" required>
-                            @error('duration_hours')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <h5 class="mt-4 mb-3">Course Schedule (Start to End Time)</h5>
-
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label">Start Date</label>
-                                <input type="text" class="form-control datepicker @error('start_date') is-invalid @enderror"
-                                       id="start_date_display" value="{{ old('start_date') }}" placeholder="DD/MM/YYYY" autocomplete="off">
-                                <input type="hidden" name="start_date" id="start_date_hidden" value="{{ old('start_date') }}">
-                                @error('start_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Start Time</label>
-                                <input type="text" class="form-control timepicker @error('start_time') is-invalid @enderror"
-                                       name="start_time" value="{{ old('start_time') }}" placeholder="HH:MM" autocomplete="off">
-                                @error('start_time')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label">End Date</label>
-                                <input type="text" class="form-control datepicker @error('end_date') is-invalid @enderror"
-                                       id="end_date_display" value="{{ old('end_date') }}" placeholder="DD/MM/YYYY" autocomplete="off">
-                                <input type="hidden" name="end_date" id="end_date_hidden" value="{{ old('end_date') }}">
-                                @error('end_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">End Time</label>
-                                <input type="text" class="form-control timepicker @error('end_time') is-invalid @enderror"
-                                       name="end_time" value="{{ old('end_time') }}" placeholder="HH:MM" autocomplete="off">
-                                @error('end_time')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="is_active" value="1"
-                                       {{ old('is_active', true) ? 'checked' : '' }}>
-                                <label class="form-check-label">
-                                    Active Course
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Create Course
-                            </button>
-                        </div>
-                    </div>
+        <!-- Create Course Button at the end -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-end gap-3">
+                    <a href="{{ route('course-management.index') }}" class="btn btn-secondary px-4 py-2">
+                        <i class="fas fa-times me-2"></i>{{ trans('courses.cancel') }}
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4 py-2">
+                        <i class="fas fa-save me-2"></i>{{ trans('courses.create_course') }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -537,21 +543,21 @@ function filterStudents() {
 }
 
 function filterStudentsByCompanies() {
-    const selectedCompanyIds = Array.from(document.querySelectorAll('.company-checkbox:checked'))
-        .map(cb => parseInt(cb.value));
+    const selectedCompanyRadio = document.querySelector('.company-radio:checked');
+    const selectedCompanyId = selectedCompanyRadio ? parseInt(selectedCompanyRadio.value) : null;
 
     const studentItems = document.querySelectorAll('.student-search-item');
 
-    if (selectedCompanyIds.length === 0) {
-        // Show all students if no companies selected
+    if (!selectedCompanyId) {
+        // Show all students if no company selected
         studentItems.forEach(item => {
             item.style.display = 'block';
         });
     } else {
-        // Filter students by selected companies
+        // Filter students by selected company
         studentItems.forEach(item => {
             const studentCompanyIds = JSON.parse(item.getAttribute('data-company-ids') || '[]');
-            const hasMatchingCompany = selectedCompanyIds.some(id => studentCompanyIds.includes(id));
+            const hasMatchingCompany = studentCompanyIds.includes(selectedCompanyId);
 
             if (hasMatchingCompany) {
                 item.style.display = 'block';

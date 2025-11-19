@@ -202,7 +202,8 @@ return [
     'students_selected' => ':count students selected',
     'no_students_available' => 'No students available',
     'assign_to_companies' => 'Assign to Companies (Optional)',
-    'select_companies' => 'Select Companies',
+    'select_companies' => 'Select Company',
     'search_companies' => 'Search companies...',
     'select_companies_to_assign' => 'Select companies to assign this course to',
+    'select_company_to_assign' => 'Select a company to assign this course to',
 ];
