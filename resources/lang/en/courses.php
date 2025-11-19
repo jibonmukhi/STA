@@ -190,4 +190,18 @@ return [
     'optional' => 'Optional',
     'assign_teachers' => 'Assign Teachers',
     'no_teachers_available' => 'No teachers available',
+
+    // Student Enrollment
+    'enroll_students' => 'Enroll Students',
+    'select_students_to_enroll' => 'Select Students to Enroll',
+    'select_companies_filter_info' => 'Select companies above to filter students, or select from all users below.',
+    'search_students' => 'Search students...',
+    'select_all_visible' => 'Select All Visible',
+    'deselect_all' => 'Deselect All',
+    'students_selected' => ':count students selected',
+    'no_students_available' => 'No students available',
+    'assign_to_companies' => 'Assign to Companies (Optional)',
+    'select_companies' => 'Select Companies',
+    'search_companies' => 'Search companies...',
+    'select_companies_to_assign' => 'Select companies to assign this course to',
 ];

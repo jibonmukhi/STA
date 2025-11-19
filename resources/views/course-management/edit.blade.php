@@ -78,59 +78,6 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label">{{ trans('courses.category') }} *</label>
-                                <select class="form-select @error('category') is-invalid @enderror" name="category" required>
-                                    <option value="">{{ trans('courses.select_category') }}</option>
-                                    @foreach($categories as $key => $value)
-                                        <option value="{{ $key }}" {{ old('category', $course->category) == $key ? 'selected' : '' }}>
-                                            {{ $value }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('category')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">{{ trans('courses.delivery_method') }} *</label>
-                                <select class="form-select @error('delivery_method') is-invalid @enderror" name="delivery_method" required>
-                                    <option value="">{{ trans('courses.select_method') }}</option>
-                                    @foreach($deliveryMethods as $key => $value)
-                                        <option value="{{ $key }}" {{ old('delivery_method', $course->delivery_method) == $key ? 'selected' : '' }}>
-                                            {{ $value }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('delivery_method')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">{{ trans('courses.status') }} *</label>
-                                <select class="form-select @error('status') is-invalid @enderror" name="status" required>
-                                    @foreach($statuses as $key => $value)
-                                        <option value="{{ $key }}" {{ old('status', $course->status) == $key ? 'selected' : '' }}>
-                                            {{ $value }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('status')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">{{ trans('courses.description') }}</label>
-                            <textarea class="form-control @error('description') is-invalid @enderror"
-                                      name="description" rows="3">{{ old('description', $course->description) }}</textarea>
-                            @error('description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
                         <div class="mb-3">
                             <label class="form-label">{{ trans('courses.assign_teachers') }}</label>
                             <div class="mb-2">
@@ -195,6 +142,83 @@
                         @endif
                     </div>
                 </div>
+
+                <!-- Enroll Students -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-users"></i> {{ trans('courses.enroll_students') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">{{ trans('courses.select_students_to_enroll') }}</label>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> <small>{{ trans('courses.select_companies_filter_info') }}</small>
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" class="form-control form-control-sm" id="studentSearch" placeholder="{{ trans('courses.search_students') }}" onkeyup="filterStudents()">
+                            </div>
+                            <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto; background: white;">
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllVisibleStudents()">
+                                        <i class="fas fa-check-square"></i> {{ trans('courses.select_all_visible') }}
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAllStudents()">
+                                        <i class="fas fa-square"></i> {{ trans('courses.deselect_all') }}
+                                    </button>
+                                    @if(isset($users) && $users->count() > 0)
+                                        <small class="text-muted ms-2">({{ $users->count() }} total users)</small>
+                                    @endif
+                                </div>
+                                <div id="studentsList">
+                                    @if(isset($users) && $users->count() > 0)
+                                        @php
+                                            $enrolledStudentIds = $course->enrollments->pluck('user_id')->toArray();
+                                        @endphp
+                                        @foreach($users as $user)
+                                            @php
+                                                $userCompanyIds = $user->companies->pluck('id')->toArray();
+                                                $assignedCompanyIds = $assignedCompanies->pluck('id')->toArray();
+                                                $matchesCompany = empty($assignedCompanyIds) || !empty(array_intersect($userCompanyIds, $assignedCompanyIds));
+                                            @endphp
+                                            <div class="form-check mb-2 student-search-item"
+                                                 data-student-name="{{ strtolower($user->full_name) }}"
+                                                 data-student-email="{{ strtolower($user->email) }}"
+                                                 data-company-ids="{{ json_encode($userCompanyIds) }}"
+                                                 style="display: {{ $matchesCompany ? 'block' : 'none' }};">
+                                                <input class="form-check-input student-checkbox" type="checkbox" name="student_ids[]" value="{{ $user->id }}" id="student_{{ $user->id }}"
+                                                       {{ in_array($user->id, $enrolledStudentIds) ? 'checked' : '' }}>
+                                                <label class="form-check-label d-flex align-items-center" for="student_{{ $user->id }}">
+                                                    <div>
+                                                        <strong>{{ $user->full_name }}</strong>
+                                                        <small class="text-muted d-block">{{ $user->email }}</small>
+                                                        @if($user->companies->count() > 0)
+                                                            <small class="text-info d-block">
+                                                                <i class="fas fa-building"></i> {{ $user->companies->pluck('name')->join(', ') }}
+                                                            </small>
+                                                        @endif
+                                                        @if(in_array($user->id, $enrolledStudentIds))
+                                                            <small class="text-success d-block">
+                                                                <i class="fas fa-check-circle"></i> Already enrolled
+                                                            </small>
+                                                        @endif
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p class="text-muted">{{ trans('courses.no_students_available') }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                            @error('student_ids')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
+                            <div class="mt-2">
+                                <small class="text-muted"><span id="selectedStudentCount">0</span> {{ trans('courses.students_selected', ['count' => '']) }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="col-lg-4">
@@ -217,16 +241,17 @@
                         <div class="row mb-3">
                             <div class="col-6">
                                 <label class="form-label">Start Date</label>
-                                <input type="date" class="form-control @error('start_date') is-invalid @enderror"
-                                       name="start_date" value="{{ old('start_date', $course->start_date?->format('Y-m-d')) }}">
+                                <input type="text" class="form-control datepicker @error('start_date') is-invalid @enderror"
+                                       id="start_date_display" value="{{ old('start_date', $course->start_date?->format('d/m/Y')) }}" placeholder="DD/MM/YYYY" autocomplete="off">
+                                <input type="hidden" name="start_date" id="start_date_hidden" value="{{ old('start_date', $course->start_date?->format('Y-m-d')) }}">
                                 @error('start_date')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-6">
                                 <label class="form-label">Start Time</label>
-                                <input type="time" class="form-control @error('start_time') is-invalid @enderror"
-                                       name="start_time" value="{{ old('start_time', $course->start_time) }}">
+                                <input type="text" class="form-control timepicker @error('start_time') is-invalid @enderror"
+                                       name="start_time" value="{{ old('start_time', $course->start_time) }}" placeholder="HH:MM" autocomplete="off">
                                 @error('start_time')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -236,16 +261,17 @@
                         <div class="row mb-3">
                             <div class="col-6">
                                 <label class="form-label">End Date</label>
-                                <input type="date" class="form-control @error('end_date') is-invalid @enderror"
-                                       name="end_date" value="{{ old('end_date', $course->end_date?->format('Y-m-d')) }}">
+                                <input type="text" class="form-control datepicker @error('end_date') is-invalid @enderror"
+                                       id="end_date_display" value="{{ old('end_date', $course->end_date?->format('d/m/Y')) }}" placeholder="DD/MM/YYYY" autocomplete="off">
+                                <input type="hidden" name="end_date" id="end_date_hidden" value="{{ old('end_date', $course->end_date?->format('Y-m-d')) }}">
                                 @error('end_date')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-6">
                                 <label class="form-label">End Time</label>
-                                <input type="time" class="form-control @error('end_time') is-invalid @enderror"
-                                       name="end_time" value="{{ old('end_time', $course->end_time) }}">
+                                <input type="text" class="form-control timepicker @error('end_time') is-invalid @enderror"
+                                       name="end_time" value="{{ old('end_time', $course->end_time) }}" placeholder="HH:MM" autocomplete="off">
                                 @error('end_time')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -290,5 +316,146 @@ function filterTeachers() {
         }
     });
 }
+
+function filterStudents() {
+    const searchTerm = document.getElementById('studentSearch').value.toLowerCase();
+    const studentItems = document.querySelectorAll('.student-search-item');
+
+    studentItems.forEach(item => {
+        const studentName = item.getAttribute('data-student-name');
+        const studentEmail = item.getAttribute('data-student-email');
+
+        if (studentName.includes(searchTerm) || studentEmail.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function selectAllVisibleStudents() {
+    const studentItems = document.querySelectorAll('.student-search-item');
+    studentItems.forEach(item => {
+        if (item.style.display !== 'none') {
+            const checkbox = item.querySelector('.student-checkbox');
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        }
+    });
+    updateStudentCount();
+}
+
+function deselectAllStudents() {
+    const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+    studentCheckboxes.forEach(cb => {
+        cb.checked = false;
+    });
+    updateStudentCount();
+}
+
+function updateStudentCount() {
+    const selectedCount = document.querySelectorAll('.student-checkbox:checked').length;
+    document.getElementById('selectedStudentCount').textContent = selectedCount;
+}
+
+// Add event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+    studentCheckboxes.forEach(cb => {
+        cb.addEventListener('change', updateStudentCount);
+    });
+
+    // Initial count
+    updateStudentCount();
+});
 </script>
+
+@push('styles')
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+<style>
+.ui-datepicker {
+    z-index: 9999 !important;
+}
+.ui-timepicker-wrapper {
+    z-index: 9999 !important;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.ui-timepicker-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.ui-timepicker-list li {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.ui-timepicker-list li:hover,
+.ui-timepicker-selected {
+    background-color: #0d6efd;
+    color: white;
+}
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialize datepicker for start_date
+    $('#start_date_display').datepicker({
+        dateFormat: 'dd/mm/yy',
+        altField: '#start_date_hidden',
+        altFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: '-10:+10',
+        showButtonPanel: true,
+        beforeShow: function(input, inst) {
+            setTimeout(function() {
+                inst.dpDiv.css({
+                    'z-index': 9999
+                });
+            }, 0);
+        }
+    });
+
+    // Initialize datepicker for end_date
+    $('#end_date_display').datepicker({
+        dateFormat: 'dd/mm/yy',
+        altField: '#end_date_hidden',
+        altFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: '-10:+10',
+        showButtonPanel: true,
+        beforeShow: function(input, inst) {
+            setTimeout(function() {
+                inst.dpDiv.css({
+                    'z-index': 9999
+                });
+            }, 0);
+        }
+    });
+
+    // Initialize timepicker
+    $('.timepicker').timepicker({
+        timeFormat: 'HH:mm',
+        interval: 15,
+        minTime: '0:00',
+        maxTime: '23:45',
+        defaultTime: '9:00',
+        startTime: '0:00',
+        dynamic: false,
+        dropdown: true,
+        scrollbar: true
+    });
+});
+</script>
+@endpush
 @endsection

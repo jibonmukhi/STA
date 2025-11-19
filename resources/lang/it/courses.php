@@ -190,4 +190,18 @@ return [
     'optional' => 'Opzionale',
     'assign_teachers' => 'Assegna Docenti',
     'no_teachers_available' => 'Nessun docente disponibile',
+
+    // Student Enrollment
+    'enroll_students' => 'Iscrivi Studenti',
+    'select_students_to_enroll' => 'Seleziona Studenti da Iscrivere',
+    'select_companies_filter_info' => 'Seleziona le aziende sopra per filtrare gli studenti, oppure seleziona da tutti gli utenti qui sotto.',
+    'search_students' => 'Cerca studenti...',
+    'select_all_visible' => 'Seleziona Tutti Visibili',
+    'deselect_all' => 'Deseleziona Tutti',
+    'students_selected' => ':count studenti selezionati',
+    'no_students_available' => 'Nessuno studente disponibile',
+    'assign_to_companies' => 'Assegna alle Aziende (Opzionale)',
+    'select_companies' => 'Seleziona Aziende',
+    'search_companies' => 'Cerca aziende...',
+    'select_companies_to_assign' => 'Seleziona le aziende a cui assegnare questo corso',
 ];

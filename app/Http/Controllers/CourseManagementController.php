@@ -89,7 +89,16 @@ class CourseManagementController extends Controller
         // Get all active companies
         $companies = Company::where('active', true)->orderBy('name')->get();
 
-        return view('course-management.create', compact('masterCourses', 'categories', 'levels', 'deliveryMethods', 'statuses', 'teachers', 'companies'));
+        // Get all users (potential students) with their companies
+        // Exclude users with admin, super_admin, or teacher roles
+        $users = User::with('companies')
+            ->whereDoesntHave('roles', function($query) {
+                $query->whereIn('name', ['admin', 'super_admin', 'teacher']);
+            })
+            ->orderBy('name')
+            ->get();
+
+        return view('course-management.create', compact('masterCourses', 'categories', 'levels', 'deliveryMethods', 'statuses', 'teachers', 'companies', 'users'));
     }
 
     /**
@@ -116,6 +125,8 @@ class CourseManagementController extends Controller
             'teacher_ids.*' => 'exists:users,id',
             'company_ids' => 'nullable|array',
             'company_ids.*' => 'exists:companies,id',
+            'student_ids' => 'nullable|array',
+            'student_ids.*' => 'exists:users,id',
             'prerequisites' => 'nullable|string',
             'delivery_method' => 'required|string|in:online,offline,hybrid',
             'max_participants' => 'nullable|integer|min:1',
@@ -155,6 +166,31 @@ class CourseManagementController extends Controller
             }
         }
 
+        // Enroll students if selected
+        if (!empty($validated['student_ids'])) {
+            foreach ($validated['student_ids'] as $studentId) {
+                $student = User::find($studentId);
+                $primaryCompany = $student->primary_company;
+
+                $course->enrollments()->create([
+                    'user_id' => $studentId,
+                    'company_id' => $primaryCompany ? $primaryCompany->id : null,
+                    'status' => 'enrolled',
+                    'enrolled_at' => now(),
+                    'progress_percentage' => 0,
+                ]);
+            }
+        }
+
+        AuditLogService::log(
+            'Course Instance Created',
+            $course,
+            null,
+            $course->toArray(),
+            'Created course instance: ' . $course->title . ' (Code: ' . $course->course_code . ')',
+            'Course Management'
+        );
+
         return redirect()->route('course-management.show', $course)
                         ->with('success', 'Course instance created successfully.');
     }
@@ -183,13 +219,26 @@ class CourseManagementController extends Controller
         // Get users with teacher role
         $teachers = User::role('teacher')->orderBy('name')->get();
 
+        // Get all users (potential students) with their companies
+        // Exclude users with admin, super_admin, or teacher roles
+        $users = User::with('companies')
+            ->whereDoesntHave('roles', function($query) {
+                $query->whereIn('name', ['admin', 'super_admin', 'teacher']);
+            })
+            ->orderBy('name')
+            ->get();
+
+        // Load enrollments for the course
+        $courseManagement->load(['enrollments', 'assignedCompanies']);
+
         return view('course-management.edit', [
             'course' => $courseManagement,
             'categories' => $categories,
             'levels' => $levels,
             'deliveryMethods' => $deliveryMethods,
             'statuses' => $statuses,
-            'teachers' => $teachers
+            'teachers' => $teachers,
+            'users' => $users
         ]);
     }
 
@@ -203,25 +252,12 @@ class CourseManagementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'course_code' => 'required|string|max:255|unique:courses,course_code,' . $courseManagement->id,
-            'description' => 'nullable|string',
-            'objectives' => 'nullable|string',
-            'category' => 'required|string',
-            'level' => 'nullable|string|in:beginner,intermediate,advanced',
             'duration_hours' => 'required|integer|min:1',
-            'credits' => 'nullable|numeric|min:0',
-            'price' => 'nullable|numeric|min:0',
-            'instructor' => 'nullable|string|max:255',
-            'teacher_id' => 'nullable|exists:users,id',
             'teacher_ids' => 'nullable|array',
             'teacher_ids.*' => 'exists:users,id',
-            'prerequisites' => 'nullable|string',
-            'delivery_method' => 'required|string|in:online,offline,hybrid',
-            'max_participants' => 'nullable|integer|min:1',
+            'student_ids' => 'nullable|array',
+            'student_ids.*' => 'exists:users,id',
             'is_active' => 'boolean',
-            'is_mandatory' => 'boolean',
-            'status' => 'required|string|in:active,inactive,ongoing,done',
-            'available_from' => 'nullable|date',
-            'available_until' => 'nullable|date|after_or_equal:available_from',
             'start_date' => 'nullable|date',
             'start_time' => 'nullable',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -254,6 +290,36 @@ class CourseManagementController extends Controller
         } else {
             // If no teachers selected, clear all
             $courseManagement->teachers()->sync([]);
+        }
+
+        // Sync student enrollments
+        if (isset($validated['student_ids'])) {
+            $currentEnrollmentIds = $courseManagement->enrollments->pluck('user_id')->toArray();
+            $newStudentIds = $validated['student_ids'];
+
+            // Remove students who were unchecked
+            $toRemove = array_diff($currentEnrollmentIds, $newStudentIds);
+            if (!empty($toRemove)) {
+                $courseManagement->enrollments()->whereIn('user_id', $toRemove)->delete();
+            }
+
+            // Add new students who were checked
+            $toAdd = array_diff($newStudentIds, $currentEnrollmentIds);
+            foreach ($toAdd as $studentId) {
+                $student = User::find($studentId);
+                $primaryCompany = $student->primary_company;
+
+                $courseManagement->enrollments()->create([
+                    'user_id' => $studentId,
+                    'company_id' => $primaryCompany ? $primaryCompany->id : null,
+                    'status' => 'enrolled',
+                    'enrolled_at' => now(),
+                    'progress_percentage' => 0,
+                ]);
+            }
+        } else {
+            // If no students selected, remove all enrollments
+            $courseManagement->enrollments()->delete();
         }
 
         return redirect()->route('course-management.show', $courseManagement)

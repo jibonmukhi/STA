@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CourseEvent;
+use App\Models\Course;
+use App\Models\CourseEnrollment;
 use Carbon\Carbon;
 
 class EndUserDashboardController extends Controller
@@ -59,58 +61,84 @@ class EndUserDashboardController extends Controller
             $currentYear = now()->year;
         }
 
-        // Get course events for the user based on their role
-        $query = CourseEvent::with(['user', 'company']);
+        // Get course schedules based on user role
+        $coursesQuery = Course::query()
+            ->instances() // Only course instances, not master templates
+            ->with(['teachers', 'enrollments', 'assignedCompanies'])
+            ->whereNotNull('start_date');
 
-        if ($user->hasRole('end_user')) {
-            // End users see only their own events
-            $query->forUser($user->id);
+        if ($user->hasRole('teacher')) {
+            // Teachers see courses they're assigned to
+            $coursesQuery->whereHas('teachers', function($q) use ($user) {
+                $q->where('users.id', $user->id);
+            });
         } elseif ($user->hasRole('company_manager')) {
-            // Company managers see events from their companies and their own events
+            // Company managers see courses assigned to their companies
             $companyIds = $user->companies()->pluck('companies.id')->toArray();
-            $query->where(function($q) use ($user, $companyIds) {
-                $q->forUser($user->id)
-                  ->orWhereIn('company_id', $companyIds);
+            $coursesQuery->where(function($q) use ($user, $companyIds) {
+                $q->whereHas('enrollments', function($eq) use ($user) {
+                    $eq->where('user_id', $user->id);
+                })
+                ->orWhereHas('assignedCompanies', function($cq) use ($companyIds) {
+                    $cq->whereIn('companies.id', $companyIds);
+                });
+            });
+        } elseif ($user->hasRole('end_user')) {
+            // End users see only courses they're enrolled in
+            $coursesQuery->whereHas('enrollments', function($q) use ($user) {
+                $q->where('user_id', $user->id);
             });
         }
-        // STA managers see all events (no additional filtering needed)
+        // STA managers see all courses (no additional filtering)
 
-        // Get events for current month
-        $events = $query->byMonth($currentYear, $currentMonth)
-                       ->orderBy('start_date', 'asc')
-                       ->orderBy('start_time', 'asc')
-                       ->get();
+        // Get courses for current month
+        $courses = (clone $coursesQuery)->where(function($q) use ($currentYear, $currentMonth) {
+            $q->whereYear('start_date', $currentYear)
+              ->whereMonth('start_date', $currentMonth);
+        })->orderBy('start_date', 'asc')->get();
 
-        // Get today's events
-        $todaysEvents = $query->whereDate('start_date', now()->toDateString())
-                             ->orderBy('start_time', 'asc')
-                             ->get();
+        // Get today's courses
+        $todaysCourses = (clone $coursesQuery)->whereDate('start_date', now()->toDateString())->get();
 
-        // Get upcoming events (next 7 days)
-        $upcomingEvents = $query->upcoming()
-                               ->whereDate('start_date', '>=', now()->toDateString())
-                               ->whereDate('start_date', '<=', now()->addDays(7)->toDateString())
-                               ->orderBy('start_date', 'asc')
-                               ->orderBy('start_time', 'asc')
-                               ->limit(5)
-                               ->get();
+        // Get upcoming courses (next 7 days)
+        $upcomingCourses = (clone $coursesQuery)
+            ->whereDate('start_date', '>=', now()->toDateString())
+            ->whereDate('start_date', '<=', now()->addDays(7)->toDateString())
+            ->orderBy('start_date', 'asc')
+            ->limit(5)
+            ->get();
 
-        // Format events for JavaScript
-        $formattedEvents = $events->map(function($event) {
+        // Convert courses to event objects
+        $events = $courses;
+        $todaysEvents = $todaysCourses;
+        $upcomingEvents = $upcomingCourses;
+
+        // Format events for JavaScript (convert Course to event format)
+        $formattedEvents = $events->map(function($course) {
+            $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
+            $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
+
             return [
-                'id' => $event->id,
-                'title' => $event->title,
-                'description' => $event->description ?? '',
-                'date' => $event->start_date->format('Y-m-d'),
-                'startTime' => $event->start_time,
-                'endTime' => $event->end_time,
-                'status' => $event->status,
-                'location' => $event->location ?? '',
-                'courseTitle' => $event->course->title ?? '',
-                'courseCode' => $event->course->course_code ?? '',
-                'instructor' => $event->course->instructor ?? '',
-                'maxParticipants' => $event->max_participants,
-                'registeredParticipants' => $event->registered_participants
+                'id' => $course->id,
+                'title' => $course->title,
+                'description' => $course->description ?? '',
+                'date' => $course->start_date->format('Y-m-d'),
+                'startDate' => $course->start_date->format('Y-m-d'),
+                'endDate' => $course->end_date ? $course->end_date->format('Y-m-d') : $course->start_date->format('Y-m-d'),
+                'startTime' => $course->start_time ?? '09:00',
+                'endTime' => $course->end_time ?? '17:00',
+                'status' => $course->status,
+                'location' => $course->delivery_method == 'online' ? 'Online' : ($course->delivery_method == 'offline' ? 'In Presenza' : 'Ibrido'),
+                'courseTitle' => $course->title,
+                'courseCode' => $course->course_code,
+                'instructor' => $course->teachers->pluck('full_name')->join(', ') ?: ($course->instructor ?? 'N/A'),
+                'maxParticipants' => $course->max_participants ?? 0,
+                'registeredParticipants' => $course->enrollments->count(),
+                'category' => $course->category,
+                'categoryColor' => $categoryColor,
+                'statusColor' => $statusColor,
+                'deliveryMethod' => $course->delivery_method,
+                'durationHours' => $course->duration_hours
             ];
         });
 
@@ -155,7 +183,7 @@ class EndUserDashboardController extends Controller
             'total_events' => $events->count(),
             'todays_events' => $todaysEvents->count(),
             'upcoming_events' => $upcomingEvents->count(),
-            'completed_events' => $query->where('status', 'completed')->count(),
+            'completed_events' => (clone $coursesQuery)->where('status', 'completed')->count(),
         ];
 
         return view('user.calendar', compact(

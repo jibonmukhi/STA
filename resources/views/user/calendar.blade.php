@@ -160,23 +160,28 @@
                 </div>
                 <div class="card-body">
                     <div id="todays-events">
-                        @forelse($todaysEvents as $event)
-                            <div class="event-item mb-2 p-2 border-left border-{{ $event->event_type_color }} bg-light">
-                                <div class="fw-bold text-sm">{{ $event->title }}</div>
+                        @forelse($todaysEvents as $course)
+                            @php
+                                $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
+                            @endphp
+                            <div class="event-item mb-2 p-2 border-start border-{{ $categoryColor }} border-3 bg-light">
+                                <div class="fw-bold text-sm">{{ $course->title }}</div>
                                 <div class="text-muted small">
-                                    {{ $event->formatted_time }}
-                                    @if($event->is_online)
+                                    {{ $course->start_time ?? '09:00' }} - {{ $course->end_time ?? '17:00' }}
+                                    @if($course->delivery_method == 'online')
                                         <span class="badge bg-info ms-1">Online</span>
+                                    @elseif($course->delivery_method == 'offline')
+                                        <span class="badge bg-success ms-1">{{ trans('courses.delivery_methods.offline') }}</span>
+                                    @else
+                                        <span class="badge bg-warning ms-1">{{ trans('courses.delivery_methods.hybrid') }}</span>
                                     @endif
-                                    @if($event->is_mandatory)
-                                        <span class="badge bg-danger ms-1">Mandatory</span>
+                                    @if($course->is_mandatory)
+                                        <span class="badge bg-danger ms-1">{{ trans('courses.mandatory') }}</span>
                                     @endif
                                 </div>
-                                @if($event->location)
-                                    <div class="text-muted small">
-                                        <i class="fas fa-map-marker-alt me-1"></i>{{ $event->location }}
-                                    </div>
-                                @endif
+                                <div class="text-muted small">
+                                    <i class="fas fa-chalkboard-teacher me-1"></i>{{ $course->teachers->pluck('full_name')->join(', ') ?: ($course->instructor ?? 'N/A') }}
+                                </div>
                             </div>
                         @empty
                             <div class="text-center mt-3">
@@ -193,22 +198,26 @@
                     <h6 class="card-title mb-0">Upcoming Events</h6>
                 </div>
                 <div class="card-body">
-                    @forelse($upcomingEvents as $event)
-                        <div class="event-item mb-2 p-2 border-left border-{{ $event->event_type_color }} bg-light">
-                            <div class="fw-bold text-sm">{{ $event->title }}</div>
+                    @forelse($upcomingEvents as $course)
+                        @php
+                            $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
+                            $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
+                        @endphp
+                        <div class="event-item mb-2 p-2 border-start border-{{ $categoryColor }} border-3 bg-light">
+                            <div class="fw-bold text-sm">{{ $course->title }}</div>
                             <div class="text-muted small">
-                                {{ $event->formatted_date }} - {{ $event->formatted_time }}
+                                {{ $course->start_date->format('d/m/Y') }} - {{ $course->start_time ?? '09:00' }}
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-1">
-                                <span class="badge bg-{{ $event->event_type_color }}">{{ ucfirst($event->event_type) }}</span>
-                                @if($event->credits)
-                                    <small class="text-muted">{{ $event->credits }} credits</small>
+                                <span class="badge bg-{{ $categoryColor }}">{{ trans('courses.categories.' . $course->category) }}</span>
+                                @if($course->duration_hours)
+                                    <small class="text-muted">{{ $course->duration_hours }}h</small>
                                 @endif
                             </div>
                         </div>
                     @empty
                         <div class="text-center mt-3">
-                            <small class="text-muted">No upcoming events</small>
+                            <small class="text-muted">{{ trans('calendar.no_upcoming_events') }}</small>
                         </div>
                     @endforelse
                 </div>
@@ -217,33 +226,23 @@
             <!-- Calendar Legend -->
             <div class="card">
                 <div class="card-header">
-                    <h6 class="card-title mb-0">Event Types</h6>
+                    <h6 class="card-title mb-0">{{ trans('courses.categories.title', [], null, 'Course Categories') }}</h6>
                 </div>
                 <div class="card-body">
-                    <div class="legend-item d-flex align-items-center mb-2">
-                        <div class="legend-color bg-primary me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
-                        <small>Courses</small>
-                    </div>
-                    <div class="legend-item d-flex align-items-center mb-2">
-                        <div class="legend-color bg-success me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
-                        <small>Training</small>
-                    </div>
-                    <div class="legend-item d-flex align-items-center mb-2">
-                        <div class="legend-color bg-danger me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
-                        <small>Exams</small>
-                    </div>
-                    <div class="legend-item d-flex align-items-center mb-2">
-                        <div class="legend-color bg-info me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
-                        <small>Webinars</small>
-                    </div>
-                    <div class="legend-item d-flex align-items-center mb-2">
-                        <div class="legend-color bg-warning me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
-                        <small>Workshops</small>
-                    </div>
-                    <div class="legend-item d-flex align-items-center mb-2">
-                        <div class="legend-color bg-secondary me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
-                        <small>Meetings</small>
-                    </div>
+                    @php
+                        $categories = [
+                            'alimentaristi' => dataVaultColor('course_category', 'alimentaristi') ?? 'primary',
+                            'antincendio' => dataVaultColor('course_category', 'antincendio') ?? 'danger',
+                            'altri_corsi' => dataVaultColor('course_category', 'altri_corsi') ?? 'info',
+                            'other' => dataVaultColor('course_category', 'other') ?? 'secondary',
+                        ];
+                    @endphp
+                    @foreach($categories as $category => $color)
+                        <div class="legend-item d-flex align-items-center mb-2">
+                            <div class="legend-color bg-{{ $color }} me-2" style="width: 12px; height: 12px; border-radius: 2px;"></div>
+                            <small>{{ trans('courses.categories.' . $category) }}</small>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -505,11 +504,120 @@
 
     function changeView(view) {
         currentView = view;
+
+        // Update active button state
         document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
 
-        // In a real implementation, you would switch between different calendar views here
-        alert(`Switching to ${view} view - this feature can be implemented based on your needs`);
+        if (view === 'month') {
+            // Show month view (default)
+            generateCalendar();
+        } else if (view === 'week') {
+            // Show week view
+            renderWeekView();
+        } else if (view === 'day') {
+            // Show day view
+            renderDayView();
+        }
+    }
+
+    function renderWeekView() {
+        const calendarBody = document.getElementById('calendar-body');
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay()); // Start from Sunday
+
+        let weekHtml = '<tr>';
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(startOfWeek);
+            date.setDate(startOfWeek.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            const dayEvents = courseEvents.filter(e => e.date === dateStr || e.startDate === dateStr);
+
+            const isCurrentDay = isToday(date);
+
+            weekHtml += `
+                <td class="calendar-day p-3 ${isCurrentDay ? 'today' : ''}" style="height: 400px; vertical-align: top;">
+                    <div class="day-number text-center mb-2">
+                        <strong>${date.getDate()}</strong>
+                        <br><small class="text-muted">${dayNamesShort[date.getDay()]}</small>
+                    </div>
+                    <div class="events-container" style="max-height: 350px; overflow-y: auto;">
+                        ${dayEvents.length > 0 ? dayEvents.map(e => {
+                            const borderColor = getCategoryColor(e.category);
+                            const bgColor = getCategoryColorRGB(e.category);
+                            return `
+                                <div class="event-item mb-1 p-2 cursor-pointer" style="border-left: 3px solid #${borderColor}; background-color: rgba(${bgColor}, 0.1); cursor: pointer;" onclick='viewEventDetails(${JSON.stringify(e)})'>
+                                    <div class="fw-bold small">${e.title}</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">${e.startTime || '09:00'}</div>
+                                </div>
+                            `;
+                        }).join('') : '<small class="text-muted">No events</small>'}
+                    </div>
+                </td>
+            `;
+        }
+        weekHtml += '</tr>';
+        calendarBody.innerHTML = weekHtml;
+    }
+
+    function renderDayView() {
+        const calendarBody = document.getElementById('calendar-body');
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const todayEvents = courseEvents.filter(e => e.date === todayStr || e.startDate === todayStr);
+
+        let dayHtml = `
+            <tr>
+                <td colspan="7" class="p-4">
+                    <h4 class="text-center mb-4">${dayNames[today.getDay()]}, ${monthNames[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}</h4>
+                    <div class="timeline">
+                        ${todayEvents.length > 0 ? todayEvents.map(e => {
+                            const borderColor = getCategoryColor(e.category);
+                            const bgColor = getCategoryColorRGB(e.category);
+                            return `
+                                <div class="event-item mb-3 p-3 cursor-pointer" style="border-left: 4px solid #${borderColor}; background-color: rgba(${bgColor}, 0.1); cursor: pointer;" onclick='viewEventDetails(${JSON.stringify(e)})'>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="mb-1">${e.title}</h5>
+                                            <div class="text-muted mb-2"><strong>${e.courseCode || ''}</strong></div>
+                                            <div class="mb-1"><i class="fas fa-clock me-2"></i>${e.startTime || '09:00'} - ${e.endTime || '17:00'}</div>
+                                            <div class="mb-1"><i class="fas fa-chalkboard-teacher me-2"></i>${e.instructor || 'N/A'}</div>
+                                            <div class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>${e.location || 'N/A'}</div>
+                                            ${e.description ? `<div class="mt-2 text-muted small">${e.description}</div>` : ''}
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-${e.categoryColor || 'info'}">${e.category || 'Course'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('') : '<p class="text-center text-muted py-5">No events scheduled for today</p>'}
+                    </div>
+                </td>
+            </tr>
+        `;
+        calendarBody.innerHTML = dayHtml;
+    }
+
+    function getCategoryColor(category) {
+        const colors = {
+            'alimentaristi': '007bff',
+            'antincendio': 'dc3545',
+            'altri_corsi': '17a2b8',
+            'other': '6c757d'
+        };
+        return colors[category] || '007bff';
+    }
+
+    function getCategoryColorRGB(category) {
+        const colors = {
+            'alimentaristi': '0, 123, 255',
+            'antincendio': '220, 53, 69',
+            'altri_corsi': '23, 162, 184',
+            'other': '108, 117, 125'
+        };
+        return colors[category] || '0, 123, 255';
     }
 
     function viewEventDetails(event) {

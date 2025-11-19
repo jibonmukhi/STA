@@ -17,7 +17,10 @@
                         </ol>
                     </nav>
                 </div>
-                <div>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('calendar') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-calendar-alt"></i> {{ trans('courses.view_calendar') }}
+                    </a>
                     @can('create', App\Models\Course::class)
                     <a href="{{ route('course-management.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> {{ trans('courses.start_new') }}
