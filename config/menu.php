@@ -116,23 +116,23 @@ return [
             ]
         ],
         [
-            'title' => 'Courses',
+            'title' => 'navigation.courses',
             'icon' => 'fas fa-graduation-cap',
             'submenu' => [
                 [
-                    'title' => 'All Courses',
+                    'title' => 'navigation.all_courses',
                     'route' => 'courses.index'
                 ],
                 [
-                    'title' => 'Add Course',
+                    'title' => 'navigation.add_course',
                     'route' => 'courses.create'
                 ],
                 [
-                    'title' => 'Course Management',
+                    'title' => 'navigation.course_management',
                     'route' => 'course-management.index'
                 ],
                 [
-                    'title' => 'Start New',
+                    'title' => 'navigation.start_new',
                     'route' => 'course-management.create'
                 ]
             ]

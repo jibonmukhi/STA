@@ -117,7 +117,6 @@
                                         <th>{{ trans('courses.course_code') }}</th>
                                         <th>{{ trans('courses.title') }}</th>
                                         <th>{{ trans('courses.category') }}</th>
-                                        <th>{{ trans('courses.teacher') }}</th>
                                         <th>{{ trans('courses.duration') }}</th>
                                         <th>{{ trans('courses.delivery_method') }}</th>
                                         <th>{{ trans('courses.status') }}</th>
@@ -144,30 +143,6 @@
                                                 <span class="badge bg-{{ $categoryColor }}">
                                                     {{ $categoryLabel }}
                                                 </span>
-                                            </td>
-                                            <td>
-                                                @if($course->teachers && $course->teachers->count() > 0)
-                                                    <div class="d-flex flex-wrap gap-1">
-                                                        @foreach($course->teachers as $teacher)
-                                                            <div class="d-flex align-items-center">
-                                                                <img src="{{ $teacher->photo_url }}" alt="{{ $teacher->full_name }}"
-                                                                     class="rounded-circle me-1" style="object-fit: cover; width: 24px; height: 24px;">
-                                                                <span class="small">{{ $teacher->full_name }}</span>
-                                                                @if(!$loop->last)<span class="text-muted mx-1">|</span>@endif
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                @elseif($course->teacher)
-                                                    <div class="d-flex align-items-center">
-                                                        <img src="{{ $course->teacher->photo_url }}" alt="{{ $course->teacher->full_name }}"
-                                                             class="rounded-circle me-2" style="object-fit: cover;">
-                                                        <span>{{ $course->teacher->full_name }}</span>
-                                                    </div>
-                                                @elseif($course->instructor)
-                                                    <span class="text-muted">{{ $course->instructor }}</span>
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
                                             </td>
                                             <td>
                                                 <strong>{{ $course->duration_hours }}</strong>h

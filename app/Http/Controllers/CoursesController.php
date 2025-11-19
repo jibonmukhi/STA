@@ -122,7 +122,7 @@ class CoursesController extends Controller
                         ->with('success', 'Course created successfully.');
     }
 
-    public function show(Course $course): View|RedirectResponse
+    public function show(Request $request, Course $course): View|RedirectResponse
     {
         // Redirect company managers to course-management instead
         if (auth()->user()->hasRole('company_manager') || auth()->user()->hasRole('end_user')) {
@@ -130,9 +130,22 @@ class CoursesController extends Controller
                            ->with('error', 'You do not have permission to view master course templates.');
         }
 
-        // Load course instances (started courses) for this master
-        $course->load(['materials.uploader', 'instances']);
-        return view('courses.show', compact('course'));
+        // Load course materials
+        $course->load(['materials.uploader']);
+
+        // Paginate course instances
+        $perPage = $request->input('per_page', 10);
+        $allowedPerPage = [10, 25, 50, 100];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+
+        $instances = $course->instances()
+            ->with(['teachers', 'enrollments'])
+            ->orderBy('start_date', 'desc')
+            ->paginate($perPage);
+
+        return view('courses.show', compact('course', 'instances'));
     }
 
     public function edit(Course $course): View|RedirectResponse

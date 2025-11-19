@@ -44,7 +44,7 @@ return [
     'view_users' => 'Visualizza Utenti',
 
     // Course management
-    'course_management' => 'Corsi',
+    'course_management' => 'Gestione Corsi',
     'all_courses' => 'Tutti i Corsi',
     'add_course' => 'Aggiungi Corso',
     'my_company_courses' => 'Corsi della Mia Azienda',
@@ -53,6 +53,9 @@ return [
     'my_learning' => 'Il Mio Apprendimento',
     'course_enrollments' => 'Gestisci Iscrizioni',
     'course_events' => 'Eventi del Corso',
+    'courses' => 'Corsi',
+    'start_new' => 'Avvia Nuovo',
+    'start_new_course' => 'Avvia Nuovo Corso',
 
     // Teacher menu
     'my_courses' => 'I Miei Corsi',

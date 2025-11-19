@@ -69,7 +69,8 @@
                                     try {
                                         if (isset($subItem['route'])) {
                                             $routeUrl = route($subItem['route']);
-                                            $isActive = request()->routeIs($subItem['route']);
+                                            // Check exact route match or routes that start with the same prefix
+                                            $isActive = request()->routeIs($subItem['route']) || request()->routeIs($subItem['route'] . '.*');
                                         }
                                     } catch (Exception $e) {
                                         // Route doesn't exist, use # as fallback
@@ -98,7 +99,8 @@
                     try {
                         if (isset($menuItem['route'])) {
                             $mainRouteUrl = route($menuItem['route']);
-                            $mainIsActive = request()->routeIs($menuItem['route']);
+                            // Check exact route match or routes that start with the same prefix
+                            $mainIsActive = request()->routeIs($menuItem['route']) || request()->routeIs($menuItem['route'] . '.*');
                         }
                     } catch (Exception $e) {
                         // Route doesn't exist, use # as fallback

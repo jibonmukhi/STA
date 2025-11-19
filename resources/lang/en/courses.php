@@ -33,6 +33,7 @@ return [
     'course_title' => 'Course Title',
     'course_code' => 'Course Code',
     'description' => 'Description',
+    'course_programme' => 'Course Programme',
     'objectives' => 'Objectives',
     'category' => 'Category',
     'level' => 'Level',

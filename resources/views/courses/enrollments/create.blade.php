@@ -35,7 +35,7 @@
                     <h5 class="mb-0">Select Users to Enroll</h5>
                 </div>
                 <div class="card-body">
-                    @if($availableUsers->count() > 0)
+                    @if($allUsers->count() > 0)
                         <form action="{{ route('courses.enrollments.store', $course) }}" method="POST">
                             @csrf
 
@@ -46,58 +46,124 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Filter by Company</label>
-                                <select class="form-select" id="companyFilter" onchange="filterByCompany(this.value)">
-                                    <option value="">All Companies</option>
+                                <div class="mb-2">
+                                    <input type="text" class="form-control form-control-sm" id="companySearch" placeholder="Search companies..." onkeyup="filterCompanies()">
+                                </div>
+                                <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto; background: white;">
+                                    <div class="mb-2">
+                                        <small class="text-muted">Select companies to filter students (companies with enrolled users are pre-selected)</small>
+                                    </div>
                                     @foreach($companies as $company)
-                                        <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                                            {{ $company->name }}
-                                        </option>
+                                        @php
+                                            $hasEnrolledUsers = in_array($company->id, $enrolledCompanyIds);
+                                        @endphp
+                                        <div class="form-check mb-2 company-search-item" data-company-name="{{ strtolower($company->name) }}">
+                                            <input class="form-check-input company-checkbox" type="checkbox"
+                                                   id="company_{{ $company->id }}"
+                                                   value="{{ $company->id }}"
+                                                   {{ $hasEnrolledUsers ? 'checked' : '' }}
+                                                   onchange="filterByCompanies()">
+                                            <label class="form-check-label" for="company_{{ $company->id }}">
+                                                {{ $company->name }}
+                                                @if($hasEnrolledUsers)
+                                                    <span class="badge bg-success ms-1" style="font-size: 0.65rem;">Has Enrolled Users</span>
+                                                @endif
+                                            </label>
+                                        </div>
                                     @endforeach
-                                </select>
-                                <small class="text-muted">Filter users by their company</small>
+                                </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Select Users <span class="text-danger">*</span></label>
-                                <div class="mb-2">
-                                    <input type="text" class="form-control" id="user_search" placeholder="Search users by name or email..." onkeyup="filterUsers()">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> <small>Select companies above to filter students. Enrolled users are shown with a badge and cannot be enrolled again.</small>
                                 </div>
                                 <div class="mb-2">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" id="selectAll">Select All</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAll">Deselect All</button>
-                                    @if(request('company_id'))
-                                        <span class="badge bg-info ms-2">
-                                            Showing users from: {{ $companies->find(request('company_id'))?->name }}
-                                        </span>
-                                    @else
-                                        <span class="badge bg-secondary ms-2">
-                                            Showing: All users ({{ $availableUsers->count() }})
-                                        </span>
-                                    @endif
+                                    <input type="text" class="form-control form-control-sm" id="user_search" placeholder="Search users by name or email..." onkeyup="filterUsers()">
+                                </div>
+                                <div class="mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllAvailable()">Select All Available</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAll()">Deselect All</button>
+                                    <span class="badge bg-secondary ms-2">
+                                        Total: {{ $allUsers->count() }} users
+                                    </span>
+                                    <span class="badge bg-success ms-1" id="enrolledCount">
+                                        Enrolled: {{ count($enrolledUserIds) }}
+                                    </span>
+                                    <span class="badge bg-primary ms-1" id="selectedCount">
+                                        Selected: 0
+                                    </span>
                                 </div>
                                 <div class="border rounded p-3" style="max-height: 400px; overflow-y: auto;">
-                                    @if($availableUsers->count() > 0)
-                                        @foreach($availableUsers as $user)
-                                            <div class="form-check mb-2 user-item" data-user-name="{{ strtolower($user->name) }}" data-user-email="{{ strtolower($user->email) }}">
-                                                <input class="form-check-input user-checkbox" type="checkbox" name="user_ids[]" value="{{ $user->id }}" id="user{{ $user->id }}">
-                                                <label class="form-check-label w-100" for="user{{ $user->id }}">
-                                                    <div class="d-flex justify-content-between align-items-start">
-                                                        <div>
-                                                            <strong>{{ $user->name }}</strong>
-                                                            <br><small class="text-muted">{{ $user->email }}</small>
+                                    @if($allUsers->count() > 0)
+                                        @foreach($allUsers as $user)
+                                            @php
+                                                $isEnrolled = in_array($user->id, $enrolledUserIds);
+                                                $userCompanyIds = $user->companies->pluck('id')->toArray();
+                                            @endphp
+                                            <div class="mb-2 user-item {{ $isEnrolled ? 'enrolled-user' : 'form-check' }}"
+                                                 data-user-name="{{ strtolower($user->name) }}"
+                                                 data-user-email="{{ strtolower($user->email) }}"
+                                                 data-company-ids="{{ json_encode($userCompanyIds) }}"
+                                                 style="{{ count($enrolledCompanyIds) > 0 && count(array_intersect($userCompanyIds, $enrolledCompanyIds)) > 0 ? 'display: block;' : (count($enrolledCompanyIds) > 0 ? 'display: none;' : 'display: block;') }}">
+                                                @if($isEnrolled)
+                                                    <!-- Enrolled user - no checkbox -->
+                                                    <div class="d-flex align-items-start p-2">
+                                                        <div class="me-2">
+                                                            <i class="fas fa-check-circle text-success" style="font-size: 1.2rem;"></i>
                                                         </div>
-                                                        @if($user->primary_company)
-                                                            <span class="badge bg-info">{{ $user->primary_company->name }}</span>
-                                                        @else
-                                                            <span class="badge bg-secondary">No Company</span>
-                                                        @endif
+                                                        <div class="flex-grow-1">
+                                                            <div class="d-flex justify-content-between align-items-start">
+                                                                <div>
+                                                                    <strong>{{ $user->name }}</strong>
+                                                                    <small class="text-muted d-block">{{ $user->email }}</small>
+                                                                    @if($user->companies->count() > 0)
+                                                                        <small class="text-info d-block">
+                                                                            <i class="fas fa-building"></i> {{ $user->companies->pluck('name')->join(', ') }}
+                                                                        </small>
+                                                                    @endif
+                                                                </div>
+                                                                <div>
+                                                                    <span class="badge bg-success">Already Enrolled</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </label>
+                                                @else
+                                                    <!-- Available user - with checkbox -->
+                                                    <input class="form-check-input user-checkbox"
+                                                           type="checkbox"
+                                                           name="user_ids[]"
+                                                           value="{{ $user->id }}"
+                                                           id="user{{ $user->id }}"
+                                                           onchange="updateSelectedCount()">
+                                                    <label class="form-check-label w-100" for="user{{ $user->id }}">
+                                                        <div class="d-flex justify-content-between align-items-start">
+                                                            <div>
+                                                                <strong>{{ $user->name }}</strong>
+                                                                <small class="text-muted d-block">{{ $user->email }}</small>
+                                                                @if($user->companies->count() > 0)
+                                                                    <small class="text-info d-block">
+                                                                        <i class="fas fa-building"></i> {{ $user->companies->pluck('name')->join(', ') }}
+                                                                    </small>
+                                                                @endif
+                                                            </div>
+                                                            <div>
+                                                                @if($user->primary_company)
+                                                                    <span class="badge bg-info">{{ $user->primary_company->name }}</span>
+                                                                @else
+                                                                    <span class="badge bg-secondary">No Company</span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                @endif
                                             </div>
                                         @endforeach
                                     @else
                                         <p class="text-muted text-center py-3 mb-0">
-                                            <i class="fas fa-info-circle"></i> No users available from the selected company.
+                                            <i class="fas fa-info-circle"></i> No users available.
                                         </p>
                                     @endif
                                 </div>
@@ -146,23 +212,65 @@
 
 @push('scripts')
 <script>
-    document.getElementById('selectAll').addEventListener('click', function() {
-        document.querySelectorAll('.user-checkbox').forEach(function(checkbox) {
+    function filterCompanies() {
+        const searchTerm = document.getElementById('companySearch').value.toLowerCase();
+        const companyItems = document.querySelectorAll('.company-search-item');
+
+        companyItems.forEach(item => {
+            const companyName = item.getAttribute('data-company-name');
+
+            if (companyName.includes(searchTerm)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    function filterByCompanies() {
+        const selectedCompanyIds = Array.from(document.querySelectorAll('.company-checkbox:checked'))
+            .map(cb => parseInt(cb.value));
+
+        const userItems = document.querySelectorAll('.user-item');
+
+        if (selectedCompanyIds.length === 0) {
+            // Show all users if no companies selected
+            userItems.forEach(item => {
+                item.style.display = 'block';
+            });
+        } else {
+            // Filter users by selected companies
+            userItems.forEach(item => {
+                const userCompanyIds = JSON.parse(item.getAttribute('data-company-ids') || '[]');
+                const hasMatchingCompany = selectedCompanyIds.some(id => userCompanyIds.includes(id));
+
+                if (hasMatchingCompany) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        updateSelectedCount();
+    }
+
+    function selectAllAvailable() {
+        document.querySelectorAll('.user-checkbox:not([disabled])').forEach(function(checkbox) {
             const parentItem = checkbox.closest('.user-item');
-            if (!parentItem || parentItem.style.display !== 'none') {
+            if (parentItem && parentItem.style.display !== 'none') {
                 checkbox.checked = true;
             }
         });
-    });
+        updateSelectedCount();
+    }
 
-    document.getElementById('deselectAll').addEventListener('click', function() {
-        document.querySelectorAll('.user-checkbox').forEach(function(checkbox) {
-            const parentItem = checkbox.closest('.user-item');
-            if (!parentItem || parentItem.style.display !== 'none') {
-                checkbox.checked = false;
-            }
+    function deselectAll() {
+        document.querySelectorAll('.user-checkbox:not([disabled])').forEach(function(checkbox) {
+            checkbox.checked = false;
         });
-    });
+        updateSelectedCount();
+    }
 
     function filterUsers() {
         const searchTerm = document.getElementById('user_search').value.toLowerCase();
@@ -173,22 +281,46 @@
             const userEmail = item.getAttribute('data-user-email');
 
             if (userName.includes(searchTerm) || userEmail.includes(searchTerm)) {
-                item.style.display = 'block';
+                // Don't override company filter - check if item is currently visible due to company filter
+                const userCompanyIds = JSON.parse(item.getAttribute('data-company-ids') || '[]');
+                const selectedCompanyIds = Array.from(document.querySelectorAll('.company-checkbox:checked'))
+                    .map(cb => parseInt(cb.value));
+
+                if (selectedCompanyIds.length === 0 || selectedCompanyIds.some(id => userCompanyIds.includes(id))) {
+                    item.style.display = 'block';
+                }
             } else {
                 item.style.display = 'none';
             }
         });
     }
 
-    function filterByCompany(companyId) {
-        const currentUrl = new URL(window.location.href);
-        if (companyId) {
-            currentUrl.searchParams.set('company_id', companyId);
-        } else {
-            currentUrl.searchParams.delete('company_id');
-        }
-        window.location.href = currentUrl.toString();
+    function updateSelectedCount() {
+        const selectedCount = document.querySelectorAll('.user-checkbox:checked:not([disabled])').length;
+        document.getElementById('selectedCount').textContent = 'Selected: ' + selectedCount;
     }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSelectedCount();
+    });
 </script>
+
+<style>
+.enrolled-user {
+    background-color: rgba(25, 135, 84, 0.08);
+    border-left: 4px solid #198754;
+    border-radius: 4px;
+    padding: 4px !important;
+}
+
+.enrolled-user:hover {
+    background-color: rgba(25, 135, 84, 0.12);
+}
+
+.user-item:not(.enrolled-user):hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+</style>
 @endpush
 @endsection

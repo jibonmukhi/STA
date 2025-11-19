@@ -44,7 +44,7 @@ return [
     'view_users' => 'View Users',
 
     // Course management
-    'course_management' => 'Courses',
+    'course_management' => 'Course Management',
     'all_courses' => 'All Courses',
     'add_course' => 'Add Course',
     'my_company_courses' => 'My Company Courses',
@@ -53,6 +53,9 @@ return [
     'my_learning' => 'My Learning',
     'course_enrollments' => 'Manage Enrollments',
     'course_events' => 'Course Events',
+    'courses' => 'Courses',
+    'start_new' => 'Start New',
+    'start_new_course' => 'Start New Course',
 
     // Teacher menu
     'my_courses' => 'My Courses',

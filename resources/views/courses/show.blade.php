@@ -80,68 +80,22 @@
                         </div>
                     </div>
 
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <strong>Course Title:</strong>
+                        </div>
+                        <div class="col-sm-9">
+                            {{ $course->title }}
+                        </div>
+                    </div>
+
                     @if($course->description)
                         <div class="row mb-3">
                             <div class="col-sm-3">
-                                <strong>Description:</strong>
+                                <strong>{{ trans('courses.course_programme') }}:</strong>
                             </div>
                             <div class="col-sm-9">
                                 <p>{{ $course->description }}</p>
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="row mb-3">
-                        <div class="col-sm-3">
-                            <strong>Category:</strong>
-                        </div>
-                        <div class="col-sm-9">
-                            @php
-                                $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
-                                $categoryLabel = dataVaultLabel('course_category', $course->category) ?? (App\Models\Course::getCategories()[$course->category] ?? $course->category);
-                            @endphp
-                            <span class="badge bg-{{ $categoryColor }}">{{ $categoryLabel }}</span>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-sm-3">
-                            <strong>Delivery Method:</strong>
-                        </div>
-                        <div class="col-sm-9">
-                            <span class="badge bg-secondary">{{ App\Models\Course::getDeliveryMethods()[$course->delivery_method] ?? $course->delivery_method }}</span>
-                        </div>
-                    </div>
-
-                    @if($course->level)
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <strong>Level:</strong>
-                            </div>
-                            <div class="col-sm-9">
-                                <span class="badge bg-info">{{ ucfirst($course->level) }}</span>
-                            </div>
-                        </div>
-                    @endif
-
-                    @if($course->objectives)
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <strong>Objectives:</strong>
-                            </div>
-                            <div class="col-sm-9">
-                                <p>{{ $course->objectives }}</p>
-                            </div>
-                        </div>
-                    @endif
-
-                    @if($course->prerequisites)
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <strong>Prerequisites:</strong>
-                            </div>
-                            <div class="col-sm-9">
-                                <p>{{ $course->prerequisites }}</p>
                             </div>
                         </div>
                     @endif
@@ -156,14 +110,35 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-12">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Category</small>
+                            @php
+                                $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
+                                $categoryLabel = dataVaultLabel('course_category', $course->category) ?? (App\Models\Course::getCategories()[$course->category] ?? $course->category);
+                            @endphp
+                            <span class="badge bg-{{ $categoryColor }}">{{ $categoryLabel }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Delivery Method</small>
+                            <span class="badge bg-secondary">{{ App\Models\Course::getDeliveryMethods()[$course->delivery_method] ?? $course->delivery_method }}</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        @if($course->level)
+                            <div class="col-6">
+                                <small class="text-muted d-block">Level</small>
+                                <span class="badge bg-info">{{ ucfirst($course->level) }}</span>
+                            </div>
+                        @endif
+                        <div class="col-6">
                             <small class="text-muted d-block">Duration</small>
                             <strong>{{ $course->duration_hours }} hours</strong>
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <div class="col-12">
+                        <div class="col-6">
                             <small class="text-muted d-block">Status</small>
                             @php
                                 $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
@@ -187,7 +162,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
                         <i class="fas fa-copy"></i> Course Instances
-                        <span class="badge bg-primary ms-2">{{ $course->instances->count() }}</span>
+                        <span class="badge bg-primary ms-2">{{ $instances->total() }}</span>
                     </h5>
                     @can('create', App\Models\Course::class)
                     <a href="{{ route('course-management.create') }}" class="btn btn-sm btn-success">
@@ -195,11 +170,11 @@
                     </a>
                     @endcan
                 </div>
-                <div class="card-body">
-                    @if($course->instances->count() > 0)
+                <div class="card-body p-0">
+                    @if($instances->count() > 0)
                         <div class="table-responsive">
-                            <table class="table table-hover table-sm">
-                                <thead>
+                            <table class="table table-hover table-sm mb-0">
+                                <thead class="table-light">
                                     <tr>
                                         <th>Course Code</th>
                                         <th>Title</th>
@@ -211,7 +186,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($course->instances as $instance)
+                                    @foreach($instances as $instance)
                                     <tr>
                                         <td><strong>{{ $instance->course_code }}</strong></td>
                                         <td>{{ $instance->title }}</td>
@@ -249,164 +224,62 @@
                                 </tbody>
                             </table>
                         </div>
-                    @else
-                        <p class="text-muted text-center py-4 mb-0">
-                            No course instances created yet.
-                            @can('create', App\Models\Course::class)
-                            <a href="{{ route('course-management.create') }}" class="btn btn-sm btn-success mt-2">
-                                <i class="fas fa-play"></i> Start First Instance
-                            </a>
-                            @endcan
-                        </p>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Course Materials Section -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Course Materials</h5>
-                    @can('update', $course)
-                    <button type="button" class="btn btn-sm btn-primary" onclick="toggleUploadForm()">
-                        <i class="fas fa-upload"></i> Upload Material
-                    </button>
-                    @endcan
-                </div>
-                <div class="card-body">
-                    <!-- Inline Upload Form -->
-                    <div id="uploadMaterialForm" style="display: none;" class="bg-light p-3 mb-3 rounded">
-                        <h6 class="mb-3"><i class="fas fa-upload"></i> Upload New Material</h6>
-                        <form action="{{ route('course-materials.store', $course) }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Title <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" name="title" required>
+                        <div class="card-footer bg-light">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center">
+                                        <label class="me-2 mb-0 text-nowrap">Rows per page:</label>
+                                        <select class="form-select form-select-sm" id="perPageSelect" style="width: auto;">
+                                            <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                                            <option value="25" {{ request('per_page', 10) == 25 ? 'selected' : '' }}>25</option>
+                                            <option value="50" {{ request('per_page', 10) == 50 ? 'selected' : '' }}>50</option>
+                                            <option value="100" {{ request('per_page', 10) == 100 ? 'selected' : '' }}>100</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Material Type <span class="text-danger">*</span></label>
-                                    <select class="form-select form-select-sm" name="material_type" required>
-                                        <option value="pdf">PDF</option>
-                                        <option value="video">Video</option>
-                                        <option value="document">Document</option>
-                                        <option value="presentation">Presentation</option>
-                                        <option value="image">Image</option>
-                                        <option value="other">Other</option>
-                                    </select>
+                                <div class="col-md-6 text-center my-2 my-md-0">
+                                    <small class="text-muted">
+                                        Showing {{ $instances->firstItem() ?? 0 }} to {{ $instances->lastItem() ?? 0 }} of {{ $instances->total() }} entries
+                                    </small>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex justify-content-end">
+                                        {{ $instances->withQueryString()->links('pagination::bootstrap-4') }}
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">File <span class="text-danger">*</span></label>
-                                    <input type="file" class="form-control form-control-sm" name="file" required>
-                                    <small class="text-muted">Max size: 50MB</small>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Order</label>
-                                    <input type="number" class="form-control form-control-sm" name="order" value="0" min="0">
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Downloadable</label>
-                                    <select class="form-select form-select-sm" name="is_downloadable">
-                                        <option value="1" selected>Yes</option>
-                                        <option value="0">No</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Description</label>
-                                <textarea class="form-control form-control-sm" name="description" rows="2"
-                                          placeholder="Optional description..."></textarea>
-                            </div>
-
-                            <div>
-                                <button type="submit" class="btn btn-success btn-sm">
-                                    <i class="fas fa-upload"></i> Upload
-                                </button>
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleUploadForm()">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    @if($course->materials->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Type</th>
-                                        <th>File Name</th>
-                                        <th>Size</th>
-                                        <th>Uploaded By</th>
-                                        <th>Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($course->materials as $material)
-                                    <tr>
-                                        <td>
-                                            <strong>{{ $material->title }}</strong>
-                                            @if($material->description)
-                                                <br><small class="text-muted">{{ Str::limit($material->description, 50) }}</small>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info">{{ ucfirst($material->material_type) }}</span>
-                                        </td>
-                                        <td>{{ $material->file_name }}</td>
-                                        <td>{{ $material->file_size_formatted }}</td>
-                                        <td>{{ $material->uploader?->name ?? 'N/A' }}</td>
-                                        <td>{{ $material->created_at->format('M d, Y') }}</td>
-                                        <td>
-                                            @if($material->is_downloadable)
-                                                <a href="{{ route('course-materials.download', $material) }}" class="btn btn-sm btn-success" title="Download">
-                                                    <i class="fas fa-download"></i>
-                                                </a>
-                                            @endif
-                                            @can('update', $course)
-                                                <form action="{{ route('course-materials.destroy', $material) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this material?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endcan
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
                         </div>
                     @else
-                        <p class="text-muted text-center py-4">No materials uploaded yet.</p>
+                        <div class="p-4">
+                            <p class="text-muted text-center py-4 mb-0">
+                                No course instances created yet.
+                                @can('create', App\Models\Course::class)
+                                <a href="{{ route('course-management.create') }}" class="btn btn-sm btn-success mt-2">
+                                    <i class="fas fa-play"></i> Start First Instance
+                                </a>
+                                @endcan
+                            </p>
+                        </div>
                     @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Upload Material Modal -->
-@endsection
 
-@push('scripts')
 <script>
-function toggleUploadForm() {
-    const form = document.getElementById('uploadMaterialForm');
-    if (form.style.display === 'none') {
-        form.style.display = 'block';
-    } else {
-        form.style.display = 'none';
+document.addEventListener('DOMContentLoaded', function() {
+    const perPageSelect = document.getElementById('perPageSelect');
+
+    if (perPageSelect) {
+        perPageSelect.addEventListener('change', function() {
+            const url = new URL(window.location.href);
+            url.searchParams.set('per_page', this.value);
+            url.searchParams.delete('page'); // Reset to first page when changing per_page
+            window.location.href = url.toString();
+        });
     }
-}
+});
 </script>
-@endpush
+@endsection

@@ -33,6 +33,7 @@ return [
     'course_title' => 'Titolo del Corso',
     'course_code' => 'Codice Corso',
     'description' => 'Descrizione',
+    'course_programme' => 'Programma del Corso',
     'objectives' => 'Obiettivi',
     'category' => 'Categoria',
     'level' => 'Livello',

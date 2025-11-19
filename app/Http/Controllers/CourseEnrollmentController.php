@@ -37,9 +37,20 @@ class CourseEnrollmentController extends Controller
         // Get all companies for the filter dropdown
         $companies = \App\Models\Company::orderBy('name')->get();
 
-        // Get users who are not already enrolled
-        $enrolledUserIds = $course->enrollments()->pluck('user_id')->toArray();
-        $query = User::whereNotIn('id', $enrolledUserIds)
+        // Get currently enrolled users with their company info
+        $enrolledUsers = $course->enrollments()
+            ->with('user.companies')
+            ->get()
+            ->pluck('user');
+        $enrolledUserIds = $enrolledUsers->pluck('id')->toArray();
+
+        // Get companies that have enrolled users in this course
+        $enrolledCompanyIds = $enrolledUsers->flatMap(function($user) {
+            return $user->companies->pluck('id');
+        })->unique()->toArray();
+
+        // Get all users (both enrolled and not enrolled) for display
+        $query = User::with('companies')
             ->whereDoesntHave('roles', function($q) {
                 $q->where('name', 'admin');
             });
@@ -51,9 +62,9 @@ class CourseEnrollmentController extends Controller
             });
         }
 
-        $availableUsers = $query->orderBy('name')->get();
+        $allUsers = $query->orderBy('name')->get();
 
-        return view('courses.enrollments.create', compact('course', 'availableUsers', 'companies'));
+        return view('courses.enrollments.create', compact('course', 'allUsers', 'companies', 'enrolledUserIds', 'enrolledCompanyIds'));
     }
 
     public function store(Request $request, Course $course)

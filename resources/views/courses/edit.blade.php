@@ -98,7 +98,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Description</label>
+                            <label class="form-label">{{ trans('courses.course_programme') }}</label>
                             <textarea class="form-control @error('description') is-invalid @enderror"
                                       name="description" rows="3">{{ old('description', $course->description) }}</textarea>
                             @error('description')
