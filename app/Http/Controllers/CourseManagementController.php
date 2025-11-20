@@ -290,6 +290,7 @@ class CourseManagementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'course_code' => 'required|string|max:255|unique:courses,course_code,' . $courseManagement->id,
+            'status' => 'required|string|in:active,inactive,ongoing,done',
             'teacher_ids' => 'nullable|array',
             'teacher_ids.*' => 'exists:users,id',
             'student_ids' => 'nullable|array',
@@ -302,6 +303,23 @@ class CourseManagementController extends Controller
         ]);
 
         // Log course status change if applicable
+        if (isset($validated['status']) && $courseManagement->status !== $validated['status']) {
+            AuditLogService::logCustom(
+                'course_status_changed',
+                "Course '{$courseManagement->title}' status changed from '{$courseManagement->status}' to '{$validated['status']}'",
+                'courses',
+                'info',
+                [
+                    'course_id' => $courseManagement->id,
+                    'course_title' => $courseManagement->title,
+                    'old_status' => $courseManagement->status,
+                    'new_status' => $validated['status'],
+                    'changed_by' => auth()->id()
+                ]
+            );
+        }
+
+        // Log course active/inactive change if applicable
         if (isset($validated['is_active']) && $courseManagement->is_active !== $validated['is_active']) {
             $statusText = $validated['is_active'] ? 'activated' : 'deactivated';
             AuditLogService::logCustom(
@@ -361,6 +379,53 @@ class CourseManagementController extends Controller
 
         return redirect()->route('course-management.show', $courseManagement)
                         ->with('success', 'Course instance updated successfully.');
+    }
+
+    /**
+     * Update course status via AJAX
+     */
+    public function updateStatus(Request $request, Course $courseManagement): \Illuminate\Http\JsonResponse
+    {
+        $this->authorize('update', $courseManagement);
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:active,inactive,ongoing,done',
+        ]);
+
+        $oldStatus = $courseManagement->status;
+        $newStatus = $validated['status'];
+
+        // Update status
+        $courseManagement->update(['status' => $newStatus]);
+
+        // Log status change
+        AuditLogService::logCustom(
+            'course_status_changed',
+            "Course '{$courseManagement->title}' status changed from '{$oldStatus}' to '{$newStatus}'",
+            'courses',
+            'info',
+            [
+                'course_id' => $courseManagement->id,
+                'course_title' => $courseManagement->title,
+                'old_status' => $oldStatus,
+                'new_status' => $newStatus,
+                'changed_by' => auth()->id()
+            ]
+        );
+
+        // Get updated status display info
+        $statusColor = dataVaultColor('course_status', $newStatus) ?? 'secondary';
+        $statusIcon = dataVaultIcon('course_status', $newStatus) ?? 'fas fa-circle';
+        $statusLabel = dataVaultLabel('course_status', $newStatus) ?? ucfirst($newStatus);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status updated successfully',
+            'status' => $newStatus,
+            'statusColor' => $statusColor,
+            'statusIcon' => $statusIcon,
+            'statusLabel' => $statusLabel
+        ]);
     }
 
     /**

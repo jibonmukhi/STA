@@ -83,6 +83,21 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label">Status *</label>
+                            <select class="form-select @error('status') is-invalid @enderror" name="status" required>
+                                @foreach($statuses as $statusKey => $statusLabel)
+                                    <option value="{{ $statusKey }}" {{ old('status', $course->status) == $statusKey ? 'selected' : '' }}>
+                                        {{ $statusLabel }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted">Update the course status</small>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label">Assigned Teachers *</label>
                             <div class="mb-2">
                                 <input type="text" class="form-control form-control-sm" id="teacherSearch" placeholder="Search teachers..." onkeyup="filterTeachers()">

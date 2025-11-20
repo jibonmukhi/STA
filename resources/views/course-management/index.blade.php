@@ -3,6 +3,12 @@
 @section('title', 'Course Management')
 
 @section('content')
+<script>
+    // Pass translations to JavaScript
+    window.translations = {
+        confirm_status_change: "{{ trans('courses.confirm_status_change') }}"
+    };
+</script>
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
@@ -240,6 +246,24 @@
                                                 </span>
                                             </td>
                                             <td>
+                                                @can('update', $course)
+                                                <select class="form-select form-select-sm status-dropdown"
+                                                        data-course-id="{{ $course->id }}"
+                                                        style="min-width: 130px;">
+                                                    @foreach($statuses as $statusKey => $statusLabel)
+                                                        @php
+                                                            $statusColor = dataVaultColor('course_status', $statusKey) ?? 'secondary';
+                                                            $statusIcon = dataVaultIcon('course_status', $statusKey) ?? 'fas fa-circle';
+                                                        @endphp
+                                                        <option value="{{ $statusKey }}"
+                                                                {{ $course->status == $statusKey ? 'selected' : '' }}
+                                                                data-color="{{ $statusColor }}"
+                                                                data-icon="{{ $statusIcon }}">
+                                                            {{ $statusLabel }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @else
                                                 @php
                                                     $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
                                                     $statusIcon = dataVaultIcon('course_status', $course->status) ?? 'fas fa-circle';
@@ -248,6 +272,7 @@
                                                 <span class="badge bg-{{ $statusColor }}">
                                                     <i class="{{ $statusIcon }}"></i> {{ $statusLabel }}
                                                 </span>
+                                                @endcan
                                             </td>
                                             <td class="text-end">
                                                 <div class="btn-group" role="group">
@@ -541,6 +566,81 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize both dropdowns
     initCustomDropdown('companySearch', 'companyValue', 'companyList');
     initCustomDropdown('teacherSearch', 'teacherValue', 'teacherList');
+
+    // Handle status dropdown change
+    document.querySelectorAll('.status-dropdown').forEach(function(dropdown) {
+        dropdown.addEventListener('change', function() {
+            const courseId = this.getAttribute('data-course-id');
+            const newStatus = this.value;
+            const originalValue = this.querySelector('option[selected]')?.value || this.value;
+            const newStatusLabel = this.options[this.selectedIndex].text;
+            const originalStatusLabel = this.querySelector('option[selected]')?.text || this.options[this.selectedIndex].text;
+
+            // Show confirmation dialog with localized message
+            const confirmMessage = window.translations.confirm_status_change
+                .replace(':old_status', originalStatusLabel)
+                .replace(':new_status', newStatusLabel);
+
+            if (!confirm(confirmMessage)) {
+                // User cancelled, revert to original value
+                this.value = originalValue;
+                return;
+            }
+
+            // Disable dropdown during update
+            this.disabled = true;
+
+            // Send AJAX request to update status
+            fetch(`/course-management/${courseId}/update-status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    status: newStatus
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-check-circle"></i> ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.body.appendChild(alertDiv);
+
+                    // Remove alert after 3 seconds
+                    setTimeout(() => {
+                        alertDiv.remove();
+                    }, 3000);
+
+                    // Update the selected option
+                    dropdown.querySelector('option[selected]')?.removeAttribute('selected');
+                    dropdown.querySelector(`option[value="${newStatus}"]`).setAttribute('selected', 'selected');
+                } else {
+                    // Revert to original value on error
+                    dropdown.value = originalValue;
+                    alert('Error updating status. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Revert to original value on error
+                dropdown.value = originalValue;
+                alert('Error updating status. Please try again.');
+            })
+            .finally(() => {
+                // Re-enable dropdown
+                dropdown.disabled = false;
+            });
+        });
+    });
 });
 </script>
 @endsection

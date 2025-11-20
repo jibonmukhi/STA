@@ -104,6 +104,7 @@ return [
     'course_updated' => 'Course updated successfully.',
     'course_deleted' => 'Course deleted successfully.',
     'confirm_delete' => 'Are you sure you want to delete this course?',
+    'confirm_status_change' => 'Are you sure you want to change the course status from ":old_status" to ":new_status"?',
 
     // Course Information
     'course_information' => 'Course Information',

@@ -170,7 +170,21 @@
                         <input type="hidden" name="delivery_method" id="hiddenDeliveryMethod">
                         <input type="hidden" name="duration_hours" id="hiddenDuration">
                         <input type="hidden" name="description" id="hiddenDescription">
-                        <input type="hidden" name="status" value="active">
+
+                        <div class="mb-3">
+                            <label class="form-label">Status *</label>
+                            <select class="form-select @error('status') is-invalid @enderror" name="status" required>
+                                @foreach($statuses as $statusKey => $statusLabel)
+                                    <option value="{{ $statusKey }}" {{ old('status', 'active') == $statusKey ? 'selected' : '' }}>
+                                        {{ $statusLabel }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted">Select the initial status for this course</small>
+                        </div>
 
                         <div class="mb-3">
                             <label class="form-label">Assigned Teachers *</label>

@@ -96,6 +96,7 @@ Route::middleware('auth')->group(function () {
 
     // Course Management Routes - Course Instances (Started Courses)
     Route::resource('course-management', \App\Http\Controllers\CourseManagementController::class);
+    Route::patch('/course-management/{courseManagement}/update-status', [\App\Http\Controllers\CourseManagementController::class, 'updateStatus'])->name('course-management.update-status');
     Route::get('/course-management/{courseManagement}/bulk-invite', [\App\Http\Controllers\CourseManagementController::class, 'showBulkInvite'])->name('course-management.bulk-invite');
     Route::post('/course-management/{courseManagement}/bulk-invite', [\App\Http\Controllers\CourseManagementController::class, 'sendBulkInvite'])->name('course-management.send-bulk-invite');
 
