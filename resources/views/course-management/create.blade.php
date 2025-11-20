@@ -119,7 +119,7 @@
 
                 <!-- Template Details (Read-only) -->
                 <div class="card mb-4" id="templateDetailsCard" style="display: none;">
-                    <div class="card-header bg-info text-white">
+                    <div class="card-header bg-primary text-white">
                         <h5 class="mb-0"><i class="fas fa-info-circle"></i> Template Details (Read-only)</h5>
                     </div>
                     <div class="card-body">
@@ -140,7 +140,7 @@
 
                 <!-- Instance Information (Editable) -->
                 <div class="card mb-4">
-                    <div class="card-header gradient-header-orange">
+                    <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">Course Instance Details</h5>
                     </div>
                     <div class="card-body">
@@ -201,7 +201,7 @@
 
             <div class="col-lg-4">
                 <div class="card">
-                    <div class="card-header gradient-header-purple">
+                    <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">Course Schedule</h5>
                     </div>
                     <div class="card-body">
@@ -266,7 +266,7 @@
             <!-- Assign to Companies -->
             <div class="col-lg-6">
                 <div class="card h-100">
-                    <div class="card-header gradient-header-blue">
+                    <div class="card-header bg-primary text-white">
                         <h5 class="mb-0"><i class="fas fa-building"></i> {{ trans('courses.assign_to_companies') }}</h5>
                     </div>
                     <div class="card-body">
@@ -298,7 +298,7 @@
             <!-- Enroll Students -->
             <div class="col-lg-6">
                 <div class="card h-100">
-                    <div class="card-header gradient-header-green">
+                    <div class="card-header bg-primary text-white">
                         <h5 class="mb-0"><i class="fas fa-users"></i> {{ trans('courses.enroll_students') }}</h5>
                     </div>
                     <div class="card-body">
@@ -710,68 +710,4 @@ $(document).ready(function() {
 </script>
 @endpush
 
-@push('styles')
-<style>
-/* Base styling for all gradient card headers */
-.gradient-header-purple,
-.gradient-header-blue,
-.gradient-header-green,
-.gradient-header-orange {
-    color: white !important;
-    border-bottom: none !important;
-}
-
-.gradient-header-purple h5,
-.gradient-header-blue h5,
-.gradient-header-green h5,
-.gradient-header-orange h5,
-.gradient-header-purple .badge,
-.gradient-header-blue .badge,
-.gradient-header-green .badge,
-.gradient-header-orange .badge,
-.gradient-header-purple i,
-.gradient-header-blue i,
-.gradient-header-green i,
-.gradient-header-orange i {
-    color: white !important;
-}
-
-.gradient-header-purple .btn,
-.gradient-header-blue .btn,
-.gradient-header-green .btn,
-.gradient-header-orange .btn {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: white !important;
-}
-
-.gradient-header-purple .btn:hover,
-.gradient-header-blue .btn:hover,
-.gradient-header-green .btn:hover,
-.gradient-header-orange .btn:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.4);
-}
-
-/* Specific gradient for Course Schedule - Purple to Violet */
-.gradient-header-purple {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-}
-
-/* Assign to Companies - Blue to Cyan */
-.gradient-header-blue {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
-}
-
-/* Enroll Students - Green to Teal */
-.gradient-header-green {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
-}
-
-/* Course Instance Details - Orange to Pink */
-.gradient-header-orange {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
-}
-</style>
-@endpush
 @endsection

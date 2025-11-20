@@ -75,7 +75,7 @@
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
-                <div class="card-header gradient-header-orange">
+                <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Course Details</h5>
                 </div>
                 <div class="card-body">
@@ -212,7 +212,7 @@
 
         <div class="col-lg-4">
             <div class="card">
-                <div class="card-header gradient-header-purple">
+                <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Course Information</h5>
                 </div>
                 <div class="card-body">
@@ -245,10 +245,10 @@
     <div class="row mt-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header gradient-header-blue d-flex justify-content-between align-items-center">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
                         <i class="fas fa-users"></i> Enrolled Students
-                        <span class="badge bg-primary ms-2">{{ $course->enrollments->count() }}</span>
+                        <span class="badge bg-white text-primary ms-2">{{ $course->enrollments->count() }}</span>
                     </h5>
                     @can('manageStudents', $course)
                     <a href="{{ route('courses.enrollments.create', $course) }}" class="btn btn-sm btn-primary">
@@ -333,10 +333,10 @@
     <div class="row mt-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header gradient-header-green d-flex justify-content-between align-items-center">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Course Materials</h5>
                     @can('update', $course)
-                    <button type="button" class="btn btn-sm btn-primary" onclick="toggleUploadForm()">
+                    <button type="button" class="btn btn-sm btn-light" onclick="toggleUploadForm()">
                         <i class="fas fa-upload"></i> Upload Material
                     </button>
                     @endcan
@@ -463,78 +463,6 @@
 <!-- Upload Material Modal -->
 @endsection
 
-@push('styles')
-<style>
-/* Base styling for all gradient card headers */
-.gradient-header-purple,
-.gradient-header-blue,
-.gradient-header-green,
-.gradient-header-orange {
-    color: white !important;
-    border-bottom: none !important;
-}
-
-.gradient-header-purple h5,
-.gradient-header-blue h5,
-.gradient-header-green h5,
-.gradient-header-orange h5,
-.gradient-header-purple .badge,
-.gradient-header-blue .badge,
-.gradient-header-green .badge,
-.gradient-header-orange .badge,
-.gradient-header-purple i,
-.gradient-header-blue i,
-.gradient-header-green i,
-.gradient-header-orange i {
-    color: white !important;
-}
-
-.gradient-header-purple .btn,
-.gradient-header-blue .btn,
-.gradient-header-green .btn,
-.gradient-header-orange .btn {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: white !important;
-}
-
-.gradient-header-purple .btn:hover,
-.gradient-header-blue .btn:hover,
-.gradient-header-green .btn:hover,
-.gradient-header-orange .btn:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.4);
-}
-
-/* Override for badge inside gradient header */
-.gradient-header-purple .badge.bg-primary,
-.gradient-header-blue .badge.bg-primary,
-.gradient-header-green .badge.bg-primary,
-.gradient-header-orange .badge.bg-primary {
-    background-color: rgba(255, 255, 255, 0.3) !important;
-}
-
-/* Specific gradient for Course Information - Purple to Violet */
-.gradient-header-purple {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-}
-
-/* Enrolled Students - Blue to Cyan */
-.gradient-header-blue {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
-}
-
-/* Course Materials - Green to Teal */
-.gradient-header-green {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
-}
-
-/* Additional section - Orange to Pink */
-.gradient-header-orange {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
-}
-</style>
-@endpush
 
 @push('scripts')
 <script>
