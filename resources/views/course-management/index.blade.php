@@ -6,7 +6,10 @@
 <script>
     // Pass translations to JavaScript
     window.translations = {
-        confirm_status_change: "{{ trans('courses.confirm_status_change') }}"
+        confirm_status_change: {!! json_encode(trans('courses.confirm_status_change')) !!},
+        confirm_send_email: {!! json_encode(trans('courses.confirm_send_email')) !!},
+        email_sent_success: {!! json_encode(trans('courses.email_sent_success')) !!},
+        sending_emails: {!! json_encode(trans('courses.sending_emails')) !!}
     };
 </script>
 <div class="container-fluid">
@@ -283,6 +286,12 @@
                                                     <a href="{{ route('course-management.edit', $course) }}" class="btn btn-sm btn-outline-primary" title="{{ trans('courses.edit') }}">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-success send-email-btn"
+                                                            data-course-id="{{ $course->id }}"
+                                                            data-course-title="{{ $course->title }}"
+                                                            title="{{ trans('courses.send_notification') }}">
+                                                        <i class="fas fa-envelope"></i>
+                                                    </button>
                                                     @endcan
                                                     @can('delete', $course)
                                                     <form action="{{ route('course-management.destroy', $course) }}" method="POST" class="d-inline">
@@ -638,6 +647,67 @@ document.addEventListener('DOMContentLoaded', function() {
             .finally(() => {
                 // Re-enable dropdown
                 dropdown.disabled = false;
+            });
+        });
+    });
+
+    // Handle send email button click
+    document.querySelectorAll('.send-email-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const courseId = this.getAttribute('data-course-id');
+            const courseTitle = this.getAttribute('data-course-title');
+
+            // Show confirmation dialog with localized message
+            const confirmMessage = window.translations.confirm_send_email
+                .replace(':course_title', courseTitle);
+
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            // Disable button and show loading state
+            const originalHTML = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            // Send AJAX request to send notifications
+            fetch(`/course-management/${courseId}/send-notifications`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-check-circle"></i> ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.body.appendChild(alertDiv);
+
+                    // Remove alert after 5 seconds
+                    setTimeout(() => {
+                        alertDiv.remove();
+                    }, 5000);
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to send notification emails'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending notification emails. Please try again.');
+            })
+            .finally(() => {
+                // Re-enable button and restore original content
+                button.disabled = false;
+                button.innerHTML = originalHTML;
             });
         });
     });

@@ -429,6 +429,67 @@ class CourseManagementController extends Controller
     }
 
     /**
+     * Send notification emails to teachers, company manager, and students
+     */
+    public function sendNotifications(Course $courseManagement): \Illuminate\Http\JsonResponse
+    {
+        $this->authorize('update', $courseManagement);
+
+        try {
+            $sentCount = 0;
+            $recipientsList = [];
+
+            // Send to all assigned teachers
+            foreach ($courseManagement->teachers as $teacher) {
+                $teacher->notify(new \App\Notifications\CourseUpdateNotification($courseManagement));
+                $sentCount++;
+                $recipientsList[] = $teacher->email . ' (Teacher)';
+            }
+
+            // Send to assigned company manager
+            $assignedCompany = $courseManagement->assignedCompanies->first();
+            if ($assignedCompany && $assignedCompany->manager) {
+                $assignedCompany->manager->notify(new \App\Notifications\CourseUpdateNotification($courseManagement));
+                $sentCount++;
+                $recipientsList[] = $assignedCompany->manager->email . ' (Company Manager)';
+            }
+
+            // Send to all enrolled students
+            foreach ($courseManagement->enrollments as $enrollment) {
+                $enrollment->user->notify(new \App\Notifications\CourseUpdateNotification($courseManagement));
+                $sentCount++;
+                $recipientsList[] = $enrollment->user->email . ' (Student)';
+            }
+
+            // Log the notification send
+            AuditLogService::logCustom(
+                'course_notifications_sent',
+                "Notification emails sent for course '{$courseManagement->title}' to {$sentCount} recipients",
+                'courses',
+                'info',
+                [
+                    'course_id' => $courseManagement->id,
+                    'course_title' => $courseManagement->title,
+                    'recipients_count' => $sentCount,
+                    'recipients' => $recipientsList,
+                    'sent_by' => auth()->id()
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => "Notification emails sent to {$sentCount} recipients successfully!",
+                'sent_count' => $sentCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error sending notification emails: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Delete course instance
      */
     public function destroy(Course $courseManagement): RedirectResponse

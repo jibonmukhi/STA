@@ -105,6 +105,16 @@ return [
     'course_deleted' => 'Corso eliminato con successo.',
     'confirm_delete' => 'Sei sicuro di voler eliminare questo corso?',
     'confirm_status_change' => 'Sei sicuro di voler cambiare lo stato del corso da ":old_status" a ":new_status"?',
+    'send_notification' => 'Invia Email di Notifica',
+    'confirm_send_email' => 'Inviare email di notifica per ":course_title" a:
+
+• Tutti i docenti assegnati
+• Responsabile aziendale assegnato
+• Tutti gli studenti iscritti
+
+Vuoi procedere?',
+    'email_sent_success' => 'Email di notifica inviate con successo!',
+    'sending_emails' => 'Invio email in corso...',
 
     // Course Information
     'course_information' => 'Informazioni del Corso',

@@ -95,10 +95,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/courses/{course}/schedule', [CoursesController::class, 'schedule'])->name('courses.schedule');
 
     // Course Management Routes - Course Instances (Started Courses)
-    Route::resource('course-management', \App\Http\Controllers\CourseManagementController::class);
+    // Define custom routes BEFORE resource route to avoid conflicts
     Route::patch('/course-management/{courseManagement}/update-status', [\App\Http\Controllers\CourseManagementController::class, 'updateStatus'])->name('course-management.update-status');
+    Route::post('/course-management/{courseManagement}/send-notifications', [\App\Http\Controllers\CourseManagementController::class, 'sendNotifications'])->name('course-management.send-notifications');
     Route::get('/course-management/{courseManagement}/bulk-invite', [\App\Http\Controllers\CourseManagementController::class, 'showBulkInvite'])->name('course-management.bulk-invite');
     Route::post('/course-management/{courseManagement}/bulk-invite', [\App\Http\Controllers\CourseManagementController::class, 'sendBulkInvite'])->name('course-management.send-bulk-invite');
+    Route::resource('course-management', \App\Http\Controllers\CourseManagementController::class);
 
     // Course Materials Routes
     Route::get('/courses/{course}/materials/create', [\App\Http\Controllers\CourseMaterialController::class, 'create'])->name('course-materials.create');
