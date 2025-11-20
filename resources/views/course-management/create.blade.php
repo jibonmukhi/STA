@@ -4,6 +4,10 @@
 
 @section('content')
 <style>
+.card {
+    position: unset!important;
+}
+
 .master-course-wrapper {
     position: relative;
 }
