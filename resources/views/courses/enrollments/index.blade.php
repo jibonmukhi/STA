@@ -22,7 +22,7 @@
                     <a href="{{ route('courses.enrollments.create', $course) }}" class="btn btn-primary">
                         <i class="fas fa-user-plus"></i> Enroll Users
                     </a>
-                    <a href="{{ route('courses.show', $course) }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('course-management.show', $course) }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Course
                     </a>
                 </div>

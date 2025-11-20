@@ -49,6 +49,9 @@ class CourseEnrollmentController extends Controller
             return $user->companies->pluck('id');
         })->unique()->toArray();
 
+        // Get the course's assigned company (first one if multiple)
+        $defaultCompanyId = $course->assignedCompanies->first()?->id;
+
         // Get all users (both enrolled and not enrolled) for display
         $query = User::with('companies')
             ->whereDoesntHave('roles', function($q) {
@@ -64,7 +67,7 @@ class CourseEnrollmentController extends Controller
 
         $allUsers = $query->orderBy('name')->get();
 
-        return view('courses.enrollments.create', compact('course', 'allUsers', 'companies', 'enrolledUserIds', 'enrolledCompanyIds'));
+        return view('courses.enrollments.create', compact('course', 'allUsers', 'companies', 'enrolledUserIds', 'enrolledCompanyIds', 'defaultCompanyId'));
     }
 
     public function store(Request $request, Course $course)
@@ -72,11 +75,51 @@ class CourseEnrollmentController extends Controller
         $this->authorize('manageStudents', $course);
 
         $request->validate([
-            'user_ids' => 'required|array',
+            'user_ids' => 'nullable|array',
             'user_ids.*' => 'exists:users,id',
             'status' => 'required|in:enrolled,in_progress',
             'notes' => 'nullable|string',
+            'selected_company_id' => 'nullable|exists:companies,id',
         ]);
+
+        // Log the received data for debugging
+        \Log::info('Enrollment Request Data', [
+            'selected_company_id' => $request->selected_company_id,
+            'user_ids' => $request->user_ids,
+            'all_request' => $request->all()
+        ]);
+
+        // Update course's assigned company if a company was selected
+        // Only ONE company is allowed, so replace any existing assignments
+        if ($request->selected_company_id) {
+            // Check if this company is already the assigned company
+            $currentAssignedCompany = $course->assignedCompanies->first();
+
+            if (!$currentAssignedCompany || $currentAssignedCompany->id != $request->selected_company_id) {
+                // Delete all existing company assignments (only one company allowed)
+                $course->companyAssignments()->delete();
+
+                // Create new company assignment
+                $course->companyAssignments()->create([
+                    'company_id' => $request->selected_company_id,
+                    'assigned_by' => auth()->id(),
+                    'assigned_date' => now(),
+                    'is_mandatory' => false,
+                ]);
+
+                \Log::info('Replaced course assigned company', [
+                    'course_id' => $course->id,
+                    'old_company_id' => $currentAssignedCompany?->id,
+                    'new_company_id' => $request->selected_company_id,
+                ]);
+            }
+        }
+
+        // If no users selected, redirect back with info message
+        if (empty($request->user_ids)) {
+            return redirect()->route('course-management.show', $course)
+                ->with('info', 'No users were enrolled as none were selected.');
+        }
 
         $enrolled = 0;
         foreach ($request->user_ids as $userId) {
@@ -87,10 +130,24 @@ class CourseEnrollmentController extends Controller
 
             if (!$exists) {
                 $user = User::find($userId);
+
+                // Determine company_id: MUST use the selected company or course's assigned company
+                // Priority: selected_company_id > course's first assigned company
+                // DO NOT fall back to user's primary company to ensure consistency
+                $companyId = $request->selected_company_id
+                    ?: $course->assignedCompanies->first()?->id;
+
+                \Log::info('Creating enrollment', [
+                    'user_id' => $userId,
+                    'selected_company_id' => $request->selected_company_id,
+                    'course_assigned_company_id' => $course->assignedCompanies->first()?->id,
+                    'final_company_id' => $companyId
+                ]);
+
                 $enrollment = CourseEnrollment::create([
                     'course_id' => $course->id,
                     'user_id' => $userId,
-                    'company_id' => $user->primary_company?->id,
+                    'company_id' => $companyId,
                     'status' => $request->status,
                     'enrolled_at' => now(),
                     'progress_percentage' => 0,
@@ -104,7 +161,16 @@ class CourseEnrollmentController extends Controller
                 ]);
 
                 // Send enrollment notification email
-                $user->notify(new \App\Notifications\CourseEnrollmentNotification($course, $enrollment));
+                try {
+                    $user->notify(new \App\Notifications\CourseEnrollmentNotification($course, $enrollment));
+                } catch (\Exception $e) {
+                    // Log the error but don't fail the enrollment
+                    \Log::warning('Failed to send enrollment notification email', [
+                        'user_id' => $userId,
+                        'course_id' => $course->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
 
                 // Add course calendar event for this user if course has schedule
                 if ($course->start_date && $course->end_date) {
@@ -129,7 +195,7 @@ class CourseEnrollmentController extends Controller
             }
         }
 
-        return redirect()->route('courses.enrollments.index', $course)
+        return redirect()->route('course-management.show', $course)
             ->with('success', "{$enrolled} user(s) enrolled successfully.");
     }
 
@@ -284,10 +350,15 @@ class CourseEnrollmentController extends Controller
             }
         }
 
+        // Use course's assigned company to ensure consistency
+        // Priority: course's first assigned company > user's primary company
+        $companyId = $course->assignedCompanies->first()?->id
+            ?: $user->primary_company?->id;
+
         $enrollment = CourseEnrollment::create([
             'course_id' => $course->id,
             'user_id' => $user->id,
-            'company_id' => $user->primary_company?->id,
+            'company_id' => $companyId,
             'status' => 'enrolled',
             'enrolled_at' => now(),
             'progress_percentage' => 0,
@@ -299,7 +370,16 @@ class CourseEnrollmentController extends Controller
         ]);
 
         // Send enrollment notification email
-        $user->notify(new \App\Notifications\CourseEnrollmentNotification($course, $enrollment));
+        try {
+            $user->notify(new \App\Notifications\CourseEnrollmentNotification($course, $enrollment));
+        } catch (\Exception $e) {
+            // Log the error but don't fail the enrollment
+            \Log::warning('Failed to send self-enrollment notification email', [
+                'user_id' => $user->id,
+                'course_id' => $course->id,
+                'error' => $e->getMessage()
+            ]);
+        }
 
         // Add course calendar event for this user if course has schedule
         if ($course->start_date && $course->end_date) {

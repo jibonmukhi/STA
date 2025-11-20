@@ -107,8 +107,20 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <div class="d-flex gap-2 w-100">
+                            <div class="col-md-3">
+                                <label class="form-label">Start Date</label>
+                                <input type="text" class="form-control datepicker" id="filter_start_date" placeholder="DD/MM/YYYY" autocomplete="off" readonly>
+                                <input type="hidden" name="start_date" id="filter_start_date_hidden" value="{{ request('start_date') }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">End Date</label>
+                                <input type="text" class="form-control datepicker" id="filter_end_date" placeholder="DD/MM/YYYY" autocomplete="off" readonly>
+                                <input type="hidden" name="end_date" id="filter_end_date_hidden" value="{{ request('end_date') }}">
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-0">
+                            <div class="col-md-12 d-flex justify-content-end">
+                                <div class="d-flex gap-2">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-search"></i> {{ trans('courses.filter') }}
                                     </button>
@@ -148,7 +160,9 @@
                                         <th>{{ trans('courses.title') }}</th>
                                         <th>{{ trans('courses.category') }}</th>
                                         <th>{{ trans('courses.teacher') }}</th>
-                                        <th>{{ trans('courses.duration') }}</th>
+                                        <th>Company</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
                                         <th>{{ trans('courses.delivery_method') }}</th>
                                         <th>{{ trans('courses.status') }}</th>
                                         <th class="text-end">{{ trans('courses.actions') }}</th>
@@ -200,7 +214,25 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <strong>{{ $course->duration_hours }}</strong>h
+                                                @if($course->assignedCompanies && $course->assignedCompanies->count() > 0)
+                                                    <span class="badge bg-info">{{ $course->assignedCompanies->first()->name }}</span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($course->start_date)
+                                                    <small>{{ $course->start_date->format('d/m/Y') }}</small>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($course->end_date)
+                                                    <small>{{ $course->end_date->format('d/m/Y') }}</small>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 <span class="badge bg-secondary">
@@ -369,8 +401,57 @@
 .dropdown-item.hidden {
     display: none;
 }
-
+.ui-datepicker {
+    z-index: 9999 !important;
+}
 </style>
+
+@push('styles')
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+@endpush
+
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialize start date datepicker
+    $('#filter_start_date').datepicker({
+        dateFormat: 'dd/mm/yy',
+        altField: '#filter_start_date_hidden',
+        altFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: '-10:+10',
+        showButtonPanel: true
+    });
+
+    // Initialize end date datepicker
+    $('#filter_end_date').datepicker({
+        dateFormat: 'dd/mm/yy',
+        altField: '#filter_end_date_hidden',
+        altFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: '-10:+10',
+        showButtonPanel: true
+    });
+
+    // Set initial display values if dates are present
+    var startDateValue = $('#filter_start_date_hidden').val();
+    if (startDateValue) {
+        var startDateParts = startDateValue.split('-');
+        $('#filter_start_date').val(startDateParts[2] + '/' + startDateParts[1] + '/' + startDateParts[0]);
+    }
+
+    var endDateValue = $('#filter_end_date_hidden').val();
+    if (endDateValue) {
+        var endDateParts = endDateValue.split('-');
+        $('#filter_end_date').val(endDateParts[2] + '/' + endDateParts[1] + '/' + endDateParts[0]);
+    }
+});
+</script>
+@endpush
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

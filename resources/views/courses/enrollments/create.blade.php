@@ -20,8 +20,8 @@
                     </nav>
                 </div>
                 <div>
-                    <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Enrollments
+                    <a href="{{ route('course-management.show', $course) }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Course
                     </a>
                 </div>
             </div>
@@ -39,6 +39,22 @@
                         <form action="{{ route('courses.enrollments.store', $course) }}" method="POST">
                             @csrf
 
+                            @php
+                                // Find the first company with enrolled users for default selection
+                                $firstEnrolledCompanyId = null;
+                                foreach($companies as $comp) {
+                                    if (in_array($comp->id, $enrolledCompanyIds)) {
+                                        $firstEnrolledCompanyId = $comp->id;
+                                        break;
+                                    }
+                                }
+                                // Priority: enrolled company > course's default company
+                                $initialSelectedCompanyId = $firstEnrolledCompanyId ?: ($defaultCompanyId ?? '');
+                            @endphp
+
+                            <!-- Hidden field to capture selected company -->
+                            <input type="hidden" name="selected_company_id" id="selected_company_id" value="{{ $initialSelectedCompanyId }}">
+
                             <div class="mb-3">
                                 <label class="form-label">Course</label>
                                 <input type="text" class="form-control" value="{{ $course->title }} ({{ $course->course_code }})" readonly>
@@ -51,17 +67,42 @@
                                 </div>
                                 <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto; background: white;">
                                     <div class="mb-2">
-                                        <small class="text-muted">Select companies to filter students (companies with enrolled users are pre-selected)</small>
+                                        <small class="text-muted">Select a company to filter students</small>
+                                    </div>
+                                    @php
+                                        // Find the first company with enrolled users
+                                        $firstEnrolledCompanyId = null;
+                                        foreach($companies as $comp) {
+                                            if (in_array($comp->id, $enrolledCompanyIds)) {
+                                                $firstEnrolledCompanyId = $comp->id;
+                                                break;
+                                            }
+                                        }
+                                        // Determine which should be selected: enrolled company > default company > all companies
+                                        $selectedCompanyId = $firstEnrolledCompanyId ?: ($defaultCompanyId ?? null);
+                                    @endphp
+
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input company-radio" type="radio"
+                                               name="company_filter"
+                                               id="company_all"
+                                               value=""
+                                               {{ !$selectedCompanyId ? 'checked' : '' }}
+                                               onchange="filterByCompanies()">
+                                        <label class="form-check-label" for="company_all">
+                                            <strong>All Companies</strong>
+                                        </label>
                                     </div>
                                     @foreach($companies as $company)
                                         @php
                                             $hasEnrolledUsers = in_array($company->id, $enrolledCompanyIds);
                                         @endphp
                                         <div class="form-check mb-2 company-search-item" data-company-name="{{ strtolower($company->name) }}">
-                                            <input class="form-check-input company-checkbox" type="checkbox"
+                                            <input class="form-check-input company-radio" type="radio"
+                                                   name="company_filter"
                                                    id="company_{{ $company->id }}"
                                                    value="{{ $company->id }}"
-                                                   {{ $hasEnrolledUsers ? 'checked' : '' }}
+                                                   {{ $selectedCompanyId == $company->id ? 'checked' : '' }}
                                                    onchange="filterByCompanies()">
                                             <label class="form-check-label" for="company_{{ $company->id }}">
                                                 {{ $company->name }}
@@ -75,7 +116,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Select Users <span class="text-danger">*</span></label>
+                                <label class="form-label">Select Users</label>
                                 <div class="alert alert-info">
                                     <i class="fas fa-info-circle"></i> <small>Select companies above to filter students. Enrolled users are shown with a badge and cannot be enrolled again.</small>
                                 </div>
@@ -105,8 +146,7 @@
                                             <div class="mb-2 user-item {{ $isEnrolled ? 'enrolled-user' : 'form-check' }}"
                                                  data-user-name="{{ strtolower($user->name) }}"
                                                  data-user-email="{{ strtolower($user->email) }}"
-                                                 data-company-ids="{{ json_encode($userCompanyIds) }}"
-                                                 style="{{ count($enrolledCompanyIds) > 0 && count(array_intersect($userCompanyIds, $enrolledCompanyIds)) > 0 ? 'display: block;' : (count($enrolledCompanyIds) > 0 ? 'display: none;' : 'display: block;') }}">
+                                                 data-company-ids="{{ json_encode($userCompanyIds) }}">
                                                 @if($isEnrolled)
                                                     <!-- Enrolled user - no checkbox -->
                                                     <div class="d-flex align-items-start p-2">
@@ -192,7 +232,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-secondary">Cancel</a>
+                                <a href="{{ route('course-management.show', $course) }}" class="btn btn-secondary">Cancel</a>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-user-plus"></i> Enroll Selected Users
                                 </button>
@@ -202,7 +242,7 @@
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle"></i> All available users are already enrolled in this course.
                         </div>
-                        <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-secondary">Back to Enrollments</a>
+                        <a href="{{ route('course-management.show', $course) }}" class="btn btn-secondary">Back to Course</a>
                     @endif
                 </div>
             </div>
@@ -228,21 +268,30 @@
     }
 
     function filterByCompanies() {
-        const selectedCompanyIds = Array.from(document.querySelectorAll('.company-checkbox:checked'))
-            .map(cb => parseInt(cb.value));
+        const selectedRadio = document.querySelector('.company-radio:checked');
+        const selectedCompanyId = selectedRadio ? parseInt(selectedRadio.value) : null;
+
+        // Update the hidden field with selected company ID
+        const hiddenField = document.getElementById('selected_company_id');
+        if (hiddenField) {
+            hiddenField.value = selectedCompanyId && !isNaN(selectedCompanyId) ? selectedCompanyId : '';
+            console.log('Updated hidden field value:', hiddenField.value, 'Selected Company ID:', selectedCompanyId);
+        } else {
+            console.error('Hidden field not found!');
+        }
 
         const userItems = document.querySelectorAll('.user-item');
 
-        if (selectedCompanyIds.length === 0) {
-            // Show all users if no companies selected
+        if (!selectedCompanyId || isNaN(selectedCompanyId)) {
+            // Show all users if no company selected or "All Companies" is selected
             userItems.forEach(item => {
                 item.style.display = 'block';
             });
         } else {
-            // Filter users by selected companies
+            // Filter users by selected company
             userItems.forEach(item => {
                 const userCompanyIds = JSON.parse(item.getAttribute('data-company-ids') || '[]');
-                const hasMatchingCompany = selectedCompanyIds.some(id => userCompanyIds.includes(id));
+                const hasMatchingCompany = userCompanyIds.includes(selectedCompanyId);
 
                 if (hasMatchingCompany) {
                     item.style.display = 'block';
@@ -283,10 +332,10 @@
             if (userName.includes(searchTerm) || userEmail.includes(searchTerm)) {
                 // Don't override company filter - check if item is currently visible due to company filter
                 const userCompanyIds = JSON.parse(item.getAttribute('data-company-ids') || '[]');
-                const selectedCompanyIds = Array.from(document.querySelectorAll('.company-checkbox:checked'))
-                    .map(cb => parseInt(cb.value));
+                const selectedRadio = document.querySelector('.company-radio:checked');
+                const selectedCompanyId = selectedRadio ? parseInt(selectedRadio.value) : null;
 
-                if (selectedCompanyIds.length === 0 || selectedCompanyIds.some(id => userCompanyIds.includes(id))) {
+                if (!selectedCompanyId || isNaN(selectedCompanyId) || userCompanyIds.includes(selectedCompanyId)) {
                     item.style.display = 'block';
                 }
             } else {
@@ -302,6 +351,8 @@
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
+        // Trigger company filter on page load to apply default company selection
+        filterByCompanies();
         updateSelectedCount();
     });
 </script>

@@ -58,6 +58,16 @@ class CourseManagementController extends Controller
             });
         }
 
+        // Filter by start date
+        if ($request->has('start_date') && $request->start_date) {
+            $query->whereDate('start_date', '>=', $request->start_date);
+        }
+
+        // Filter by end date
+        if ($request->has('end_date') && $request->end_date) {
+            $query->whereDate('end_date', '<=', $request->end_date);
+        }
+
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -78,7 +88,7 @@ class CourseManagementController extends Controller
             $perPage = 25;
         }
 
-        $courses = $query->with(['teacher', 'teachers', 'parentCourse'])->orderBy('created_at', 'desc')->paginate($perPage);
+        $courses = $query->with(['teacher', 'teachers', 'parentCourse', 'assignedCompanies'])->orderBy('created_at', 'desc')->paginate($perPage);
 
         $categories = Course::getCategories();
         $levels = Course::getLevels();
@@ -191,13 +201,18 @@ class CourseManagementController extends Controller
 
         // Enroll students if selected
         if (!empty($validated['student_ids'])) {
+            // Use course's assigned company to ensure consistency
+            $courseCompanyId = !empty($validated['company_id']) ? $validated['company_id'] : null;
+
             foreach ($validated['student_ids'] as $studentId) {
                 $student = User::find($studentId);
-                $primaryCompany = $student->primary_company;
+
+                // Priority: course's assigned company > user's primary company
+                $companyId = $courseCompanyId ?: $student->primary_company?->id;
 
                 $course->enrollments()->create([
                     'user_id' => $studentId,
-                    'company_id' => $primaryCompany ? $primaryCompany->id : null,
+                    'company_id' => $companyId,
                     'status' => 'enrolled',
                     'enrolled_at' => now(),
                     'progress_percentage' => 0,
@@ -223,7 +238,7 @@ class CourseManagementController extends Controller
      */
     public function show(Course $courseManagement): View
     {
-        $courseManagement->load(['materials.uploader', 'teacher', 'teachers', 'parentCourse']);
+        $courseManagement->load(['materials.uploader', 'teacher', 'teachers', 'parentCourse', 'assignedCompanies']);
         return view('course-management.show', ['course' => $courseManagement]);
     }
 

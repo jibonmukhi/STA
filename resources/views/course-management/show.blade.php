@@ -39,7 +39,7 @@
                     <div class="row g-3">
                         @can('manageStudents', $course)
                         <div class="col-md-3">
-                            <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-outline-primary w-100">
+                            <a href="{{ route('courses.enrollments.create', $course) }}" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-users"></i> Manage Enrollments
                             </a>
                         </div>
@@ -75,7 +75,7 @@
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header gradient-header-orange">
                     <h5 class="mb-0">Course Details</h5>
                 </div>
                 <div class="card-body">
@@ -155,6 +155,25 @@
                         </div>
                     @endif
 
+                    @if($course->assignedCompanies && $course->assignedCompanies->count() > 0)
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <strong>Assigned Company:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                @php
+                                    $assignedCompany = $course->assignedCompanies->first();
+                                @endphp
+                                <span class="badge bg-info" style="font-size: 0.875rem; padding: 0.5rem 0.75rem;">
+                                    <i class="fas fa-building me-1"></i>{{ $assignedCompany->name }}
+                                    @if($assignedCompany->pivot->is_mandatory)
+                                        <span class="badge bg-warning ms-1">Mandatory</span>
+                                    @endif
+                                </span>
+                            </div>
+                        </div>
+                    @endif
+
                     @if($course->start_date || $course->end_date)
                         <hr class="my-4">
                         <h6 class="mb-3"><i class="fas fa-clock"></i> Course Schedule</h6>
@@ -193,7 +212,7 @@
 
         <div class="col-lg-4">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header gradient-header-purple">
                     <h5 class="mb-0">Course Information</h5>
                 </div>
                 <div class="card-body">
@@ -226,30 +245,51 @@
     <div class="row mt-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header gradient-header-blue d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
                         <i class="fas fa-users"></i> Enrolled Students
                         <span class="badge bg-primary ms-2">{{ $course->enrollments->count() }}</span>
                     </h5>
                     @can('manageStudents', $course)
-                    <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-sm btn-primary">
+                    <a href="{{ route('courses.enrollments.create', $course) }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-cog"></i> Manage All
                     </a>
                     @endcan
                 </div>
                 <div class="card-body">
                     @if($course->enrollments->count() > 0)
-                        <div class="row">
-                            @foreach($course->enrollments->take(8) as $enrollment)
-                            <div class="col-md-3 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <img src="{{ $enrollment->user->photo_url }}"
-                                         alt="{{ $enrollment->user->full_name }}"
-                                         class="rounded-circle me-2"
-                                         style="width: 40px; height: 40px; object-fit: cover;">
-                                    <div class="flex-grow-1">
-                                        <div class="fw-bold small">{{ $enrollment->user->name }}</div>
-                                        <div class="small text-muted">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Company</th>
+                                        <th>Enrolled Date</th>
+                                        <th>Progress</th>
+                                        <th>Status</th>
+                                        <th>Score</th>
+                                        <th>Grade</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($course->enrollments as $enrollment)
+                                    <tr>
+                                        <td>
+                                            <strong>{{ $enrollment->user->name }}</strong><br>
+                                            <small class="text-muted">{{ $enrollment->user->email }}</small>
+                                        </td>
+                                        <td>{{ $enrollment->company?->name ?? 'N/A' }}</td>
+                                        <td>{{ $enrollment->enrolled_at ? $enrollment->enrolled_at->format('M d, Y') : 'N/A' }}</td>
+                                        <td>
+                                            <div class="progress" style="min-width: 100px;">
+                                                <div class="progress-bar" role="progressbar" style="width: {{ $enrollment->progress_percentage }}%;"
+                                                     aria-valuenow="{{ $enrollment->progress_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                                    {{ $enrollment->progress_percentage }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
                                             @php
                                                 $statusColors = [
                                                     'enrolled' => 'secondary',
@@ -260,23 +300,29 @@
                                                 ];
                                                 $color = $statusColors[$enrollment->status] ?? 'secondary';
                                             @endphp
-                                            <span class="badge badge-sm bg-{{ $color }}">{{ ucfirst(str_replace('_', ' ', $enrollment->status)) }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
+                                            <span class="badge bg-{{ $color }}">{{ ucfirst(str_replace('_', ' ', $enrollment->status)) }}</span>
+                                        </td>
+                                        <td>{{ $enrollment->final_score ?? '-' }}</td>
+                                        <td>{{ $enrollment->grade ?? '-' }}</td>
+                                        <td>
+                                            @can('manageStudents', $course)
+                                            <form action="{{ route('enrollments.destroy', $enrollment) }}" method="POST" class="d-inline"
+                                                  onsubmit="return confirm('Are you sure you want to remove this enrollment?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete Enrollment">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                            @endcan
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-
-                        @if($course->enrollments->count() > 8)
-                        <div class="text-center mt-3">
-                            <a href="{{ route('courses.enrollments.index', $course) }}" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-ellipsis-h"></i> View All {{ $course->enrollments->count() }} Students
-                            </a>
-                        </div>
-                        @endif
                     @else
-                        <p class="text-muted text-center py-4 mb-0">No students enrolled yet.</p>
+                        <p class="text-muted text-center py-4">No students enrolled yet.</p>
                     @endif
                 </div>
             </div>
@@ -287,7 +333,7 @@
     <div class="row mt-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header gradient-header-green d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Course Materials</h5>
                     @can('update', $course)
                     <button type="button" class="btn btn-sm btn-primary" onclick="toggleUploadForm()">
@@ -416,6 +462,79 @@
 </div>
 <!-- Upload Material Modal -->
 @endsection
+
+@push('styles')
+<style>
+/* Base styling for all gradient card headers */
+.gradient-header-purple,
+.gradient-header-blue,
+.gradient-header-green,
+.gradient-header-orange {
+    color: white !important;
+    border-bottom: none !important;
+}
+
+.gradient-header-purple h5,
+.gradient-header-blue h5,
+.gradient-header-green h5,
+.gradient-header-orange h5,
+.gradient-header-purple .badge,
+.gradient-header-blue .badge,
+.gradient-header-green .badge,
+.gradient-header-orange .badge,
+.gradient-header-purple i,
+.gradient-header-blue i,
+.gradient-header-green i,
+.gradient-header-orange i {
+    color: white !important;
+}
+
+.gradient-header-purple .btn,
+.gradient-header-blue .btn,
+.gradient-header-green .btn,
+.gradient-header-orange .btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white !important;
+}
+
+.gradient-header-purple .btn:hover,
+.gradient-header-blue .btn:hover,
+.gradient-header-green .btn:hover,
+.gradient-header-orange .btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Override for badge inside gradient header */
+.gradient-header-purple .badge.bg-primary,
+.gradient-header-blue .badge.bg-primary,
+.gradient-header-green .badge.bg-primary,
+.gradient-header-orange .badge.bg-primary {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Specific gradient for Course Information - Purple to Violet */
+.gradient-header-purple {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Enrolled Students - Blue to Cyan */
+.gradient-header-blue {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+/* Course Materials - Green to Teal */
+.gradient-header-green {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+}
+
+/* Additional section - Orange to Pink */
+.gradient-header-orange {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>

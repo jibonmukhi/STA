@@ -57,7 +57,7 @@
 
                 <!-- Instance Information (Editable) -->
                 <div class="card mb-4">
-                    <div class="card-header">
+                    <div class="card-header gradient-header-orange">
                         <h5 class="mb-0">Course Instance Details</h5>
                     </div>
                     <div class="card-body">
@@ -114,7 +114,7 @@
 
             <div class="col-lg-4">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header gradient-header-purple">
                         <h5 class="mb-0">Course Schedule</h5>
                     </div>
                     <div class="card-body">
@@ -174,41 +174,39 @@
             </div>
         </div>
 
-        <!-- Assigned Companies and Enroll Students Side by Side (Full Width) -->
+        <!-- Assigned Company and Enroll Students Side by Side (Full Width) -->
         <div class="row mb-4">
-            <!-- Assigned Companies -->
+            <!-- Assigned Company -->
             <div class="col-lg-6">
                 <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-building"></i> Assigned Companies</h5>
+                    <div class="card-header gradient-header-blue">
+                        <h5 class="mb-0"><i class="fas fa-building"></i> Assigned Company</h5>
                     </div>
                     <div class="card-body">
                         @php
-                            $assignedCompanies = $course->assignedCompanies;
+                            $assignedCompany = $course->assignedCompanies->first();
                         @endphp
-                        @if($assignedCompanies && $assignedCompanies->count() > 0)
+                        @if($assignedCompany)
                             <div class="mb-2">
-                                <small class="text-muted">Companies assigned to this course instance:</small>
+                                <small class="text-muted">Company assigned to this course instance:</small>
                             </div>
                             <div class="list-group">
-                                @foreach($assignedCompanies as $company)
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>{{ $company->name }}</strong>
-                                                @if($company->pivot->is_mandatory)
-                                                    <span class="badge bg-warning ms-2">Mandatory</span>
-                                                @endif
-                                            </div>
-                                            <small class="text-muted">
-                                                Assigned: {{ $company->pivot->assigned_date ? \Carbon\Carbon::parse($company->pivot->assigned_date)->format('M d, Y') : '-' }}
-                                            </small>
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ $assignedCompany->name }}</strong>
+                                            @if($assignedCompany->pivot->is_mandatory)
+                                                <span class="badge bg-warning ms-2">Mandatory</span>
+                                            @endif
                                         </div>
+                                        <small class="text-muted">
+                                            Assigned: {{ $assignedCompany->pivot->assigned_date ? \Carbon\Carbon::parse($assignedCompany->pivot->assigned_date)->format('M d, Y') : '-' }}
+                                        </small>
                                     </div>
-                                @endforeach
+                                </div>
                             </div>
                         @else
-                            <p class="text-muted mb-0">No companies assigned yet. Use "Send Invitations" to assign companies.</p>
+                            <p class="text-muted mb-0">No company assigned yet. Enroll students to assign a company.</p>
                         @endif
                     </div>
                 </div>
@@ -217,7 +215,7 @@
             <!-- Enroll Students -->
             <div class="col-lg-6">
                 <div class="card h-100">
-                    <div class="card-header">
+                    <div class="card-header gradient-header-green">
                         <h5 class="mb-0"><i class="fas fa-users"></i> {{ trans('courses.enroll_students') }}</h5>
                     </div>
                     <div class="card-body">
@@ -249,8 +247,9 @@
                                         @foreach($users as $user)
                                             @php
                                                 $userCompanyIds = $user->companies->pluck('id')->toArray();
-                                                $assignedCompanyIds = $assignedCompanies->pluck('id')->toArray();
-                                                $matchesCompany = empty($assignedCompanyIds) || !empty(array_intersect($userCompanyIds, $assignedCompanyIds));
+                                                $assignedCompany = $course->assignedCompanies->first();
+                                                $assignedCompanyId = $assignedCompany ? $assignedCompany->id : null;
+                                                $matchesCompany = !$assignedCompanyId || in_array($assignedCompanyId, $userCompanyIds);
                                             @endphp
                                             <div class="form-check mb-2 student-search-item"
                                                  data-student-name="{{ strtolower($user->full_name) }}"
@@ -467,5 +466,70 @@ $(document).ready(function() {
     });
 });
 </script>
+@endpush
+
+@push('styles')
+<style>
+/* Base styling for all gradient card headers */
+.gradient-header-purple,
+.gradient-header-blue,
+.gradient-header-green,
+.gradient-header-orange {
+    color: white !important;
+    border-bottom: none !important;
+}
+
+.gradient-header-purple h5,
+.gradient-header-blue h5,
+.gradient-header-green h5,
+.gradient-header-orange h5,
+.gradient-header-purple .badge,
+.gradient-header-blue .badge,
+.gradient-header-green .badge,
+.gradient-header-orange .badge,
+.gradient-header-purple i,
+.gradient-header-blue i,
+.gradient-header-green i,
+.gradient-header-orange i {
+    color: white !important;
+}
+
+.gradient-header-purple .btn,
+.gradient-header-blue .btn,
+.gradient-header-green .btn,
+.gradient-header-orange .btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white !important;
+}
+
+.gradient-header-purple .btn:hover,
+.gradient-header-blue .btn:hover,
+.gradient-header-green .btn:hover,
+.gradient-header-orange .btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Specific gradient for Course Schedule - Purple to Violet */
+.gradient-header-purple {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Assigned Company - Blue to Cyan */
+.gradient-header-blue {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+/* Enroll Students - Green to Teal */
+.gradient-header-green {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+}
+
+/* Course Instance Details - Orange to Pink */
+.gradient-header-orange {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+}
+</style>
 @endpush
 @endsection

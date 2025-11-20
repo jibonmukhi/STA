@@ -140,7 +140,7 @@
 
                 <!-- Instance Information (Editable) -->
                 <div class="card mb-4">
-                    <div class="card-header">
+                    <div class="card-header gradient-header-orange">
                         <h5 class="mb-0">Course Instance Details</h5>
                     </div>
                     <div class="card-body">
@@ -201,7 +201,7 @@
 
             <div class="col-lg-4">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header gradient-header-purple">
                         <h5 class="mb-0">Course Schedule</h5>
                     </div>
                     <div class="card-body">
@@ -266,7 +266,7 @@
             <!-- Assign to Companies -->
             <div class="col-lg-6">
                 <div class="card h-100">
-                    <div class="card-header">
+                    <div class="card-header gradient-header-blue">
                         <h5 class="mb-0"><i class="fas fa-building"></i> {{ trans('courses.assign_to_companies') }}</h5>
                     </div>
                     <div class="card-body">
@@ -298,14 +298,14 @@
             <!-- Enroll Students -->
             <div class="col-lg-6">
                 <div class="card h-100">
-                    <div class="card-header">
+                    <div class="card-header gradient-header-green">
                         <h5 class="mb-0"><i class="fas fa-users"></i> {{ trans('courses.enroll_students') }}</h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label">{{ trans('courses.select_students_to_enroll') }}</label>
-                            <div class="alert alert-info" id="companyFilterAlert">
-                                <i class="fas fa-info-circle"></i> <small>{{ trans('courses.select_companies_filter_info') }}</small>
+                            <div class="alert alert-warning" id="companyFilterAlert">
+                                <i class="fas fa-info-circle"></i> <small>Please select a company first to see available students.</small>
                             </div>
                             <div class="mb-2">
                                 <input type="text" class="form-control form-control-sm" id="studentSearch" placeholder="{{ trans('courses.search_students') }}" onkeyup="filterStudents()">
@@ -332,7 +332,7 @@
                                                  data-student-name="{{ strtolower($user->full_name) }}"
                                                  data-student-email="{{ strtolower($user->email) }}"
                                                  data-company-ids="{{ json_encode($userCompanyIds) }}"
-                                                 style="display: block;">
+                                                 style="display: none;">
                                                 <input class="form-check-input student-checkbox" type="checkbox" name="student_ids[]" value="{{ $user->id }}" id="student_{{ $user->id }}">
                                                 <label class="form-check-label d-flex align-items-center" for="student_{{ $user->id }}">
                                                     <div>
@@ -547,13 +547,27 @@ function filterStudentsByCompanies() {
     const selectedCompanyId = selectedCompanyRadio ? parseInt(selectedCompanyRadio.value) : null;
 
     const studentItems = document.querySelectorAll('.student-search-item');
+    const companyFilterAlert = document.getElementById('companyFilterAlert');
 
     if (!selectedCompanyId) {
-        // Show all students if no company selected
+        // Hide all students if no company selected
         studentItems.forEach(item => {
-            item.style.display = 'block';
+            item.style.display = 'none';
         });
+        // Show warning alert
+        if (companyFilterAlert) {
+            companyFilterAlert.classList.remove('alert-info');
+            companyFilterAlert.classList.add('alert-warning');
+            companyFilterAlert.innerHTML = '<i class="fas fa-info-circle"></i> <small>Please select a company first to see available students.</small>';
+        }
     } else {
+        // Hide warning alert and show info
+        if (companyFilterAlert) {
+            companyFilterAlert.classList.remove('alert-warning');
+            companyFilterAlert.classList.add('alert-info');
+            companyFilterAlert.innerHTML = '<i class="fas fa-info-circle"></i> <small>{{ trans("courses.select_companies_filter_info") }}</small>';
+        }
+
         // Filter students by selected company
         studentItems.forEach(item => {
             const studentCompanyIds = JSON.parse(item.getAttribute('data-company-ids') || '[]');
@@ -694,5 +708,70 @@ $(document).ready(function() {
     });
 });
 </script>
+@endpush
+
+@push('styles')
+<style>
+/* Base styling for all gradient card headers */
+.gradient-header-purple,
+.gradient-header-blue,
+.gradient-header-green,
+.gradient-header-orange {
+    color: white !important;
+    border-bottom: none !important;
+}
+
+.gradient-header-purple h5,
+.gradient-header-blue h5,
+.gradient-header-green h5,
+.gradient-header-orange h5,
+.gradient-header-purple .badge,
+.gradient-header-blue .badge,
+.gradient-header-green .badge,
+.gradient-header-orange .badge,
+.gradient-header-purple i,
+.gradient-header-blue i,
+.gradient-header-green i,
+.gradient-header-orange i {
+    color: white !important;
+}
+
+.gradient-header-purple .btn,
+.gradient-header-blue .btn,
+.gradient-header-green .btn,
+.gradient-header-orange .btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white !important;
+}
+
+.gradient-header-purple .btn:hover,
+.gradient-header-blue .btn:hover,
+.gradient-header-green .btn:hover,
+.gradient-header-orange .btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Specific gradient for Course Schedule - Purple to Violet */
+.gradient-header-purple {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Assign to Companies - Blue to Cyan */
+.gradient-header-blue {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+/* Enroll Students - Green to Teal */
+.gradient-header-green {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+}
+
+/* Course Instance Details - Orange to Pink */
+.gradient-header-orange {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+}
+</style>
 @endpush
 @endsection
