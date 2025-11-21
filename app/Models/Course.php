@@ -178,6 +178,11 @@ class Course extends Model
         return $this->hasMany(CourseMaterial::class)->orderBy('order');
     }
 
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(CourseSession::class)->orderBy('session_order')->orderBy('session_date')->orderBy('start_time');
+    }
+
     public function companyAssignments(): HasMany
     {
         return $this->hasMany(CourseCompanyAssignment::class);

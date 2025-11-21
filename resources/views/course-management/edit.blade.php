@@ -128,61 +128,103 @@
             </div>
 
             <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Course Schedule</h5>
+                <!-- Smart Calendar Session Scheduler -->
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> {{ trans('courses.class_sessions') }}</h5>
+                        <span class="badge bg-light text-dark" id="sessionSummary">
+                            <span id="totalSessions">{{ $course->sessions->count() }}</span> {{ trans('courses.sessions') }} | <span id="totalHours">{{ $course->sessions->sum('duration_hours') }}</span> {{ trans('courses.hours') }}
+                        </span>
                     </div>
                     <div class="card-body">
-                        <h5 class="mb-3">Schedule (Start to End Time)</h5>
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle"></i>
+                            <small>{{ trans('courses.course_programme') }}: <strong><span id="courseDuration">{{ $course->duration_hours ?? 0 }}</span> {{ trans('courses.hours') }}</strong></small>
+                        </div>
 
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label">Start Date</label>
-                                <input type="text" class="form-control datepicker @error('start_date') is-invalid @enderror"
-                                       id="start_date_display" value="{{ old('start_date', $course->start_date?->format('d/m/Y')) }}" placeholder="DD/MM/YYYY" autocomplete="off">
-                                <input type="hidden" name="start_date" id="start_date_hidden" value="{{ old('start_date', $course->start_date?->format('Y-m-d')) }}">
-                                @error('start_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">Start Time</label>
-                                <input type="text" class="form-control timepicker @error('start_time') is-invalid @enderror"
-                                       name="start_time" value="{{ old('start_time', $course->start_time) }}" placeholder="HH:MM" autocomplete="off">
-                                @error('start_time')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <!-- Configuration Form -->
+                        <div class="mb-3">
+                            <label class="form-label">{{ trans('courses.start_date') }} *</label>
+                            <input type="text" class="form-control form-control-sm datepicker @error('start_date') is-invalid @enderror"
+                                   id="start_date_display" value="{{ old('start_date', $course->start_date?->format('d/m/Y')) }}" placeholder="DD/MM/YYYY" autocomplete="off">
+                            <input type="hidden" name="start_date" id="start_date_hidden" value="{{ old('start_date', $course->start_date?->format('Y-m-d')) }}">
+                            @error('start_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-6">
-                                <label class="form-label">End Date</label>
-                                <input type="text" class="form-control datepicker @error('end_date') is-invalid @enderror"
-                                       id="end_date_display" value="{{ old('end_date', $course->end_date?->format('d/m/Y')) }}" placeholder="DD/MM/YYYY" autocomplete="off">
-                                <input type="hidden" name="end_date" id="end_date_hidden" value="{{ old('end_date', $course->end_date?->format('Y-m-d')) }}">
-                                @error('end_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <label class="form-label">{{ trans('courses.session_start_time') }}</label>
+                                <input type="time" class="form-control form-control-sm" id="sessionStartTime" value="{{ $course->sessions->first()?->start_time ? \Carbon\Carbon::parse($course->sessions->first()->start_time)->format('H:i') : '09:00' }}" onchange="updateSessionInputs()">
                             </div>
                             <div class="col-6">
-                                <label class="form-label">End Time</label>
-                                <input type="text" class="form-control timepicker @error('end_time') is-invalid @enderror"
-                                       name="end_time" value="{{ old('end_time', $course->end_time) }}" placeholder="HH:MM" autocomplete="off">
-                                @error('end_time')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <label class="form-label">{{ trans('courses.session_end_time') }}</label>
+                                <input type="time" class="form-control form-control-sm" id="sessionEndTime" value="{{ $course->sessions->first()?->end_time ? \Carbon\Carbon::parse($course->sessions->first()->end_time)->format('H:i') : '13:00' }}" onchange="updateSessionInputs()">
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="is_active" value="1"
-                                       {{ old('is_active', $course->is_active) ? 'checked' : '' }}>
-                                <label class="form-check-label">
-                                    Active Course
+                                <input class="form-check-input" type="checkbox" id="excludeWeekends" checked>
+                                <label class="form-check-label" for="excludeWeekends">
+                                    {{ trans('courses.exclude_weekends') }}
                                 </label>
                             </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="excludeHolidays" checked>
+                                <label class="form-check-label" for="excludeHolidays">
+                                    {{ trans('courses.exclude_italian_holidays') }}
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="weeklyMode">
+                                <label class="form-check-label" for="weeklyMode">
+                                    {{ trans('courses.weekly_mode') }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-sm w-100 mb-3" onclick="generateCalendar()">
+                            <i class="fas fa-magic"></i> {{ trans('courses.generate_sessions') }}
+                        </button>
+
+                        <!-- Sessions Grid -->
+                        <div id="sessionsGrid" style="display: none;">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 40px;">#</th>
+                                            <th style="width: 110px;">{{ trans('courses.session_date') }}</th>
+                                            <th style="width: 130px;">{{ trans('courses.session_start_time') }}</th>
+                                            <th style="width: 130px;">{{ trans('courses.session_end_time') }}</th>
+                                            <th style="width: 60px;">{{ trans('courses.hours') }}</th>
+                                            <th style="width: 40px;">
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="clearAllSessions()">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sessionsTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Hidden inputs for sessions -->
+                        <div id="sessionInputs"></div>
+
+                        <!-- Additional Fields -->
+                        <input type="hidden" name="end_date" id="end_date_hidden" value="{{ old('end_date', $course->end_date?->format('Y-m-d')) }}">
+                        <input type="hidden" name="start_time" id="start_time_hidden">
+                        <input type="hidden" name="end_time" id="end_time_hidden">
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" name="is_active" value="1"
+                                   {{ old('is_active', $course->is_active) ? 'checked' : '' }}>
+                            <label class="form-check-label">
+                                {{ trans('courses.active_course') }}
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -392,35 +434,409 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial count
     updateStudentCount();
+
+    // Load existing sessions into calendar
+    loadExistingSessions();
 });
+
+// Smart Calendar Session Management
+let selectedDates = [];
+let existingSessionsData = [];
+
+// Italian Holidays 2024-2025
+const italianHolidays = [
+    '2024-01-01', '2024-01-06', '2024-04-01', '2024-04-25', '2024-05-01',
+    '2024-06-02', '2024-08-15', '2024-11-01', '2024-12-08', '2024-12-25', '2024-12-26',
+    '2025-01-01', '2025-01-06', '2025-04-21', '2025-04-25', '2025-05-01',
+    '2025-06-02', '2025-08-15', '2025-11-01', '2025-12-08', '2025-12-25', '2025-12-26'
+];
+
+function loadExistingSessions() {
+    // Load existing sessions from the course
+    @if($course->sessions->count() > 0)
+        selectedDates = [
+            @foreach($course->sessions as $session)
+                '{{ $session->session_date->format('Y-m-d') }}',
+            @endforeach
+        ];
+
+        existingSessionsData = [
+            @foreach($course->sessions as $session)
+                {
+                    date: '{{ $session->session_date->format('Y-m-d') }}',
+                    startTime: '{{ \Carbon\Carbon::parse($session->start_time)->format('H:i') }}',
+                    endTime: '{{ \Carbon\Carbon::parse($session->end_time)->format('H:i') }}'
+                },
+            @endforeach
+        ];
+
+        // Auto-render grid if sessions exist and start date is set
+        const startDate = $('#start_date_hidden').val();
+        if (startDate && selectedDates.length > 0) {
+            renderSessionsGrid();
+            updateSessionSummary();
+            updateSessionInputs();
+        }
+    @endif
+}
+
+function isWeekend(date) {
+    const day = date.getDay();
+    return day === 0 || day === 6;
+}
+
+function isItalianHoliday(dateStr) {
+    return italianHolidays.includes(dateStr);
+}
+
+function generateCalendar() {
+    const startDate = $('#start_date_hidden').val();
+    const courseDuration = parseFloat($('#courseDuration').text()) || 0;
+    const sessionStartTime = $('#sessionStartTime').val();
+    const sessionEndTime = $('#sessionEndTime').val();
+    const excludeWeekends = $('#excludeWeekends').is(':checked');
+    const excludeHolidays = $('#excludeHolidays').is(':checked');
+    const weeklyMode = $('#weeklyMode').is(':checked');
+
+    if (!startDate) {
+        alert('Please select a course start date first');
+        return;
+    }
+
+    if (courseDuration === 0) {
+        alert('Course duration not available');
+        return;
+    }
+
+    if (!sessionStartTime || !sessionEndTime) {
+        alert('Please specify session start and end times');
+        return;
+    }
+
+    const start = new Date(`2000-01-01 ${sessionStartTime}`);
+    const end = new Date(`2000-01-01 ${sessionEndTime}`);
+    const sessionDurationHours = (end - start) / (1000 * 60 * 60);
+
+    if (sessionDurationHours <= 0) {
+        alert('End time must be after start time');
+        return;
+    }
+
+    const numSessionsNeeded = Math.ceil(courseDuration / sessionDurationHours);
+
+    // Auto-select business days
+    selectedDates = [];
+    let currentDate = new Date(startDate);
+    let sessionsSelected = 0;
+
+    while (sessionsSelected < numSessionsNeeded) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        const isWeekendDay = isWeekend(currentDate);
+        const isHoliday = isItalianHoliday(dateStr);
+
+        let shouldSelect = true;
+        if (excludeWeekends && isWeekendDay) shouldSelect = false;
+        if (excludeHolidays && isHoliday) shouldSelect = false;
+
+        if (shouldSelect) {
+            selectedDates.push(dateStr);
+            sessionsSelected++;
+
+            // If weekly mode, skip to same day next week
+            if (weeklyMode) {
+                currentDate.setDate(currentDate.getDate() + 7);
+            } else {
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+        } else {
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+    }
+
+    renderSessionsGrid();
+    updateSessionSummary();
+    updateSessionInputs();
+}
+
+function renderSessionsGrid() {
+    const grid = document.getElementById('sessionsGrid');
+    const tbody = document.getElementById('sessionsTableBody');
+
+    grid.style.display = 'block';
+    tbody.innerHTML = '';
+
+    const defaultStartTime = $('#sessionStartTime').val() || '09:00';
+    const defaultEndTime = $('#sessionEndTime').val() || '13:00';
+
+    selectedDates.forEach((dateStr, index) => {
+        const sessionNumber = index + 1;
+
+        // Use existing session data if available, otherwise use defaults
+        let sessionStartTime = defaultStartTime;
+        let sessionEndTime = defaultEndTime;
+
+        if (existingSessionsData.length > 0 && existingSessionsData[index]) {
+            sessionStartTime = existingSessionsData[index].startTime;
+            sessionEndTime = existingSessionsData[index].endTime;
+        }
+
+        // Format date for display (dd/mm/yyyy)
+        const date = new Date(dateStr);
+        const displayDate = date.toLocaleDateString('it-IT');
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="text-center">${sessionNumber}</td>
+            <td>
+                <input type="text" class="form-control form-control-sm session-datepicker"
+                       id="session-date-${index}"
+                       value="${displayDate}"
+                       data-date-value="${dateStr}"
+                       autocomplete="off"
+                       readonly>
+            </td>
+            <td>
+                <input type="time" class="form-control form-control-sm"
+                       value="${sessionStartTime}"
+                       onchange="updateSessionTime(${index}, 'start', this.value)">
+            </td>
+            <td>
+                <input type="time" class="form-control form-control-sm"
+                       value="${sessionEndTime}"
+                       onchange="updateSessionTime(${index}, 'end', this.value)">
+            </td>
+            <td class="text-center">
+                <span id="duration-${index}">0</span>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeSession(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+
+        // Initialize datepicker for this row
+        $(`#session-date-${index}`).datepicker({
+            dateFormat: 'dd/mm/yy',
+            changeMonth: true,
+            changeYear: true,
+            onSelect: function(dateText, inst) {
+                // Convert dd/mm/yyyy to yyyy-mm-dd
+                const parts = dateText.split('/');
+                const isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                updateSessionDate(index, isoDate);
+            }
+        });
+
+        updateDurationDisplay(index);
+    });
+}
+
+function updateSessionDate(index, newDate) {
+    const oldDate = selectedDates[index];
+    selectedDates[index] = newDate;
+
+    // Update existing session data if available
+    if (existingSessionsData.length > 0 && existingSessionsData[index]) {
+        existingSessionsData[index].date = newDate;
+    }
+
+    // Sort both arrays together to maintain correspondence
+    const combined = selectedDates.map((date, i) => ({
+        date: date,
+        data: existingSessionsData[i] || null
+    }));
+
+    combined.sort((a, b) => a.date.localeCompare(b.date));
+
+    selectedDates = combined.map(item => item.date);
+    existingSessionsData = combined.map(item => item.data).filter(item => item !== null);
+
+    renderSessionsGrid();
+    updateSessionSummary();
+    updateSessionInputs();
+}
+
+function updateSessionTime(index, type, newTime) {
+    // Update existing session data if available
+    if (existingSessionsData.length > 0 && existingSessionsData[index]) {
+        if (type === 'start') {
+            existingSessionsData[index].startTime = newTime;
+        } else if (type === 'end') {
+            existingSessionsData[index].endTime = newTime;
+        }
+    }
+
+    updateDurationDisplay(index);
+    updateSessionSummary();
+    updateSessionInputs();
+}
+
+function updateDurationDisplay(index) {
+    const row = document.getElementById('sessionsTableBody').children[index];
+    if (!row) return;
+
+    const timeInputs = row.querySelectorAll('input[type="time"]');
+    if (timeInputs.length < 2) return;
+
+    const startTime = timeInputs[0].value;
+    const endTime = timeInputs[1].value;
+
+    const start = new Date(`2000-01-01 ${startTime}`);
+    const end = new Date(`2000-01-01 ${endTime}`);
+    const hours = (end - start) / (1000 * 60 * 60);
+
+    const durationSpan = document.getElementById(`duration-${index}`);
+    if (durationSpan) {
+        durationSpan.textContent = hours.toFixed(2);
+    }
+}
+
+function removeSession(index) {
+    selectedDates.splice(index, 1);
+    renderSessionsGrid();
+    updateSessionSummary();
+    updateSessionInputs();
+}
+
+function clearAllSessions() {
+    if (confirm('Are you sure you want to clear all sessions?')) {
+        selectedDates = [];
+        document.getElementById('sessionsGrid').style.display = 'none';
+        updateSessionSummary();
+        updateSessionInputs();
+    }
+}
+
+function updateSessionSummary() {
+    const totalSessions = selectedDates.length;
+    let totalHours = 0;
+
+    // Calculate total hours from grid
+    const tbody = document.getElementById('sessionsTableBody');
+    if (tbody && tbody.children.length > 0) {
+        for (let i = 0; i < tbody.children.length; i++) {
+            const row = tbody.children[i];
+            const timeInputs = row.querySelectorAll('input[type="time"]');
+            if (timeInputs.length >= 2) {
+                const startTime = timeInputs[0].value;
+                const endTime = timeInputs[1].value;
+
+                const start = new Date(`2000-01-01 ${startTime}`);
+                const end = new Date(`2000-01-01 ${endTime}`);
+                const hours = (end - start) / (1000 * 60 * 60);
+                totalHours += hours;
+            }
+        }
+    }
+
+    $('#totalSessions').text(totalSessions);
+    $('#totalHours').text(totalHours.toFixed(2));
+
+    const courseDuration = parseFloat($('#courseDuration').text()) || 0;
+
+    if (totalHours > courseDuration) {
+        $('#sessionSummary').removeClass('bg-light text-dark').addClass('bg-warning text-dark');
+    } else {
+        $('#sessionSummary').removeClass('bg-warning text-dark').addClass('bg-light text-dark');
+    }
+
+    if (selectedDates.length > 0) {
+        $('#end_date_hidden').val(selectedDates[selectedDates.length - 1]);
+    }
+
+    // Get first session times
+    if (tbody && tbody.children.length > 0) {
+        const firstRow = tbody.children[0];
+        const timeInputs = firstRow.querySelectorAll('input[type="time"]');
+        if (timeInputs.length >= 2) {
+            const sessionStartTime = timeInputs[0].value;
+            const sessionEndTime = timeInputs[1].value;
+            $('#start_time_hidden').val(sessionStartTime);
+            $('#end_time_hidden').val(sessionEndTime);
+        }
+    }
+}
+
+function updateSessionInputs() {
+    const container = $('#sessionInputs');
+    container.empty();
+
+    const tbody = document.getElementById('sessionsTableBody');
+    if (!tbody || tbody.children.length === 0) return;
+
+    selectedDates.forEach((dateStr, index) => {
+        const row = tbody.children[index];
+        if (!row) return;
+
+        const sessionNumber = index + 1;
+        const timeInputs = row.querySelectorAll('input[type="time"]');
+        if (timeInputs.length < 2) return;
+
+        const startTime = timeInputs[0].value;
+        const endTime = timeInputs[1].value;
+
+        const start = new Date(`2000-01-01 ${startTime}`);
+        const end = new Date(`2000-01-01 ${endTime}`);
+        const sessionDurationHours = (end - start) / (1000 * 60 * 60);
+
+        container.append(`
+            <input type="hidden" name="sessions[${index}][title]" value="Session ${sessionNumber}">
+            <input type="hidden" name="sessions[${index}][date]" value="${dateStr}">
+            <input type="hidden" name="sessions[${index}][start_time]" value="${startTime}">
+            <input type="hidden" name="sessions[${index}][end_time]" value="${endTime}">
+            <input type="hidden" name="sessions[${index}][duration]" value="${sessionDurationHours.toFixed(2)}">
+            <input type="hidden" name="sessions[${index}][order]" value="${sessionNumber}">
+        `);
+    });
+}
 </script>
 
 @push('styles')
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
 <style>
 .ui-datepicker {
     z-index: 9999 !important;
 }
-.ui-timepicker-wrapper {
-    z-index: 9999 !important;
-    max-height: 200px;
+
+/* Gradient Card Headers */
+.card-header.bg-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none;
+}
+
+.card-header.bg-primary.text-white {
+    color: #ffffff !important;
+}
+
+/* Sessions Grid Styles */
+#sessionsGrid {
+    max-height: 500px;
     overflow-y: auto;
-    overflow-x: hidden;
 }
-.ui-timepicker-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+
+#sessionsGrid .table {
+    font-size: 0.85rem;
+    table-layout: fixed;
+    width: 100%;
 }
-.ui-timepicker-list li {
-    padding: 5px 10px;
+
+#sessionsGrid input[type="text"],
+#sessionsGrid input[type="time"] {
+    font-size: 0.85rem;
+    width: 100%;
+    max-width: 100%;
+}
+
+#sessionsGrid .session-datepicker {
     cursor: pointer;
+    background-color: white;
 }
-.ui-timepicker-list li:hover,
-.ui-timepicker-selected {
-    background-color: #0d6efd;
-    color: white;
+
+#sessionsGrid td {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>
 @endpush
@@ -428,7 +844,6 @@ document.addEventListener('DOMContentLoaded', function() {
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
 <script>
 $(document).ready(function() {
     // Initialize datepicker for start_date
@@ -447,37 +862,6 @@ $(document).ready(function() {
                 });
             }, 0);
         }
-    });
-
-    // Initialize datepicker for end_date
-    $('#end_date_display').datepicker({
-        dateFormat: 'dd/mm/yy',
-        altField: '#end_date_hidden',
-        altFormat: 'yy-mm-dd',
-        changeMonth: true,
-        changeYear: true,
-        yearRange: '-10:+10',
-        showButtonPanel: true,
-        beforeShow: function(input, inst) {
-            setTimeout(function() {
-                inst.dpDiv.css({
-                    'z-index': 9999
-                });
-            }, 0);
-        }
-    });
-
-    // Initialize timepicker
-    $('.timepicker').timepicker({
-        timeFormat: 'HH:mm',
-        interval: 15,
-        minTime: '0:00',
-        maxTime: '23:45',
-        defaultTime: '9:00',
-        startTime: '0:00',
-        dynamic: false,
-        dropdown: true,
-        scrollbar: true
     });
 });
 </script>

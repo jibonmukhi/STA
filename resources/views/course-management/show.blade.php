@@ -211,6 +211,45 @@
         </div>
 
         <div class="col-lg-4">
+            <!-- Class Sessions Section -->
+            @if($course->sessions->count() > 0)
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt"></i> {{ trans('courses.class_sessions') }}
+                    </h5>
+                    <span class="badge bg-white text-primary">{{ $course->sessions->count() }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted d-block">{{ trans('courses.total_hours') }}</small>
+                        <strong>{{ $course->sessions->sum('duration_hours') }} {{ trans('courses.hours') }}</strong>
+                    </div>
+
+                    <div class="list-group">
+                        @foreach($course->sessions as $session)
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ $session->session_title }}</h6>
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-calendar me-1"></i>{{ $session->session_date->format('d/m/Y') }}
+                                    </small>
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-clock me-1"></i>{{ \Carbon\Carbon::parse($session->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($session->end_time)->format('H:i') }}
+                                    </small>
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-hourglass-half me-1"></i>{{ $session->duration_hours }} {{ trans('courses.hours') }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-info">{{ $loop->iteration }}</span>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @else
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Course Information</h5>
@@ -238,6 +277,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 
@@ -463,6 +503,19 @@
 <!-- Upload Material Modal -->
 @endsection
 
+@push('styles')
+<style>
+/* Gradient Card Headers */
+.card-header.bg-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none;
+}
+
+.card-header.bg-primary.text-white {
+    color: #ffffff !important;
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>

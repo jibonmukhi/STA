@@ -174,6 +174,15 @@ class CourseManagementController extends Controller
             'start_time' => 'nullable',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'end_time' => 'nullable',
+            'sessions' => 'nullable|array',
+            'sessions.*.title' => 'required|string|max:255',
+            'sessions.*.date' => 'required|date',
+            'sessions.*.start_time' => 'required',
+            'sessions.*.end_time' => 'required',
+            'sessions.*.duration' => 'required|numeric|min:0',
+            'sessions.*.location' => 'nullable|string|max:255',
+            'sessions.*.description' => 'nullable|string',
+            'sessions.*.order' => 'required|integer|min:1',
         ]);
 
         // Set default values for optional fields
@@ -220,17 +229,34 @@ class CourseManagementController extends Controller
             }
         }
 
+        // Create sessions if provided
+        if (!empty($validated['sessions'])) {
+            foreach ($validated['sessions'] as $sessionData) {
+                $course->sessions()->create([
+                    'session_title' => $sessionData['title'],
+                    'session_date' => $sessionData['date'],
+                    'start_time' => $sessionData['start_time'],
+                    'end_time' => $sessionData['end_time'],
+                    'duration_hours' => $sessionData['duration'],
+                    'location' => $sessionData['location'] ?? null,
+                    'description' => $sessionData['description'] ?? null,
+                    'status' => 'scheduled',
+                    'session_order' => $sessionData['order'],
+                ]);
+            }
+        }
+
         AuditLogService::log(
             'Course Instance Created',
             $course,
             null,
             $course->toArray(),
-            'Created course instance: ' . $course->title . ' (Code: ' . $course->course_code . ')',
+            'Created course instance: ' . $course->title . ' (Code: ' . $course->course_code . ') with ' . count($validated['sessions'] ?? []) . ' sessions',
             'Course Management'
         );
 
         return redirect()->route('course-management.show', $course)
-                        ->with('success', 'Course instance created successfully.');
+                        ->with('success', 'Course instance created successfully with ' . count($validated['sessions'] ?? []) . ' session(s).');
     }
 
     /**
@@ -238,7 +264,7 @@ class CourseManagementController extends Controller
      */
     public function show(Course $courseManagement): View
     {
-        $courseManagement->load(['materials.uploader', 'teacher', 'teachers', 'parentCourse', 'assignedCompanies']);
+        $courseManagement->load(['materials.uploader', 'teacher', 'teachers', 'parentCourse', 'assignedCompanies', 'sessions']);
         return view('course-management.show', ['course' => $courseManagement]);
     }
 
@@ -300,6 +326,15 @@ class CourseManagementController extends Controller
             'start_time' => 'nullable',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'end_time' => 'nullable',
+            'sessions' => 'nullable|array',
+            'sessions.*.title' => 'required|string|max:255',
+            'sessions.*.date' => 'required|date',
+            'sessions.*.start_time' => 'required',
+            'sessions.*.end_time' => 'required',
+            'sessions.*.duration' => 'required|numeric',
+            'sessions.*.location' => 'nullable|string|max:255',
+            'sessions.*.description' => 'nullable|string',
+            'sessions.*.order' => 'required|integer',
         ]);
 
         // Log course status change if applicable
@@ -375,6 +410,25 @@ class CourseManagementController extends Controller
         } else {
             // If no students selected, remove all enrollments
             $courseManagement->enrollments()->delete();
+        }
+
+        // Update sessions - delete all existing sessions and recreate from form data
+        $courseManagement->sessions()->delete();
+
+        if (!empty($validated['sessions'])) {
+            foreach ($validated['sessions'] as $sessionData) {
+                $courseManagement->sessions()->create([
+                    'session_title' => $sessionData['title'],
+                    'session_date' => $sessionData['date'],
+                    'start_time' => $sessionData['start_time'],
+                    'end_time' => $sessionData['end_time'],
+                    'duration_hours' => $sessionData['duration'],
+                    'location' => $sessionData['location'] ?? null,
+                    'description' => $sessionData['description'] ?? null,
+                    'status' => 'scheduled',
+                    'session_order' => $sessionData['order'],
+                ]);
+            }
         }
 
         return redirect()->route('course-management.show', $courseManagement)
