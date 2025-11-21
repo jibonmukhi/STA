@@ -31,7 +31,7 @@
         @csrf
         @method('PUT')
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-lg-6">
                 <!-- Template Details (Read-only) -->
                 @if($course->parentCourse)
                 <div class="card mb-4">
@@ -127,7 +127,7 @@
                 </div>
             </div>
 
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <!-- Smart Calendar Session Scheduler -->
                 <div class="card mb-3">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">

@@ -84,7 +84,7 @@
     <form action="{{ route('course-management.store') }}" method="POST">
         @csrf
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-lg-6">
                 <!-- Master Course Selection -->
                 <div class="card mb-4">
                     <div class="card-header bg-primary text-white">
@@ -222,7 +222,7 @@
                 </div>
             </div>
 
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <!-- Smart Calendar Session Scheduler -->
                 <div class="card mb-3">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">

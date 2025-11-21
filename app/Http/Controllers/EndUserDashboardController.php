@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\CourseEvent;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
+use App\Models\CourseSession;
 use Carbon\Carbon;
 
 class EndUserDashboardController extends Controller
@@ -91,54 +92,82 @@ class EndUserDashboardController extends Controller
         }
         // STA managers see all courses (no additional filtering)
 
-        // Get courses for current month
-        $courses = (clone $coursesQuery)->where(function($q) use ($currentYear, $currentMonth) {
-            $q->whereYear('start_date', $currentYear)
-              ->whereMonth('start_date', $currentMonth);
-        })->orderBy('start_date', 'asc')->get();
+        // Get course IDs that match the user's permissions
+        $courseIds = (clone $coursesQuery)->pluck('id')->toArray();
 
-        // Get today's courses
-        $todaysCourses = (clone $coursesQuery)->whereDate('start_date', now()->toDateString())->get();
-
-        // Get upcoming courses (next 7 days)
-        $upcomingCourses = (clone $coursesQuery)
-            ->whereDate('start_date', '>=', now()->toDateString())
-            ->whereDate('start_date', '<=', now()->addDays(7)->toDateString())
-            ->orderBy('start_date', 'asc')
-            ->limit(5)
+        // Get course sessions for current month
+        $sessions = CourseSession::query()
+            ->with(['course.teachers', 'course.enrollments', 'course.assignedCompanies'])
+            ->whereIn('course_id', $courseIds)
+            ->where(function($q) use ($currentYear, $currentMonth) {
+                $q->whereYear('session_date', $currentYear)
+                  ->whereMonth('session_date', $currentMonth);
+            })
+            ->orderBy('session_date', 'asc')
+            ->orderBy('start_time', 'asc')
             ->get();
 
-        // Convert courses to event objects
-        $events = $courses;
-        $todaysEvents = $todaysCourses;
-        $upcomingEvents = $upcomingCourses;
+        // Get today's sessions
+        $todaysSessions = CourseSession::query()
+            ->with(['course.teachers', 'course.enrollments', 'course.assignedCompanies'])
+            ->whereIn('course_id', $courseIds)
+            ->whereDate('session_date', now()->toDateString())
+            ->orderBy('start_time', 'asc')
+            ->get();
 
-        // Format events for JavaScript (convert Course to event format)
-        $formattedEvents = $events->map(function($course) {
+        // Get upcoming sessions (next 7 days)
+        $upcomingSessions = CourseSession::query()
+            ->with(['course.teachers', 'course.enrollments', 'course.assignedCompanies'])
+            ->whereIn('course_id', $courseIds)
+            ->whereDate('session_date', '>=', now()->toDateString())
+            ->whereDate('session_date', '<=', now()->addDays(7)->toDateString())
+            ->orderBy('session_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->limit(10)
+            ->get();
+
+        // Convert sessions to events
+        $events = $sessions;
+        $todaysEvents = $todaysSessions;
+        $upcomingEvents = $upcomingSessions;
+
+        // Format events for JavaScript (convert CourseSession to event format)
+        $formattedEvents = $sessions->map(function($session) {
+            $course = $session->course;
             $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
             $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
 
+            // Get company names
+            $companyNames = $course->assignedCompanies->pluck('name')->join(', ');
+
             return [
-                'id' => $course->id,
-                'title' => $course->title,
-                'description' => $course->description ?? '',
-                'date' => $course->start_date->format('Y-m-d'),
-                'startDate' => $course->start_date->format('Y-m-d'),
-                'endDate' => $course->end_date ? $course->end_date->format('Y-m-d') : $course->start_date->format('Y-m-d'),
-                'startTime' => $course->start_time ?? '09:00',
-                'endTime' => $course->end_time ?? '17:00',
-                'status' => $course->status,
-                'location' => $course->delivery_method == 'online' ? 'Online' : ($course->delivery_method == 'offline' ? 'In Presenza' : 'Ibrido'),
+                'id' => $session->id,
+                'sessionId' => $session->id,
+                'courseId' => $course->id,
+                'title' => $course->title . ' - ' . $session->session_title,
+                'sessionTitle' => $session->session_title,
+                'description' => $session->description ?? $course->description ?? '',
+                'date' => $session->session_date->format('Y-m-d'),
+                'startDate' => $session->session_date->format('Y-m-d'),
+                'endDate' => $session->session_date->format('Y-m-d'),
+                'startTime' => Carbon::parse($session->start_time)->format('H:i'),
+                'endTime' => Carbon::parse($session->end_time)->format('H:i'),
+                'status' => $session->status,
+                'sessionStatus' => $session->status,
+                'courseStatus' => $course->status,
+                'location' => $session->location ?? ($course->delivery_method == 'online' ? 'Online' : ($course->delivery_method == 'offline' ? 'In Presenza' : 'Ibrido')),
                 'courseTitle' => $course->title,
                 'courseCode' => $course->course_code,
                 'instructor' => $course->teachers->pluck('full_name')->join(', ') ?: ($course->instructor ?? 'N/A'),
-                'maxParticipants' => $course->max_participants ?? 0,
+                'companyNames' => $companyNames ?: 'N/A',
+                'maxParticipants' => $session->max_participants ?? $course->max_participants ?? 0,
                 'registeredParticipants' => $course->enrollments->count(),
                 'category' => $course->category,
                 'categoryColor' => $categoryColor,
                 'statusColor' => $statusColor,
                 'deliveryMethod' => $course->delivery_method,
-                'durationHours' => $course->duration_hours
+                'durationHours' => $session->duration_hours,
+                'eventType' => 'course'
             ];
         });
 
@@ -180,10 +209,10 @@ class EndUserDashboardController extends Controller
 
         // Stats for the calendar sidebar
         $stats = [
-            'total_events' => $events->count(),
-            'todays_events' => $todaysEvents->count(),
-            'upcoming_events' => $upcomingEvents->count(),
-            'completed_events' => (clone $coursesQuery)->where('status', 'completed')->count(),
+            'total_events' => $sessions->count(),
+            'todays_events' => $todaysSessions->count(),
+            'upcoming_events' => $upcomingSessions->count(),
+            'completed_events' => CourseSession::whereIn('course_id', $courseIds)->where('status', 'completed')->count(),
         ];
 
         return view('user.calendar', compact(

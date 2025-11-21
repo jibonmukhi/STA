@@ -9,6 +9,7 @@ use App\Models\Course;
 use App\Models\CourseEvent;
 use App\Models\CourseEnrollment;
 use App\Models\Certificate;
+use App\Models\CourseSession;
 use Carbon\Carbon;
 
 class TeacherDashboardController extends Controller
@@ -159,49 +160,82 @@ class TeacherDashboardController extends Controller
             $currentYear = now()->year;
         }
 
-        // Get course events for teacher's courses
+        // Get course sessions for teacher's courses
         $courseIds = $user->teacherCourses()->pluck('id')->toArray();
 
-        $query = CourseEvent::with(['course', 'user', 'company'])
-            ->whereIn('course_id', $courseIds);
-
-        // Get events for current month
-        $events = $query->byMonth($currentYear, $currentMonth)
-            ->orderBy('start_date', 'asc')
+        // Get course sessions for current month
+        $sessions = CourseSession::query()
+            ->with(['course.teachers', 'course.enrollments'])
+            ->whereIn('course_id', $courseIds)
+            ->where(function($q) use ($currentYear, $currentMonth) {
+                $q->whereYear('session_date', $currentYear)
+                  ->whereMonth('session_date', $currentMonth);
+            })
+            ->orderBy('session_date', 'asc')
             ->orderBy('start_time', 'asc')
             ->get();
 
-        // Get today's events
-        $todaysEvents = CourseEvent::whereIn('course_id', $courseIds)
-            ->whereDate('start_date', now()->toDateString())
+        // Get today's sessions
+        $todaysSessions = CourseSession::query()
+            ->with(['course.teachers', 'course.enrollments'])
+            ->whereIn('course_id', $courseIds)
+            ->whereDate('session_date', now()->toDateString())
             ->orderBy('start_time', 'asc')
             ->get();
 
-        // Get upcoming events (next 7 days)
-        $upcomingEvents = CourseEvent::whereIn('course_id', $courseIds)
-            ->upcoming()
-            ->whereDate('start_date', '>=', now()->toDateString())
-            ->whereDate('start_date', '<=', now()->addDays(7)->toDateString())
-            ->orderBy('start_date', 'asc')
+        // Get upcoming sessions (next 7 days)
+        $upcomingSessions = CourseSession::query()
+            ->with(['course.teachers', 'course.enrollments'])
+            ->whereIn('course_id', $courseIds)
+            ->whereDate('session_date', '>=', now()->toDateString())
+            ->whereDate('session_date', '<=', now()->addDays(7)->toDateString())
+            ->orderBy('session_date', 'asc')
             ->orderBy('start_time', 'asc')
-            ->limit(5)
+            ->limit(10)
             ->get();
 
-        // Format events for JavaScript
-        $formattedEvents = $events->map(function($event) {
+        // Convert sessions to events
+        $events = $sessions;
+        $todaysEvents = $todaysSessions;
+        $upcomingEvents = $upcomingSessions;
+
+        // Format events for JavaScript (convert CourseSession to event format)
+        $formattedEvents = $sessions->map(function($session) {
+            $course = $session->course;
+            $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
+            $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
+
+            // Get company names
+            $companyNames = $course->assignedCompanies->pluck('name')->join(', ');
+
             return [
-                'id' => $event->id,
-                'title' => $event->title,
-                'description' => $event->description ?? '',
-                'date' => $event->start_date->format('Y-m-d'),
-                'startTime' => $event->start_time,
-                'endTime' => $event->end_time,
-                'status' => $event->status,
-                'location' => $event->location ?? '',
-                'courseTitle' => $event->course->title ?? '',
-                'courseCode' => $event->course->course_code ?? '',
-                'maxParticipants' => $event->max_participants,
-                'registeredParticipants' => $event->registered_participants
+                'id' => $session->id,
+                'sessionId' => $session->id,
+                'courseId' => $course->id,
+                'title' => $course->title . ' - ' . $session->session_title,
+                'sessionTitle' => $session->session_title,
+                'description' => $session->description ?? $course->description ?? '',
+                'date' => $session->session_date->format('Y-m-d'),
+                'startDate' => $session->session_date->format('Y-m-d'),
+                'endDate' => $session->session_date->format('Y-m-d'),
+                'startTime' => Carbon::parse($session->start_time)->format('H:i'),
+                'endTime' => Carbon::parse($session->end_time)->format('H:i'),
+                'status' => $session->status,
+                'sessionStatus' => $session->status,
+                'courseStatus' => $course->status,
+                'location' => $session->location ?? ($course->delivery_method == 'online' ? 'Online' : ($course->delivery_method == 'offline' ? 'In Presenza' : 'Ibrido')),
+                'courseTitle' => $course->title,
+                'courseCode' => $course->course_code,
+                'instructor' => $course->teachers->pluck('full_name')->join(', ') ?: 'N/A',
+                'companyNames' => $companyNames ?: 'N/A',
+                'maxParticipants' => $session->max_participants ?? $course->max_participants ?? 0,
+                'registeredParticipants' => $course->enrollments->count(),
+                'category' => $course->category,
+                'categoryColor' => $categoryColor,
+                'statusColor' => $statusColor,
+                'deliveryMethod' => $course->delivery_method,
+                'durationHours' => $session->duration_hours,
+                'eventType' => 'course'
             ];
         });
 
@@ -243,10 +277,10 @@ class TeacherDashboardController extends Controller
 
         // Stats for the calendar sidebar
         $stats = [
-            'total_events' => $events->count(),
-            'todays_events' => $todaysEvents->count(),
-            'upcoming_events' => $upcomingEvents->count(),
-            'completed_events' => CourseEvent::whereIn('course_id', $courseIds)
+            'total_events' => $sessions->count(),
+            'todays_events' => $todaysSessions->count(),
+            'upcoming_events' => $upcomingSessions->count(),
+            'completed_events' => CourseSession::whereIn('course_id', $courseIds)
                 ->where('status', 'completed')
                 ->count(),
         ];

@@ -160,14 +160,18 @@
                 </div>
                 <div class="card-body">
                     <div id="todays-events">
-                        @forelse($todaysEvents as $course)
+                        @forelse($todaysEvents as $session)
                             @php
+                                $course = $session->course;
                                 $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
                             @endphp
                             <div class="event-item mb-2 p-2 border-start border-{{ $categoryColor }} border-3 bg-light">
                                 <div class="fw-bold text-sm">{{ $course->title }}</div>
+                                <div class="text-muted small mb-1">
+                                    <i class="fas fa-tag me-1"></i>{{ $session->session_title }}
+                                </div>
                                 <div class="text-muted small">
-                                    {{ $course->start_time ?? '09:00' }} - {{ $course->end_time ?? '17:00' }}
+                                    <i class="fas fa-clock me-1"></i>{{ \Carbon\Carbon::parse($session->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($session->end_time)->format('H:i') }}
                                     @if($course->delivery_method == 'online')
                                         <span class="badge bg-info ms-1">Online</span>
                                     @elseif($course->delivery_method == 'offline')
@@ -175,12 +179,12 @@
                                     @else
                                         <span class="badge bg-warning ms-1">{{ trans('courses.delivery_methods.hybrid') }}</span>
                                     @endif
-                                    @if($course->is_mandatory)
-                                        <span class="badge bg-danger ms-1">{{ trans('courses.mandatory') }}</span>
-                                    @endif
                                 </div>
                                 <div class="text-muted small">
                                     <i class="fas fa-chalkboard-teacher me-1"></i>{{ $course->teachers->pluck('full_name')->join(', ') ?: ($course->instructor ?? 'N/A') }}
+                                </div>
+                                <div class="text-muted small">
+                                    <i class="fas fa-hourglass-half me-1"></i>{{ $session->duration_hours }} {{ trans('courses.hours') }}
                                 </div>
                             </div>
                         @empty
@@ -198,21 +202,26 @@
                     <h6 class="card-title mb-0">Upcoming Events</h6>
                 </div>
                 <div class="card-body">
-                    @forelse($upcomingEvents as $course)
+                    @forelse($upcomingEvents as $session)
                         @php
+                            $course = $session->course;
                             $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
                             $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
                         @endphp
                         <div class="event-item mb-2 p-2 border-start border-{{ $categoryColor }} border-3 bg-light">
                             <div class="fw-bold text-sm">{{ $course->title }}</div>
+                            <div class="text-muted small mb-1">
+                                <i class="fas fa-tag me-1"></i>{{ $session->session_title }}
+                            </div>
                             <div class="text-muted small">
-                                {{ $course->start_date->format('d/m/Y') }} - {{ $course->start_time ?? '09:00' }}
+                                <i class="fas fa-calendar me-1"></i>{{ $session->session_date->format('d/m/Y') }}
+                            </div>
+                            <div class="text-muted small">
+                                <i class="fas fa-clock me-1"></i>{{ \Carbon\Carbon::parse($session->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($session->end_time)->format('H:i') }}
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-1">
                                 <span class="badge bg-{{ $categoryColor }}">{{ trans('courses.categories.' . $course->category) }}</span>
-                                @if($course->duration_hours)
-                                    <small class="text-muted">{{ $course->duration_hours }}h</small>
-                                @endif
+                                <small class="text-muted">{{ $session->duration_hours }}h</small>
                             </div>
                         </div>
                     @empty
@@ -249,23 +258,7 @@
     </div>
 </div>
 
-<!-- Event Details Modal (Read-Only) -->
-<div class="modal fade" id="eventModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="eventModalTitle">{{ trans('calendar.event_details') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="eventModalBody">
-                <!-- Event details will be populated by JavaScript -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ trans('courses.close') }}</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <style>
     .calendar-day {
@@ -428,10 +421,12 @@
                     const eventEl = document.createElement('div');
                     eventEl.className = `event-item ${event.eventType}`;
                     eventEl.textContent = event.title;
-                    eventEl.onclick = (e) => {
-                        e.stopPropagation();
-                        viewEventDetails(event);
-                    };
+                    eventEl.style.cursor = 'pointer';
+
+                    // Add simple title attribute (no Bootstrap tooltip)
+                    const tooltipContent = `${event.courseTitle}\nCompany: ${event.companyNames}\nTeacher: ${event.instructor}\nTime: ${event.startTime} - ${event.endTime}\nStatus: ${event.status ? event.status.charAt(0).toUpperCase() + event.status.slice(1) : 'N/A'}`;
+                    eventEl.title = tooltipContent;
+
                     cell.appendChild(eventEl);
                 });
 
@@ -620,46 +615,6 @@
         return colors[category] || '0, 123, 255';
     }
 
-    function viewEventDetails(event) {
-        document.getElementById('eventModalTitle').textContent = event.title;
-
-        let modalBody = `
-            <div class="row">
-                <div class="col-md-6">
-                    <h6>Event Information</h6>
-                    <table class="table table-borderless table-sm">
-                        <tr><td><strong>Course Code:</strong></td><td>${event.courseCode || 'N/A'}</td></tr>
-                        <tr><td><strong>Type:</strong></td><td><span class="badge bg-${getEventTypeColor(event.eventType)}">${event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1)}</span></td></tr>
-                        <tr><td><strong>Status:</strong></td><td><span class="badge bg-${getStatusColor(event.status)}">${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span></td></tr>
-                        <tr><td><strong>Date:</strong></td><td>${new Date(event.date).toLocaleDateString()}</td></tr>
-                        <tr><td><strong>Time:</strong></td><td>${event.startTime && event.endTime ? event.startTime + ' - ' + event.endTime : 'All Day'}</td></tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h6>Details</h6>
-                    <table class="table table-borderless table-sm">
-                        <tr><td><strong>Instructor:</strong></td><td>${event.instructor || 'N/A'}</td></tr>
-                        <tr><td><strong>Location:</strong></td><td>${event.location || 'N/A'}</td></tr>
-                        <tr><td><strong>Duration:</strong></td><td>${event.durationHours ? event.durationHours + ' hours' : 'N/A'}</td></tr>
-                        <tr><td><strong>Credits:</strong></td><td>${event.credits || 'N/A'}</td></tr>
-                        <tr><td><strong>Mandatory:</strong></td><td>${event.isMandatory ? 'Yes' : 'No'}</td></tr>
-                        <tr><td><strong>Online:</strong></td><td>${event.isOnline ? 'Yes' : 'No'}</td></tr>
-                    </table>
-                </div>
-            </div>
-        `;
-
-        if (event.description) {
-            modalBody += `<div class="mt-3"><h6>Description</h6><p>${event.description}</p></div>`;
-        }
-
-        if (event.isOnline && event.meetingUrl) {
-            modalBody += `<div class="mt-3"><h6>Meeting Link</h6><a href="${event.meetingUrl}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-external-link-alt me-1"></i>Join Meeting</a></div>`;
-        }
-
-        document.getElementById('eventModalBody').innerHTML = modalBody;
-        new bootstrap.Modal(document.getElementById('eventModal')).show();
-    }
 
     function getEventTypeColor(type) {
         const colors = {
@@ -687,5 +642,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         generateCalendar();
     });
+
 </script>
 @endsection
