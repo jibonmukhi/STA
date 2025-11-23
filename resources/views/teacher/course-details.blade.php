@@ -32,17 +32,22 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <a href="{{ route('teacher.course-students', $course) }}" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-users"></i> {{ __('teacher.view_students') }}
                             </a>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <a href="{{ route('teacher.session-attendance', $course) }}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-clipboard-check"></i> {{ __('teacher.manage_attendance') }}
+                            </a>
+                        </div>
+                        <div class="col-md-3">
                             <a href="{{ route('courses.schedule', $course) }}" class="btn btn-outline-success w-100">
                                 <i class="fas fa-clock"></i> {{ __('teacher.view_schedule') }}
                             </a>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <a href="{{ route('teacher.schedule') }}" class="btn btn-outline-info w-100">
                                 <i class="fas fa-calendar-alt"></i> {{ __('teacher.my_schedule') }}
                             </a>
@@ -270,25 +275,60 @@
                         <strong>{{ $course->sessions->sum('duration_hours') }} {{ __('teacher.hours') }}</strong>
                     </div>
 
-                    <div class="list-group">
+                    <div class="list-group session-list">
                         @foreach($course->sessions->take(5) as $session)
-                        <div class="list-group-item">
+                        @php
+                            $isCompleted = $session->status === 'completed';
+                            $isPast = $session->session_date < now();
+                            $isToday = $session->session_date->isToday();
+                            $isFuture = $session->session_date > now();
+                        @endphp
+                        <a href="{{ route('teacher.session-attendance-detail', $session) }}" class="list-group-item list-group-item-action session-item {{ $isToday ? 'session-today' : '' }} {{ $isCompleted ? 'session-completed' : '' }}" style="text-decoration: none; color: inherit;">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-1">{{ $session->session_title }}</h6>
-                                    <small class="text-muted d-block">
-                                        <i class="fas fa-calendar me-1"></i>{{ $session->session_date->format('d/m/Y') }}
-                                    </small>
-                                    <small class="text-muted d-block">
-                                        <i class="fas fa-clock me-1"></i>{{ \Carbon\Carbon::parse($session->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($session->end_time)->format('H:i') }}
-                                    </small>
-                                    <small class="text-muted d-block">
-                                        <i class="fas fa-hourglass-half me-1"></i>{{ $session->duration_hours }} {{ __('teacher.hours') }}
-                                    </small>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="session-number me-2">{{ $loop->iteration }}</span>
+                                        <h6 class="mb-0 session-title">{{ $session->session_title }}</h6>
+                                    </div>
+                                    <div class="session-details">
+                                        <small class="d-flex align-items-center mb-1">
+                                            <i class="fas fa-calendar text-primary me-2" style="width: 16px;"></i>
+                                            <span class="fw-medium">{{ $session->session_date->format('d/m/Y') }}</span>
+                                            @if($isToday)
+                                                <span class="badge bg-warning ms-2 pulse">{{ __('teacher.today') }}</span>
+                                            @endif
+                                        </small>
+                                        <small class="d-flex align-items-center mb-1">
+                                            <i class="fas fa-clock text-success me-2" style="width: 16px;"></i>
+                                            <span>{{ \Carbon\Carbon::parse($session->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($session->end_time)->format('H:i') }}</span>
+                                        </small>
+                                        <small class="d-flex align-items-center">
+                                            <i class="fas fa-hourglass-half text-info me-2" style="width: 16px;"></i>
+                                            <span>{{ $session->duration_hours }} {{ __('teacher.hours') }}</span>
+                                        </small>
+                                    </div>
                                 </div>
-                                <span class="badge bg-info">{{ $loop->iteration }}</span>
+                                <div class="text-end">
+                                    @if($isCompleted)
+                                        <span class="badge bg-success mb-2">
+                                            <i class="fas fa-check"></i> {{ __('teacher.completed') }}
+                                        </span>
+                                    @elseif($isToday)
+                                        <span class="badge bg-warning mb-2">
+                                            <i class="fas fa-star"></i> {{ __('teacher.today') }}
+                                        </span>
+                                    @elseif($isPast)
+                                        <span class="badge bg-secondary mb-2">
+                                            <i class="fas fa-history"></i> {{ __('teacher.past') }}
+                                        </span>
+                                    @else
+                                        <span class="badge bg-info mb-2">
+                                            <i class="fas fa-clock"></i> {{ __('teacher.upcoming') }}
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
+                        </a>
                         @endforeach
                     </div>
 
@@ -388,6 +428,92 @@
 .list-group-item:hover {
     border-left-color: #667eea;
     background-color: rgba(102, 126, 234, 0.05);
+}
+
+/* Session List Enhancements */
+.session-list .session-item {
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+
+.session-list .session-item:hover {
+    border-left-color: #667eea;
+    background-color: rgba(102, 126, 234, 0.05);
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-decoration: none !important;
+}
+
+.session-today {
+    border-left-color: #ffc107 !important;
+    background-color: rgba(255, 193, 7, 0.1);
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+}
+
+.session-today:hover {
+    background-color: rgba(255, 193, 7, 0.15);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.session-completed {
+    opacity: 0.75;
+}
+
+.session-completed .session-title {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+.session-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: bold;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.session-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.session-details {
+    margin-left: 38px;
+}
+
+.session-details small {
+    color: #718096;
+}
+
+.session-details .fw-medium {
+    font-weight: 500;
+    color: #2d3748;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite ease-in-out;
 }
 </style>
 @endpush

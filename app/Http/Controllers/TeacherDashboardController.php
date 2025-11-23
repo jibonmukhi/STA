@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Course;
 use App\Models\CourseEvent;
 use App\Models\CourseEnrollment;
 use App\Models\Certificate;
 use App\Models\CourseSession;
+use App\Models\SessionAttendance;
 use Carbon\Carbon;
 
 class TeacherDashboardController extends Controller
@@ -168,7 +171,7 @@ class TeacherDashboardController extends Controller
         }
 
         // Get course sessions for teacher's courses
-        $courseIds = $user->teacherCourses()->pluck('id')->toArray();
+        $courseIds = $user->teacherCourses()->pluck('courses.id')->toArray();
 
         // Get course sessions for current month
         $sessions = CourseSession::query()
@@ -366,5 +369,188 @@ class TeacherDashboardController extends Controller
             ->paginate(20);
 
         return view('teacher.certificates', compact('certificates'));
+    }
+
+    /**
+     * Show session attendance grid for a course
+     */
+    public function sessionAttendance(Course $course): View
+    {
+        $this->authorize('markAttendance', $course);
+
+        $user = Auth::user();
+
+        // Get all sessions for this course
+        $sessions = $course->sessions()
+            ->orderBy('session_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->get();
+
+        // Get all enrolled students
+        $enrollments = $course->enrollments()
+            ->with(['user', 'attendances'])
+            ->whereIn('status', ['enrolled', 'in_progress', 'completed'])
+            ->get();
+
+        // Build attendance matrix [enrollment_id][session_id] = attendance
+        $attendanceMatrix = [];
+        foreach ($enrollments as $enrollment) {
+            $attendanceMatrix[$enrollment->id] = [];
+            foreach ($sessions as $session) {
+                $attendance = $enrollment->attendances()
+                    ->where('session_id', $session->id)
+                    ->first();
+
+                $attendanceMatrix[$enrollment->id][$session->id] = $attendance;
+            }
+        }
+
+        return view('teacher.session-attendance', compact('course', 'sessions', 'attendanceMatrix', 'enrollments'));
+    }
+
+    /**
+     * Show single session attendance detail
+     */
+    public function showSessionAttendance(CourseSession $session): View
+    {
+        $this->authorize('markAttendance', $session->course);
+
+        $session->load(['course', 'attendances.student']);
+
+        // Get all enrolled students
+        $enrollments = $session->course->enrollments()
+            ->with('user')
+            ->whereIn('status', ['enrolled', 'in_progress', 'completed'])
+            ->get();
+
+        // Get attendance stats
+        $stats = $session->getAttendanceStats();
+
+        return view('teacher.session-attendance-detail', compact('session', 'enrollments', 'stats'));
+    }
+
+    /**
+     * Mark attendance for a session
+     */
+    public function markAttendance(Request $request, CourseSession $session): JsonResponse
+    {
+        $this->authorize('markAttendance', $session->course);
+
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'enrollment_id' => 'required|exists:course_enrollments,id',
+            'status' => 'required|in:present,absent,excused,late',
+            'attended_hours' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $attendance = SessionAttendance::updateOrCreate(
+                [
+                    'session_id' => $session->id,
+                    'user_id' => $validated['user_id'],
+                ],
+                [
+                    'enrollment_id' => $validated['enrollment_id'],
+                    'status' => $validated['status'],
+                    'attended_hours' => $validated['attended_hours'] ?? $session->duration_hours,
+                    'marked_by' => $user->id,
+                    'marked_at' => now(),
+                    'notes' => $validated['notes'] ?? null,
+                ]
+            );
+
+            // Trigger recalculation
+            $attendance->enrollment->calculateProgressFromAttendance();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Attendance marked successfully',
+                'attendance' => $attendance,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Bulk mark attendance for a session
+     */
+    public function bulkMarkAttendance(Request $request, CourseSession $session): JsonResponse
+    {
+        $this->authorize('markAttendance', $session->course);
+
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'attendances' => 'required|array',
+            'attendances.*.user_id' => 'required|exists:users,id',
+            'attendances.*.enrollment_id' => 'required|exists:course_enrollments,id',
+            'attendances.*.status' => 'required|in:present,absent,excused,late',
+            'attendances.*.attended_hours' => 'nullable|numeric|min:0',
+            'attendances.*.notes' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($validated['attendances'] as $data) {
+                $attendance = SessionAttendance::updateOrCreate(
+                    [
+                        'session_id' => $session->id,
+                        'user_id' => $data['user_id'],
+                    ],
+                    [
+                        'enrollment_id' => $data['enrollment_id'],
+                        'status' => $data['status'],
+                        'attended_hours' => $data['attended_hours'] ?? $session->duration_hours,
+                        'marked_by' => $user->id,
+                        'marked_at' => now(),
+                        'notes' => $data['notes'] ?? null,
+                    ]
+                );
+
+                // Trigger recalculation
+                $attendance->enrollment->calculateProgressFromAttendance();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Attendance marked successfully for all students',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Close a session
+     */
+    public function closeSession(CourseSession $session): JsonResponse
+    {
+        $this->authorize('markAttendance', $session->course);
+
+        if (!$session->canBeClosed()) {
+            return response()->json([
+                'error' => 'Cannot close session. Not all students have attendance marked.',
+                'stats' => $session->getAttendanceStats(),
+            ], 400);
+        }
+
+        try {
+            $session->closeSession();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Session closed successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

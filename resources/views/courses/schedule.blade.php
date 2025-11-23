@@ -21,9 +21,15 @@
                     <a href="{{ route('courses.planning') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> {{ trans('courses.back_to_planning') }}
                     </a>
-                    <a href="{{ route('calendar') }}" class="btn btn-outline-info">
-                        <i class="fas fa-calendar"></i> {{ trans('courses.view_calendar') }}
-                    </a>
+                    @if(auth()->user()->hasRole('teacher'))
+                        <a href="{{ route('teacher.schedule') }}" class="btn btn-outline-info">
+                            <i class="fas fa-calendar"></i> {{ trans('courses.view_calendar') }}
+                        </a>
+                    @else
+                        <a href="{{ route('calendar') }}" class="btn btn-outline-info">
+                            <i class="fas fa-calendar"></i> {{ trans('courses.view_calendar') }}
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -124,10 +130,17 @@
                                             @endif
                                         </div>
                                         <div class="card-footer bg-transparent">
-                                            <a href="{{ route('calendar') }}?date={{ $event->start_date->format('Y-m-d') }}"
-                                               class="btn btn-sm btn-outline-info">
-                                                <i class="fas fa-eye"></i> {{ trans('courses.view_in_calendar') }}
-                                            </a>
+                                            @if(auth()->user()->hasRole('teacher'))
+                                                <a href="{{ route('teacher.schedule') }}?date={{ $event->start_date->format('Y-m-d') }}"
+                                                   class="btn btn-sm btn-outline-info">
+                                                    <i class="fas fa-eye"></i> {{ trans('courses.view_in_calendar') }}
+                                                </a>
+                                            @else
+                                                <a href="{{ route('calendar') }}?date={{ $event->start_date->format('Y-m-d') }}"
+                                                   class="btn btn-sm btn-outline-info">
+                                                    <i class="fas fa-eye"></i> {{ trans('courses.view_in_calendar') }}
+                                                </a>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

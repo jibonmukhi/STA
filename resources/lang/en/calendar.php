@@ -110,6 +110,14 @@ return [
     'no_upcoming_events' => 'No upcoming events',
     'loading' => 'Loading...',
     'event_not_found' => 'Event not found',
+    'no_sessions_today' => 'No sessions today',
+    'no_upcoming_sessions' => 'No upcoming sessions',
+
+    // Sidebar
+    'todays_sessions' => "Today's Sessions",
+    'upcoming_sessions' => 'Upcoming Sessions',
+    'completed_sessions' => 'Completed Sessions',
+    'mini_calendar' => 'Mini Calendar',
 
     // Filter
     'filter' => 'Filter',

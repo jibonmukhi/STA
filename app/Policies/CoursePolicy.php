@@ -63,4 +63,19 @@ class CoursePolicy
 
         return false;
     }
+
+    public function markAttendance(User $user, Course $course)
+    {
+        // STA managers can mark attendance for all courses
+        if ($user->hasRole(['admin', 'sta_manager'])) {
+            return true;
+        }
+
+        // Teachers can only mark attendance for their own courses
+        if ($user->hasRole('teacher')) {
+            return $course->teachers()->where('teacher_id', $user->id)->exists() || $course->teacher_id === $user->id;
+        }
+
+        return false;
+    }
 }

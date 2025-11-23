@@ -51,7 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('certificate');
 
     Route::get('/calendar', [EndUserDashboardController::class, 'calendar'])
-        ->middleware('can:view personal reports')
+        ->middleware(['can:view personal reports', 'role:end_user'])
         ->name('calendar');
 
     Route::get('/reports', [EndUserDashboardController::class, 'reports'])
@@ -258,6 +258,13 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
 
     // Teacher's certificates
     Route::get('/teacher/certificates', [\App\Http\Controllers\TeacherDashboardController::class, 'certificates'])->name('teacher.certificates');
+
+    // Session Attendance Management
+    Route::get('/teacher/courses/{course}/sessions/attendance', [\App\Http\Controllers\TeacherDashboardController::class, 'sessionAttendance'])->name('teacher.session-attendance');
+    Route::get('/teacher/sessions/{session}/attendance', [\App\Http\Controllers\TeacherDashboardController::class, 'showSessionAttendance'])->name('teacher.session-attendance-detail');
+    Route::post('/teacher/sessions/{session}/attendance', [\App\Http\Controllers\TeacherDashboardController::class, 'markAttendance'])->name('teacher.mark-attendance');
+    Route::post('/teacher/sessions/{session}/attendance/bulk', [\App\Http\Controllers\TeacherDashboardController::class, 'bulkMarkAttendance'])->name('teacher.bulk-mark-attendance');
+    Route::post('/teacher/sessions/{session}/close', [\App\Http\Controllers\TeacherDashboardController::class, 'closeSession'])->name('teacher.close-session');
 });
 
 // Public certificate verification (no auth required)

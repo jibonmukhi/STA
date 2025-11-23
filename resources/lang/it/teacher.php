@@ -99,4 +99,66 @@ return [
     'download' => 'Scarica',
     'no_materials' => 'Nessun materiale disponibile ancora.',
     'view_all' => 'Vedi Tutti',
+
+    // Attendance
+    'session_attendance' => 'Presenze Sessioni',
+    'manage_attendance' => 'Gestisci Presenze',
+    'attendance_grid' => 'Griglia Presenze',
+    'mark_attendance' => 'Segna Presenza',
+    'attendance_marked' => 'Presenza segnata con successo',
+    'session_closed' => 'Sessione chiusa con successo',
+    'close_session' => 'Chiudi Sessione',
+    'session_completed' => 'Sessione Chiusa',
+    'mark_all_first' => 'Segna Prima Tutti gli Studenti',
+    'remaining' => 'rimanenti',
+    'back_to_course' => 'Torna al Corso',
+    'no_sessions_created' => 'Non sono state ancora create sessioni per questo corso.',
+    'no_students_enrolled_attendance' => 'Nessuno studente è iscritto a questo corso.',
+
+    // Attendance Status
+    'present' => 'Presente',
+    'absent' => 'Assente',
+    'excused' => 'Giustificato',
+    'late' => 'In Ritardo',
+    'not_marked' => 'Non Segnato',
+    'attendance_status' => 'Stato',
+    'hours_attended' => 'Ore di Presenza',
+    'notes' => 'Note',
+    'optional' => 'facoltativo',
+    'leave_empty_default' => 'Lascia vuoto per usare la durata della sessione',
+
+    // Attendance Stats
+    'attendance_stats' => 'Statistiche Presenze',
+    'total_enrolled_stats' => 'Totale Iscritti',
+    'marked' => 'Segnati',
+    'sessions_attended' => 'sessioni',
+    'progress_percentage' => 'Progresso',
+    'attendance_completion' => 'Completamento Presenze',
+
+    // Modal
+    'mark_attendance_title' => 'Segna Presenza',
+    'student' => 'Studente',
+    'session' => 'Sessione',
+    'save_attendance' => 'Salva Presenza',
+    'cancel' => 'Annulla',
+    'confirm_close_session' => 'Sei sicuro di voler chiudere la sessione ":title"? Questa azione non può essere annullata.',
+    'cannot_close_session' => 'Impossibile chiudere la sessione. Non tutti gli studenti hanno la presenza segnata.',
+
+    // Messages
+    'attendance_saved' => 'Presenza salvata con successo',
+    'error_saving_attendance' => 'Errore nel salvataggio della presenza',
+    'unauthorized_attendance' => 'Non autorizzato a segnare le presenze',
+
+    // Bulk Attendance
+    'mark_all_present' => 'Segna Tutti Presenti',
+    'mark_all_absent' => 'Segna Tutti Assenti',
+    'save_all_attendance' => 'Salva Tutte le Presenze',
+    'session_statistics' => 'Statistiche Sessione',
+    'total_students' => 'Totale Studenti',
+    'not_marked_students' => 'Non Segnato',
+
+    // Session Status
+    'today' => 'Oggi',
+    'past' => 'Passato',
+    'upcoming' => 'Prossimo',
 ];

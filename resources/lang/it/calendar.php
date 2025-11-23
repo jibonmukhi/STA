@@ -110,6 +110,14 @@ return [
     'no_upcoming_events' => 'Nessun evento prossimo',
     'loading' => 'Caricamento...',
     'event_not_found' => 'Evento non trovato',
+    'no_sessions_today' => 'Nessuna sessione per oggi',
+    'no_upcoming_sessions' => 'Nessuna sessione prossima',
+
+    // Sidebar
+    'todays_sessions' => 'Sessioni di Oggi',
+    'upcoming_sessions' => 'Sessioni Prossime',
+    'completed_sessions' => 'Sessioni Completate',
+    'mini_calendar' => 'Mini Calendario',
 
     // Filter
     'filter' => 'Filtra',

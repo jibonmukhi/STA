@@ -99,4 +99,66 @@ return [
     'download' => 'Download',
     'no_materials' => 'No materials available yet.',
     'view_all' => 'View All',
+
+    // Attendance
+    'session_attendance' => 'Session Attendance',
+    'manage_attendance' => 'Manage Attendance',
+    'attendance_grid' => 'Attendance Grid',
+    'mark_attendance' => 'Mark Attendance',
+    'attendance_marked' => 'Attendance marked successfully',
+    'session_closed' => 'Session closed successfully',
+    'close_session' => 'Close Session',
+    'session_completed' => 'Session Closed',
+    'mark_all_first' => 'Mark All Students First',
+    'remaining' => 'remaining',
+    'back_to_course' => 'Back to Course',
+    'no_sessions_created' => 'No sessions have been created for this course yet.',
+    'no_students_enrolled_attendance' => 'No students are enrolled in this course yet.',
+
+    // Attendance Status
+    'present' => 'Present',
+    'absent' => 'Absent',
+    'excused' => 'Excused',
+    'late' => 'Late',
+    'not_marked' => 'Not Marked',
+    'attendance_status' => 'Status',
+    'hours_attended' => 'Hours Attended',
+    'notes' => 'Notes',
+    'optional' => 'optional',
+    'leave_empty_default' => 'Leave empty to use session duration',
+
+    // Attendance Stats
+    'attendance_stats' => 'Attendance Statistics',
+    'total_enrolled_stats' => 'Total Enrolled',
+    'marked' => 'Marked',
+    'sessions_attended' => 'sessions',
+    'progress_percentage' => 'Progress',
+    'attendance_completion' => 'Attendance Completion',
+
+    // Modal
+    'mark_attendance_title' => 'Mark Attendance',
+    'student' => 'Student',
+    'session' => 'Session',
+    'save_attendance' => 'Save Attendance',
+    'cancel' => 'Cancel',
+    'confirm_close_session' => 'Are you sure you want to close the session ":title"? This action cannot be undone.',
+    'cannot_close_session' => 'Cannot close session. Not all students have attendance marked.',
+
+    // Messages
+    'attendance_saved' => 'Attendance saved successfully',
+    'error_saving_attendance' => 'Error saving attendance',
+    'unauthorized_attendance' => 'Unauthorized to mark attendance',
+
+    // Bulk Attendance
+    'mark_all_present' => 'Mark All Present',
+    'mark_all_absent' => 'Mark All Absent',
+    'save_all_attendance' => 'Save All Attendance',
+    'session_statistics' => 'Session Statistics',
+    'total_students' => 'Total Students',
+    'not_marked_students' => 'Not Marked',
+
+    // Session Status
+    'today' => 'Today',
+    'past' => 'Past',
+    'upcoming' => 'Upcoming',
 ];
