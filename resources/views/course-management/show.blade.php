@@ -12,7 +12,11 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('course-management.index') }}">Course Management</a></li>
+                            @if(auth()->user()->hasRole('teacher') && !auth()->user()->hasRole(['sta_manager', 'super_admin']))
+                                <li class="breadcrumb-item"><a href="{{ route('teacher.my-courses') }}">My Courses</a></li>
+                            @else
+                                <li class="breadcrumb-item"><a href="{{ route('course-management.index') }}">Course Management</a></li>
+                            @endif
                             <li class="breadcrumb-item active">{{ $course->title }}</li>
                         </ol>
                     </nav>
@@ -23,9 +27,15 @@
                         <i class="fas fa-edit"></i> Edit Course
                     </a>
                     @endcan
-                    <a href="{{ route('course-management.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to List
-                    </a>
+                    @if(auth()->user()->hasRole('teacher') && !auth()->user()->hasRole(['sta_manager', 'super_admin']))
+                        <a href="{{ route('teacher.my-courses') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to My Courses
+                        </a>
+                    @else
+                        <a href="{{ route('course-management.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

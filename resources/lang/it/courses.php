@@ -179,6 +179,7 @@ Vuoi procedere?',
     'actions' => 'Azioni',
     'rows_per_page' => 'Righe per pagina',
     'showing_entries' => 'Mostrando da :from a :to di :total risultati',
+    'participation' => 'Partecipazione',
 
     // Course Management (Instances)
     'course_instances' => 'Istanze dei Corsi',

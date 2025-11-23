@@ -172,7 +172,8 @@
                                         <th>Company</th>
                                         <th>Start Date</th>
                                         <th>End Date</th>
-                                        <th>{{ trans('courses.delivery_method') }}</th>
+                                        <th>{{ trans('courses.hours') }}</th>
+                                        <th>{{ trans('courses.participation') }}</th>
                                         <th>{{ trans('courses.status') }}</th>
                                         <th class="text-end">{{ trans('courses.actions') }}</th>
                                     </tr>
@@ -239,6 +240,13 @@
                                             <td>
                                                 @if($course->end_date)
                                                     <small>{{ $course->end_date->format('d/m/Y') }}</small>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($course->duration_hours)
+                                                    <small>{{ $course->duration_hours }}</small>
                                                 @else
                                                     <span class="text-muted">-</span>
                                                 @endif

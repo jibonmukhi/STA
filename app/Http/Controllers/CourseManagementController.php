@@ -12,20 +12,23 @@ use App\Services\AuditLogService;
 
 class CourseManagementController extends Controller
 {
+    public function __construct()
+    {
+        // Apply authorization middleware to all methods except 'show'
+        $this->middleware(function ($request, $next) {
+            if (!auth()->user()->hasRole(['sta_manager', 'super_admin'])) {
+                abort(403, 'Unauthorized access. This page is only accessible to STA managers.');
+            }
+            return $next($request);
+        })->except(['show']);
+    }
+
     /**
      * Display all course instances (started courses)
      */
     public function index(Request $request): View
     {
         $query = Course::query()->instances();
-
-        // Filter by company if user is company manager
-        if (auth()->user()->hasRole('company_manager')) {
-            $userCompanyIds = auth()->user()->companies->pluck('id');
-            $query->whereHas('assignedCompanies', function($q) use ($userCompanyIds) {
-                $q->whereIn('companies.id', $userCompanyIds);
-            });
-        }
 
         if ($request->has('category') && $request->category) {
             $query->byCategory($request->category);

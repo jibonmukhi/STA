@@ -179,6 +179,7 @@ Do you want to proceed?',
     'actions' => 'Actions',
     'rows_per_page' => 'Rows per page',
     'showing_entries' => 'Showing :from to :to of :total entries',
+    'participation' => 'Participation',
 
     // Course Management (Instances)
     'course_instances' => 'Course Instances',

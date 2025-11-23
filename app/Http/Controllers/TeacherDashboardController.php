@@ -65,7 +65,9 @@ class TeacherDashboardController extends Controller
     {
         $user = Auth::user();
 
-        $query = $user->teacherCourses()->with(['enrollments', 'courseEvents']);
+        $query = $user->teacherCourses()
+            ->withCount('students')
+            ->with(['assignedCompanies']);
 
         // Apply filters
         if ($request->filled('category')) {
@@ -80,17 +82,20 @@ class TeacherDashboardController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('course_code', 'like', "%{$search}%");
+                  ->orWhere('course_code', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
-        if ($request->has('show_inactive')) {
-            // Show all courses including inactive
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         } else {
-            $query->active();
+            // By default, show active courses
+            $query->where('status', 'active');
         }
 
-        $courses = $query->orderBy('title')->paginate(12);
+        $perPage = $request->get('per_page', 25);
+        $courses = $query->orderBy('title')->paginate($perPage);
 
         $categories = Course::getCategories();
         $levels = Course::getLevels();
@@ -104,8 +109,10 @@ class TeacherDashboardController extends Controller
 
         $user = Auth::user();
 
-        // Ensure this is teacher's course
-        if ($course->teacher_id !== $user->id) {
+        // Ensure this is teacher's course (check both old teacher_id and new many-to-many relationship)
+        $isTeacher = $course->teachers()->where('teacher_id', $user->id)->exists() || $course->teacher_id === $user->id;
+
+        if (!$isTeacher) {
             abort(403, 'Unauthorized access to this course.');
         }
 

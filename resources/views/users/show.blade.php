@@ -88,7 +88,7 @@
                     <div class="col-md-4">
                         <div class="mb-3">
                             <label class="form-label text-muted small">{{ __('users.tax_id_code') }}</label>
-                            <p class="fw-bold mb-1">{{ $user->tax_id_code ?: '-' }}</p>
+                            <p class="fw-bold mb-1">{{ $user->cf ?: '-' }}</p>
                         </div>
                     </div>
                 </div>

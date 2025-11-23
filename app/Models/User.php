@@ -168,6 +168,14 @@ class User extends Authenticatable
     // Teacher relationships
     public function teacherCourses()
     {
+        return $this->belongsToMany(Course::class, 'course_teacher', 'teacher_id', 'course_id')
+                    ->withPivot('is_primary')
+                    ->withTimestamps();
+    }
+
+    // Legacy single teacher relationship (deprecated - kept for backward compatibility)
+    public function taughtCourses()
+    {
         return $this->hasMany(Course::class, 'teacher_id');
     }
 
