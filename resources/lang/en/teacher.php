@@ -83,4 +83,20 @@ return [
     // Certificates
     'issue_certificate' => 'Issue Certificate',
     'no_certificates_yet' => 'No certificates issued yet.',
+
+    // Course Details
+    'back_to_courses' => 'Back to My Courses',
+    'course_details' => 'Course Details',
+    'description' => 'Description',
+    'assigned_teachers' => 'Assigned Teachers',
+    'course_schedule' => 'Course Schedule',
+    'at' => 'at',
+    'course_info' => 'Course Information',
+    'class_sessions' => 'Class Sessions',
+    'total_hours' => 'Total Hours',
+    'view_all_sessions' => 'View All Sessions',
+    'course_materials' => 'Course Materials',
+    'download' => 'Download',
+    'no_materials' => 'No materials available yet.',
+    'view_all' => 'View All',
 ];

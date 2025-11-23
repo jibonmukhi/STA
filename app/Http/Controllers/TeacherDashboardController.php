@@ -306,6 +306,48 @@ class TeacherDashboardController extends Controller
         ));
     }
 
+    public function showCourse(Course $course): View
+    {
+        $user = Auth::user();
+
+        // Ensure this is teacher's course (check both old teacher_id and new many-to-many relationship)
+        $isTeacher = $course->teachers()->where('teacher_id', $user->id)->exists() || $course->teacher_id === $user->id;
+
+        if (!$isTeacher) {
+            abort(403, 'Unauthorized access to this course.');
+        }
+
+        // Load relationships
+        $course->load([
+            'teachers',
+            'assignedCompanies',
+            'sessions' => function($query) {
+                $query->orderBy('session_date', 'asc')->orderBy('start_time', 'asc');
+            },
+            'materials' => function($query) {
+                $query->orderBy('order', 'asc')->orderBy('created_at', 'asc');
+            }
+        ]);
+
+        // Calculate student statistics
+        $stats = [
+            'total_enrolled' => CourseEnrollment::where('course_id', $course->id)
+                ->whereIn('status', ['enrolled', 'in_progress'])
+                ->count(),
+            'completed' => CourseEnrollment::where('course_id', $course->id)
+                ->where('status', 'completed')
+                ->count(),
+            'in_progress' => CourseEnrollment::where('course_id', $course->id)
+                ->where('status', 'in_progress')
+                ->count(),
+            'average_progress' => CourseEnrollment::where('course_id', $course->id)
+                ->whereIn('status', ['enrolled', 'in_progress'])
+                ->avg('progress_percentage') ?? 0,
+        ];
+
+        return view('teacher.course-details', compact('course', 'stats'));
+    }
+
     public function certificates(): View
     {
         $user = Auth::user();

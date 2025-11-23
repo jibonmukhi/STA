@@ -34,9 +34,9 @@ class CoursePolicy
             return true;
         }
 
-        // Teachers can only update their own courses
+        // Teachers can only update their own courses (check both old teacher_id and new many-to-many relationship)
         if ($user->hasRole('teacher')) {
-            return $course->teacher_id === $user->id;
+            return $course->teachers()->where('teacher_id', $user->id)->exists() || $course->teacher_id === $user->id;
         }
 
         return false;
@@ -56,9 +56,9 @@ class CoursePolicy
             return true;
         }
 
-        // Teachers can only manage students in their own courses
+        // Teachers can only manage students in their own courses (check both old teacher_id and new many-to-many relationship)
         if ($user->hasRole('teacher')) {
-            return $course->teacher_id === $user->id;
+            return $course->teachers()->where('teacher_id', $user->id)->exists() || $course->teacher_id === $user->id;
         }
 
         return false;

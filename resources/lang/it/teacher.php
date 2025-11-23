@@ -83,4 +83,20 @@ return [
     // Certificates
     'issue_certificate' => 'Emetti Certificato',
     'no_certificates_yet' => 'Nessun certificato emesso ancora.',
+
+    // Course Details
+    'back_to_courses' => 'Torna ai Miei Corsi',
+    'course_details' => 'Dettagli Corso',
+    'description' => 'Descrizione',
+    'assigned_teachers' => 'Insegnanti Assegnati',
+    'course_schedule' => 'Calendario del Corso',
+    'at' => 'alle',
+    'course_info' => 'Informazioni Corso',
+    'class_sessions' => 'Sessioni del Corso',
+    'total_hours' => 'Ore Totali',
+    'view_all_sessions' => 'Vedi Tutte le Sessioni',
+    'course_materials' => 'Materiale Didattico',
+    'download' => 'Scarica',
+    'no_materials' => 'Nessun materiale disponibile ancora.',
+    'view_all' => 'Vedi Tutti',
 ];

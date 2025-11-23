@@ -250,6 +250,7 @@ Route::middleware(['auth', 'role:company_manager'])->group(function () {
 Route::middleware(['auth', 'role:teacher'])->group(function () {
     // Teacher's courses management
     Route::get('/teacher/my-courses', [\App\Http\Controllers\TeacherDashboardController::class, 'myCourses'])->name('teacher.my-courses');
+    Route::get('/teacher/courses/{course}', [\App\Http\Controllers\TeacherDashboardController::class, 'showCourse'])->name('teacher.course-details');
     Route::get('/teacher/courses/{course}/students', [\App\Http\Controllers\TeacherDashboardController::class, 'courseStudents'])->name('teacher.course-students');
 
     // Teacher's schedule

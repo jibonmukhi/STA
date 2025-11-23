@@ -171,17 +171,12 @@
                                             </td>
                                             <td class="text-end">
                                                 <div class="btn-group" role="group">
-                                                    <a href="{{ route('course-management.show', $course) }}" class="btn btn-sm btn-outline-info" title="{{ __('teacher.view_details') }}">
+                                                    <a href="{{ route('teacher.course-details', $course) }}" class="btn btn-sm btn-outline-info" title="{{ __('teacher.view_details') }}">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     <a href="{{ route('teacher.course-students', $course) }}" class="btn btn-sm btn-outline-primary" title="{{ __('teacher.view_students') }}">
                                                         <i class="fas fa-users"></i>
                                                     </a>
-                                                    @can('update', $course)
-                                                    <a href="{{ route('courses.edit', $course) }}" class="btn btn-sm btn-outline-secondary" title="{{ __('teacher.edit_course') }}">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    @endcan
                                                 </div>
                                             </td>
                                         </tr>
