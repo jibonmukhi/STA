@@ -33,37 +33,25 @@
                     <div class="card-body">
                         <h5 class="card-title mb-3">{{ __('teacher.session_statistics') }}</h5>
                         <div class="row text-center">
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="p-3 bg-light rounded">
                                     <h4 class="mb-0">{{ $stats['total_enrolled'] }}</h4>
                                     <small class="text-muted">{{ __('teacher.total_students') }}</small>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="p-3 bg-success bg-opacity-10 rounded">
                                     <h4 class="mb-0 text-success">{{ $stats['present'] }}</h4>
                                     <small class="text-muted">{{ __('teacher.present') }}</small>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="p-3 bg-danger bg-opacity-10 rounded">
                                     <h4 class="mb-0 text-danger">{{ $stats['absent'] }}</h4>
                                     <small class="text-muted">{{ __('teacher.absent') }}</small>
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                                <div class="p-3 bg-warning bg-opacity-10 rounded">
-                                    <h4 class="mb-0 text-warning">{{ $stats['excused'] }}</h4>
-                                    <small class="text-muted">{{ __('teacher.excused') }}</small>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="p-3 bg-info bg-opacity-10 rounded">
-                                    <h4 class="mb-0 text-info">{{ $stats['late'] }}</h4>
-                                    <small class="text-muted">{{ __('teacher.late') }}</small>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="p-3 bg-secondary bg-opacity-10 rounded">
                                     <h4 class="mb-0 text-secondary">{{ $stats['not_marked'] }}</h4>
                                     <small class="text-muted">{{ __('teacher.not_marked_students') }}</small>
@@ -153,29 +141,11 @@
 
                                                 <input type="radio" class="btn-check status-input"
                                                        name="status_{{ $enrollment->id }}"
-                                                       id="late_{{ $enrollment->id }}"
-                                                       value="late"
-                                                       {{ $currentStatus === 'late' ? 'checked' : '' }}>
-                                                <label class="btn btn-outline-warning" for="late_{{ $enrollment->id }}">
-                                                    <i class="fas fa-clock"></i> {{ __('teacher.late') }}
-                                                </label>
-
-                                                <input type="radio" class="btn-check status-input"
-                                                       name="status_{{ $enrollment->id }}"
                                                        id="absent_{{ $enrollment->id }}"
                                                        value="absent"
                                                        {{ $currentStatus === 'absent' ? 'checked' : '' }}>
                                                 <label class="btn btn-outline-danger" for="absent_{{ $enrollment->id }}">
                                                     <i class="fas fa-times"></i> {{ __('teacher.absent') }}
-                                                </label>
-
-                                                <input type="radio" class="btn-check status-input"
-                                                       name="status_{{ $enrollment->id }}"
-                                                       id="excused_{{ $enrollment->id }}"
-                                                       value="excused"
-                                                       {{ $currentStatus === 'excused' ? 'checked' : '' }}>
-                                                <label class="btn btn-outline-info" for="excused_{{ $enrollment->id }}">
-                                                    <i class="fas fa-minus-circle"></i> {{ __('teacher.excused') }}
                                                 </label>
                                             </div>
                                         </td>
@@ -250,8 +220,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (status === 'present') {
                 hoursInput.value = sessionDuration;
-            } else if (status === 'late') {
-                hoursInput.value = (sessionDuration * 0.75).toFixed(2);
             } else {
                 hoursInput.value = 0;
             }
