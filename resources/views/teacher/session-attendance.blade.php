@@ -6,6 +6,11 @@
         <div>
             <h2>{{ $course->title }} - {{ __('teacher.session_attendance') }}</h2>
             <p class="text-muted mb-0">{{ __('teacher.course_code') }}: {{ $course->course_code }}</p>
+            @if($course->assignedCompanies && $course->assignedCompanies->isNotEmpty())
+                <p class="text-muted mb-0">
+                    <span class="badge bg-secondary">{{ $course->assignedCompanies->pluck('name')->join(', ') }}</span>
+                </p>
+            @endif
         </div>
         <a href="{{ route('teacher.course-details', $course) }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> {{ __('teacher.back_to_course') }}

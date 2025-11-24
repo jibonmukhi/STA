@@ -175,7 +175,7 @@ class TeacherDashboardController extends Controller
 
         // Get course sessions for current month
         $sessions = CourseSession::query()
-            ->with(['course.teachers', 'course.enrollments'])
+            ->with(['course.teachers', 'course.enrollments', 'course.assignedCompanies'])
             ->whereIn('course_id', $courseIds)
             ->where(function($q) use ($currentYear, $currentMonth) {
                 $q->whereYear('session_date', $currentYear)
@@ -187,7 +187,7 @@ class TeacherDashboardController extends Controller
 
         // Get today's sessions
         $todaysSessions = CourseSession::query()
-            ->with(['course.teachers', 'course.enrollments'])
+            ->with(['course.teachers', 'course.enrollments', 'course.assignedCompanies'])
             ->whereIn('course_id', $courseIds)
             ->whereDate('session_date', now()->toDateString())
             ->orderBy('start_time', 'asc')
@@ -195,7 +195,7 @@ class TeacherDashboardController extends Controller
 
         // Get upcoming sessions (next 7 days)
         $upcomingSessions = CourseSession::query()
-            ->with(['course.teachers', 'course.enrollments'])
+            ->with(['course.teachers', 'course.enrollments', 'course.assignedCompanies'])
             ->whereIn('course_id', $courseIds)
             ->whereDate('session_date', '>=', now()->toDateString())
             ->whereDate('session_date', '<=', now()->addDays(7)->toDateString())
@@ -212,6 +212,7 @@ class TeacherDashboardController extends Controller
         // Format events for JavaScript (convert CourseSession to event format)
         $formattedEvents = $sessions->map(function($session) {
             $course = $session->course;
+            $courseColor = $course->color ?? 'info';
             $categoryColor = dataVaultColor('course_category', $course->category) ?? 'info';
             $statusColor = dataVaultColor('course_status', $course->status) ?? 'secondary';
 
@@ -241,6 +242,7 @@ class TeacherDashboardController extends Controller
                 'maxParticipants' => $session->max_participants ?? $course->max_participants ?? 0,
                 'registeredParticipants' => $course->enrollments->count(),
                 'category' => $course->category,
+                'courseColor' => $courseColor,
                 'categoryColor' => $categoryColor,
                 'statusColor' => $statusColor,
                 'deliveryMethod' => $course->delivery_method,
@@ -380,6 +382,9 @@ class TeacherDashboardController extends Controller
 
         $user = Auth::user();
 
+        // Load assigned companies
+        $course->load('assignedCompanies');
+
         // Get all sessions for this course
         $sessions = $course->sessions()
             ->orderBy('session_date', 'asc')
@@ -415,7 +420,7 @@ class TeacherDashboardController extends Controller
     {
         $this->authorize('markAttendance', $session->course);
 
-        $session->load(['course', 'attendances.student']);
+        $session->load(['course.assignedCompanies', 'attendances.student']);
 
         // Get all enrolled students
         $enrollments = $session->course->enrollments()

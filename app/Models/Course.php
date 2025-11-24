@@ -17,6 +17,7 @@ class Course extends Model
         'parent_course_id',
         'title',
         'course_code',
+        'color',
         'description',
         'objectives',
         'category',
@@ -208,5 +209,19 @@ class Course extends Model
     public function getCompletedStudentsCountAttribute(): int
     {
         return $this->enrollments()->completed()->count();
+    }
+
+    /**
+     * Get the color for this course. If not set, generate one based on course ID
+     */
+    public function getColorAttribute($value): string
+    {
+        if ($value) {
+            return $value;
+        }
+
+        // Generate consistent color based on course ID
+        $colors = ['primary', 'success', 'danger', 'warning', 'info', 'purple', 'pink', 'indigo', 'teal', 'orange'];
+        return $colors[$this->id % count($colors)];
     }
 }

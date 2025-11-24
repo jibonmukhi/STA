@@ -13,6 +13,11 @@
                 <strong>{{ __('common.time') }}:</strong> {{ $session->start_time->format('H:i') }} - {{ $session->end_time->format('H:i') }} |
                 <strong>{{ __('common.duration') }}:</strong> {{ $session->duration_hours }}{{ __('teacher.hours') }}
             </p>
+            @if($session->course->assignedCompanies && $session->course->assignedCompanies->isNotEmpty())
+                <p class="text-muted mb-0">
+                    <span class="badge bg-secondary">{{ $session->course->assignedCompanies->pluck('name')->join(', ') }}</span>
+                </p>
+            @endif
         </div>
         <div>
             <a href="{{ route('teacher.session-attendance', $session->course) }}" class="btn btn-secondary">
