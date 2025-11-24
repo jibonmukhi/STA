@@ -32,25 +32,38 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-3">
+                        <div class="col">
                             <a href="{{ route('teacher.course-students', $course) }}" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-users"></i> {{ __('teacher.view_students') }}
                             </a>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col">
                             <a href="{{ route('teacher.session-attendance', $course) }}" class="btn btn-outline-warning w-100">
                                 <i class="fas fa-clipboard-check"></i> {{ __('teacher.manage_attendance') }}
                             </a>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col">
                             <a href="{{ route('courses.schedule', $course) }}" class="btn btn-outline-success w-100">
                                 <i class="fas fa-clock"></i> {{ __('teacher.view_schedule') }}
                             </a>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col">
                             <a href="{{ route('teacher.schedule') }}" class="btn btn-outline-info w-100">
                                 <i class="fas fa-calendar-alt"></i> {{ __('teacher.my_schedule') }}
                             </a>
+                        </div>
+                        <div class="col">
+                            <a href="{{ route('teacher.course-certificates', $course) }}" class="btn btn-warning w-100">
+                                <i class="fas fa-award"></i> {{ __('teacher.view_certificates') }}
+                            </a>
+                        </div>
+                        <div class="col">
+                            <form action="{{ route('teacher.generate-certificates', $course) }}" method="POST" class="w-100">
+                                @csrf
+                                <button type="submit" class="btn btn-danger w-100" onclick="return confirm('{{ __('teacher.generate_certificates_confirm') }}')">
+                                    <i class="fas fa-certificate"></i> {{ __('teacher.generate_certificates') }}
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

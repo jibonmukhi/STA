@@ -13,6 +13,7 @@ use App\Models\CourseEnrollment;
 use App\Models\Certificate;
 use App\Models\CourseSession;
 use App\Models\SessionAttendance;
+use App\Models\User;
 use Carbon\Carbon;
 
 class TeacherDashboardController extends Controller
@@ -353,24 +354,61 @@ class TeacherDashboardController extends Controller
         return view('teacher.course-details', compact('course', 'stats'));
     }
 
-    public function certificates(): View
+    public function certificates(Request $request): View
     {
-        $user = Auth::user();
+        $user = auth()->user();
 
-        // Get all students from teacher's courses
-        $studentIds = CourseEnrollment::whereIn('course_id', $user->teacherCourses()->pluck('id'))
-            ->pluck('user_id')
-            ->unique()
-            ->toArray();
+        // Get all courses taught by this teacher
+        $courseIds = Course::whereHas('teachers', function($q) use ($user) {
+            $q->where('users.id', $user->id);
+        })->pluck('id');
 
-        // Get certificates for these students
-        $certificates = Certificate::whereIn('user_id', $studentIds)
-            ->orWhere('user_id', $user->id) // Include teacher's own certificates
-            ->with(['user', 'company'])
-            ->latest()
-            ->paginate(20);
+        // Get certificates for students in teacher's courses
+        $certificatesQuery = Certificate::query()
+            ->with(['user', 'user.companies'])
+            ->whereHas('user.courseEnrollments', function($q) use ($courseIds) {
+                $q->whereIn('course_id', $courseIds);
+            })
+            ->where('certificate_type', 'training');
 
-        return view('teacher.certificates', compact('certificates'));
+        // Filter by course if specified
+        if ($request->has('course_id') && $request->course_id) {
+            $certificatesQuery->whereHas('user.courseEnrollments', function($q) use ($request) {
+                $q->where('course_id', $request->course_id);
+            });
+        }
+
+        // Filter by student if specified
+        if ($request->has('student_id') && $request->student_id) {
+            $certificatesQuery->where('user_id', $request->student_id);
+        }
+
+        // Search functionality
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $certificatesQuery->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('subject', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($uq) use ($search) {
+                      $uq->where('name', 'like', "%{$search}%")
+                         ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $certificates = $certificatesQuery->orderBy('issue_date', 'desc')->paginate(20);
+
+        // Get list of courses for filter dropdown
+        $courses = Course::whereIn('id', $courseIds)
+            ->orderBy('title')
+            ->get();
+
+        // Get list of students for filter dropdown
+        $students = User::whereHas('courseEnrollments', function($q) use ($courseIds) {
+            $q->whereIn('course_id', $courseIds);
+        })->orderBy('name')->get();
+
+        return view('teacher.certificates', compact('certificates', 'courses', 'students'));
     }
 
     /**
@@ -557,5 +595,127 @@ class TeacherDashboardController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Generate certificates for all enrolled students
+     * Marks attendance for remaining sessions and creates certificates
+     */
+    public function generateCertificates(Course $course)
+    {
+        $this->authorize('generateCertificates', $course);
+
+        DB::beginTransaction();
+        try {
+            // 1. Get all non-closed sessions
+            $remainingSessions = $course->sessions()
+                ->where('status', '!=', 'completed')
+                ->get();
+
+            // 2. Get all enrolled students
+            $enrollments = $course->enrollments()
+                ->whereIn('status', ['enrolled', 'in_progress', 'completed'])
+                ->with('user')
+                ->get();
+
+            // 3. Mark attendance as present for remaining sessions
+            foreach ($remainingSessions as $session) {
+                foreach ($enrollments as $enrollment) {
+                    SessionAttendance::updateOrCreate(
+                        [
+                            'session_id' => $session->id,
+                            'user_id' => $enrollment->user_id,
+                            'enrollment_id' => $enrollment->id
+                        ],
+                        [
+                            'status' => 'present',
+                            'attended_hours' => $session->duration_hours,
+                            'marked_by' => auth()->id(),
+                            'marked_at' => now()
+                        ]
+                    );
+                }
+            }
+
+            // 4. Update enrollment status to completed and recalculate progress
+            foreach ($enrollments as $enrollment) {
+                $enrollment->update([
+                    'status' => 'completed',
+                    'completed_at' => now()
+                ]);
+                $enrollment->calculateProgressFromAttendance();
+            }
+
+            // 5. Delete existing and generate new certificates
+            $certificatesGenerated = 0;
+            foreach ($enrollments as $enrollment) {
+                // Delete existing certificates for this course
+                Certificate::where('user_id', $enrollment->user_id)
+                    ->where('subject', $course->title)
+                    ->delete();
+
+                // Create new certificate
+                Certificate::create([
+                    'user_id' => $enrollment->user_id,
+                    'company_id' => $enrollment->user->company_id ?? null,
+                    'name' => $course->title . ' - Certificate of Completion',
+                    'subject' => $course->title,
+                    'issue_date' => now(),
+                    'expiration_date' => now()->addYears(2),
+                    'training_organization' => config('app.name', 'Training Organization'),
+                    'certificate_type' => 'training',
+                    'hours_completed' => $enrollment->attended_hours,
+                    'grade' => $enrollment->grade,
+                    'status' => 'active',
+                    'notes' => 'Course: ' . $course->course_code,
+                ]);
+
+                $certificatesGenerated++;
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', __('teacher.certificates_generated_success', ['count' => $certificatesGenerated]));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Certificate generation failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', __('teacher.certificates_generation_failed'));
+        }
+    }
+
+    /**
+     * Display certificates for a specific course
+     * Shows all certificates generated for students in a particular course
+     */
+    public function courseCertificates(Course $course)
+    {
+        // Check if teacher has access to this course
+        $this->authorize('view', $course);
+
+        // Get certificates for this specific course
+        $certificates = Certificate::query()
+            ->with(['user', 'user.companies'])
+            ->whereHas('user.courseEnrollments', function($q) use ($course) {
+                $q->where('course_id', $course->id);
+            })
+            ->where('subject', $course->title)
+            ->where('certificate_type', 'training')
+            ->orderBy('issue_date', 'desc')
+            ->paginate(20);
+
+        // Get enrollment statistics
+        $stats = [
+            'total_enrolled' => $course->enrollments()->count(),
+            'certificates_issued' => $certificates->total(),
+            'pending_certificates' => $course->enrollments()
+                ->whereIn('status', ['enrolled', 'in_progress'])
+                ->count(),
+            'completion_rate' => $course->enrollments()->count() > 0
+                ? round(($certificates->total() / $course->enrollments()->count()) * 100, 1)
+                : 0
+        ];
+
+        return view('teacher.course-certificates', compact('course', 'certificates', 'stats'));
     }
 }

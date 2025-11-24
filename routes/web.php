@@ -45,13 +45,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:end_user')
         ->name('user.dashboard');
 
+    // Role-specific Calendar Routes
+    Route::get('/sta/calendar', [EndUserDashboardController::class, 'calendar'])
+        ->middleware('role:sta_manager')
+        ->name('sta.calendar');
+
+    Route::get('/company/calendar', [EndUserDashboardController::class, 'calendar'])
+        ->middleware('role:company_manager')
+        ->name('company.calendar');
+
+    Route::get('/user/calendar', [EndUserDashboardController::class, 'calendar'])
+        ->middleware('role:end_user')
+        ->name('user.calendar');
+
     // Common Pages (accessible by all authenticated users with permission check)
     Route::get('/certificate', [EndUserDashboardController::class, 'certificate'])
         ->middleware('can:view personal reports')
         ->name('certificate');
 
+    // Keep the generic calendar route as fallback (redirects to role-specific route)
     Route::get('/calendar', [EndUserDashboardController::class, 'calendar'])
-        ->middleware(['can:view personal reports', 'role:end_user'])
+        ->middleware('auth')
         ->name('calendar');
 
     Route::get('/reports', [EndUserDashboardController::class, 'reports'])
@@ -265,6 +279,10 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::post('/teacher/sessions/{session}/attendance', [\App\Http\Controllers\TeacherDashboardController::class, 'markAttendance'])->name('teacher.mark-attendance');
     Route::post('/teacher/sessions/{session}/attendance/bulk', [\App\Http\Controllers\TeacherDashboardController::class, 'bulkMarkAttendance'])->name('teacher.bulk-mark-attendance');
     Route::post('/teacher/sessions/{session}/close', [\App\Http\Controllers\TeacherDashboardController::class, 'closeSession'])->name('teacher.close-session');
+
+    // Certificate Generation and Viewing
+    Route::post('/teacher/courses/{course}/generate-certificates', [\App\Http\Controllers\TeacherDashboardController::class, 'generateCertificates'])->name('teacher.generate-certificates');
+    Route::get('/teacher/courses/{course}/certificates', [\App\Http\Controllers\TeacherDashboardController::class, 'courseCertificates'])->name('teacher.course-certificates');
 });
 
 // Public certificate verification (no auth required)

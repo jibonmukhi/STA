@@ -532,17 +532,6 @@
             </div>
             @endif
 
-            <!-- Additional Information -->
-            @if($certificate->notes)
-            <div class="info-card">
-                <h5><i class="fas fa-sticky-note"></i>{{ __('certificates.additional_info') }}</h5>
-
-                <div class="info-item">
-                    <span class="info-label">{{ __('certificates.notes') }}</span>
-                    <span class="info-value">{{ nl2br(e($certificate->notes)) }}</span>
-                </div>
-            </div>
-            @endif
         </div>
 
         <!-- Right Column -->

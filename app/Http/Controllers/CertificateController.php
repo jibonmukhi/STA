@@ -385,7 +385,7 @@ class CertificateController extends Controller
     /**
      * Download certificate file
      */
-    public function download(Certificate $certificate, $type = 'certificate')
+    public function download(Certificate $certificate, $type = 'pdf')
     {
         $user = Auth::user();
 
@@ -399,10 +399,37 @@ class CertificateController extends Controller
             }
         }
 
-        $filePath = $type === 'transcript' ? $certificate->transcript_file_path : $certificate->certificate_file_path;
+        // Load related user data
+        $certificate->load('user');
 
+        // If requesting PDF or no file exists, generate PDF on the fly
+        if ($type === 'pdf' || !$certificate->certificate_file_path || !Storage::exists($certificate->certificate_file_path)) {
+            // Generate PDF view
+            $html = view('certificates.pdf', compact('certificate'))->render();
+
+            // Return the HTML as a printable page (browser will handle PDF generation)
+            return response($html)
+                ->header('Content-Type', 'text/html')
+                ->header('Content-Disposition', 'inline; filename="certificate-' . $certificate->id . '.pdf"');
+        }
+
+        // For transcript type, check if transcript file exists
+        if ($type === 'transcript') {
+            $filePath = $certificate->transcript_file_path;
+            if (!$filePath || !Storage::exists($filePath)) {
+                abort(404, 'Transcript file not found');
+            }
+            return Storage::download($filePath);
+        }
+
+        // Default to certificate file if it exists
+        $filePath = $certificate->certificate_file_path;
         if (!$filePath || !Storage::exists($filePath)) {
-            abort(404, 'File not found');
+            // Generate PDF if no file exists
+            $html = view('certificates.pdf', compact('certificate'))->render();
+            return response($html)
+                ->header('Content-Type', 'text/html')
+                ->header('Content-Disposition', 'inline; filename="certificate-' . $certificate->id . '.pdf"');
         }
 
         return Storage::download($filePath);

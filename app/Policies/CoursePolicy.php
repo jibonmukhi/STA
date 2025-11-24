@@ -78,4 +78,10 @@ class CoursePolicy
 
         return false;
     }
+
+    public function generateCertificates(User $user, Course $course)
+    {
+        // Use the same authorization logic as markAttendance
+        return $this->markAttendance($user, $course);
+    }
 }

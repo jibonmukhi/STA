@@ -139,7 +139,7 @@ return [
         ],
         [
             'title' => 'navigation.calendar',
-            'route' => 'calendar',
+            'route' => 'sta.calendar',
             'icon' => 'fas fa-calendar',
             'permission' => 'view personal reports'
         ],
@@ -227,7 +227,7 @@ return [
         ],
         [
             'title' => 'navigation.calendar',
-            'route' => 'calendar',
+            'route' => 'company.calendar',
             'icon' => 'fas fa-calendar',
             'permission' => 'view personal reports'
         ],
@@ -314,7 +314,7 @@ return [
         ],
         [
             'title' => 'navigation.calendar',
-            'route' => 'calendar',
+            'route' => 'user.calendar',
             'icon' => 'fas fa-calendar',
             'permission' => 'view personal reports'
         ],

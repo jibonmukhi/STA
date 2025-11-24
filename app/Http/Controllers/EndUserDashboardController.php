@@ -89,8 +89,10 @@ class EndUserDashboardController extends Controller
             $coursesQuery->whereHas('enrollments', function($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
+        } elseif ($user->hasRole(['sta_manager', 'admin'])) {
+            // STA managers and admins see all courses (no additional filtering)
+            // No query modifications needed - they see everything
         }
-        // STA managers see all courses (no additional filtering)
 
         // Get course IDs that match the user's permissions
         $courseIds = (clone $coursesQuery)->pluck('id')->toArray();
@@ -215,18 +217,48 @@ class EndUserDashboardController extends Controller
             'completed_events' => CourseSession::whereIn('course_id', $courseIds)->where('status', 'completed')->count(),
         ];
 
-        return view('user.calendar', compact(
-            'events',
-            'formattedEvents',
-            'todaysEvents',
-            'upcomingEvents',
-            'stats',
-            'currentMonth',
-            'currentYear',
-            'monthNames',
-            'dayNames',
-            'dayNamesShort'
-        ));
+        // Return role-specific calendar view
+        if ($user->hasRole('sta_manager')) {
+            return view('sta.calendar', compact(
+                'events',
+                'formattedEvents',
+                'todaysEvents',
+                'upcomingEvents',
+                'stats',
+                'currentMonth',
+                'currentYear',
+                'monthNames',
+                'dayNames',
+                'dayNamesShort'
+            ));
+        } elseif ($user->hasRole('company_manager')) {
+            return view('company.calendar', compact(
+                'events',
+                'formattedEvents',
+                'todaysEvents',
+                'upcomingEvents',
+                'stats',
+                'currentMonth',
+                'currentYear',
+                'monthNames',
+                'dayNames',
+                'dayNamesShort'
+            ));
+        } else {
+            // Default for end users
+            return view('user.calendar', compact(
+                'events',
+                'formattedEvents',
+                'todaysEvents',
+                'upcomingEvents',
+                'stats',
+                'currentMonth',
+                'currentYear',
+                'monthNames',
+                'dayNames',
+                'dayNamesShort'
+            ));
+        }
     }
 
     public function reports(): View
