@@ -191,33 +191,33 @@
                                     $isCompleted = $session->status === 'completed';
                                 @endphp
                                 <a href="{{ route('teacher.session-attendance-detail', $session) }}" class="list-group-item list-group-item-action session-item session-today-sidebar {{ $isCompleted ? 'session-completed' : '' }}" style="text-decoration: none; color: inherit;">
-                                    <div class="d-flex align-items-start">
-                                        <span class="session-number-small me-2">{{ $index + 1 }}</span>
-                                        <div class="flex-grow-1">
-                                            <div class="mb-2">
-                                                <span class="badge bg-{{ $courseColor }} me-1">{{ $course->title }}</span>
-                                                <span class="badge bg-info me-1">{{ $session->session_title }}</span>
-                                                @if($course->assignedCompanies && $course->assignedCompanies->isNotEmpty())
-                                                    <span class="badge bg-secondary">{{ $course->assignedCompanies->pluck('name')->join(', ') }}</span>
-                                                @endif
+                                    <div class="d-flex align-items-start" style="width: 100%;">
+                                        <span class="session-number-small me-2 flex-shrink-0">{{ $index + 1 }}</span>
+                                        <div class="flex-grow-1" style="min-width: 0; max-width: 100%; overflow: hidden;">
+                                            <div class="mb-1" style="width: 100%;">
+                                                <div class="d-flex flex-wrap gap-1" style="width: 100%;">
+                                                    <span class="badge bg-{{ $courseColor }}" style="max-width: 100%;">{{ $course->title }}</span>
+                                                    <span class="badge bg-info" style="max-width: 100%;">{{ $session->session_title }}</span>
+                                                    @if($course->assignedCompanies && $course->assignedCompanies->isNotEmpty())
+                                                        <span class="badge bg-secondary" style="max-width: 100%;">{{ $course->assignedCompanies->pluck('name')->join(', ') }}</span>
+                                                    @endif
+                                                    @if($isCompleted)
+                                                        <span class="badge bg-success" style="max-width: 100%;">
+                                                            <i class="fas fa-check"></i> {{ __('teacher.completed') }}
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-warning" style="max-width: 100%;">
+                                                            <i class="fas fa-star"></i> {{ __('teacher.today') }}
+                                                        </span>
+                                                    @endif
+                                                </div>
                                             </div>
-                                            <p class="mb-0 text-muted small">
+                                            <p class="mb-0 text-muted small" style="width: 100%; overflow: hidden;">
                                                 <i class="fas fa-clock text-primary"></i> {{ \Carbon\Carbon::parse($session->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($session->end_time)->format('H:i') }}
-                                                <span class="ms-2">
+                                                <span class="d-inline-block ms-2">
                                                     <i class="fas fa-hourglass-half text-success"></i> {{ $session->duration_hours }}{{ __('teacher.hours') }}
                                                 </span>
                                             </p>
-                                        </div>
-                                        <div class="text-end">
-                                            @if($isCompleted)
-                                                <span class="badge bg-success">
-                                                    <i class="fas fa-check"></i> {{ __('teacher.completed') }}
-                                                </span>
-                                            @else
-                                                <span class="badge bg-warning">
-                                                    <i class="fas fa-star"></i> {{ __('teacher.today') }}
-                                                </span>
-                                            @endif
                                         </div>
                                     </div>
                                 </a>
@@ -247,40 +247,38 @@
                                     $isPast = $session->session_date < now();
                                 @endphp
                                 <a href="{{ route('teacher.session-attendance-detail', $session) }}" class="list-group-item list-group-item-action session-item {{ $isToday ? 'session-today-sidebar' : '' }} {{ $isCompleted ? 'session-completed' : '' }}" style="text-decoration: none; color: inherit;">
-                                    <div class="d-flex align-items-start">
-                                        <span class="session-number-small me-2">{{ $index + 1 }}</span>
-                                        <div class="flex-grow-1">
-                                            <div class="mb-2">
-                                                <span class="badge bg-{{ $courseColor }} me-1">{{ $course->title }}</span>
-                                                <span class="badge bg-info me-1">{{ $session->session_title }}</span>
-                                                @if($course->assignedCompanies && $course->assignedCompanies->isNotEmpty())
-                                                    <span class="badge bg-secondary">{{ $course->assignedCompanies->pluck('name')->join(', ') }}</span>
-                                                @endif
+                                    <div class="d-flex align-items-start" style="width: 100%;">
+                                        <span class="session-number-small me-2 flex-shrink-0">{{ $index + 1 }}</span>
+                                        <div class="flex-grow-1" style="min-width: 0; max-width: 100%; overflow: hidden;">
+                                            <div class="mb-1" style="width: 100%;">
+                                                <div class="d-flex flex-wrap gap-1" style="width: 100%;">
+                                                    <span class="badge bg-{{ $courseColor }}" style="max-width: 100%;">{{ $course->title }}</span>
+                                                    <span class="badge bg-info" style="max-width: 100%;">{{ $session->session_title }}</span>
+                                                    @if($course->assignedCompanies && $course->assignedCompanies->isNotEmpty())
+                                                        <span class="badge bg-secondary" style="max-width: 100%;">{{ $course->assignedCompanies->pluck('name')->join(', ') }}</span>
+                                                    @endif
+                                                    @if($isCompleted)
+                                                        <span class="badge bg-success" style="max-width: 100%;">
+                                                            <i class="fas fa-check"></i> {{ __('teacher.completed') }}
+                                                        </span>
+                                                    @elseif($isToday)
+                                                        <span class="badge bg-warning" style="max-width: 100%;">
+                                                            <i class="fas fa-star"></i> {{ __('teacher.today') }}
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-info" style="max-width: 100%;">
+                                                            <i class="fas fa-arrow-right"></i> {{ __('teacher.upcoming') }}
+                                                        </span>
+                                                    @endif
+                                                    <span class="badge bg-{{ $categoryColor }}" style="max-width: 100%;">{{ dataVaultLabel('course_category', $course->category) }}</span>
+                                                </div>
                                             </div>
-                                            <p class="mb-0 text-muted small">
+                                            <p class="mb-0 text-muted small" style="width: 100%; overflow: hidden;">
                                                 <i class="fas fa-calendar text-info"></i> {{ $session->session_date->format('d/m/Y') }}
-                                                <span class="ms-2">
+                                                <span class="d-inline-block ms-2">
                                                     <i class="fas fa-clock text-primary"></i> {{ \Carbon\Carbon::parse($session->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($session->end_time)->format('H:i') }}
                                                 </span>
                                             </p>
-                                        </div>
-                                        <div class="text-end">
-                                            @if($isCompleted)
-                                                <span class="badge bg-success mb-1">
-                                                    <i class="fas fa-check"></i> {{ __('teacher.completed') }}
-                                                </span>
-                                            @elseif($isToday)
-                                                <span class="badge bg-warning mb-1">
-                                                    <i class="fas fa-star"></i> {{ __('teacher.today') }}
-                                                </span>
-                                            @else
-                                                <span class="badge bg-info mb-1">
-                                                    <i class="fas fa-arrow-right"></i> {{ __('teacher.upcoming') }}
-                                                </span>
-                                            @endif
-                                            <div>
-                                                <span class="badge bg-{{ $categoryColor }} small">{{ dataVaultLabel('course_category', $course->category) }}</span>
-                                            </div>
                                         </div>
                                     </div>
                                 </a>
@@ -408,7 +406,16 @@
         font-weight: bold;
     }
 
+    /* Prevent horizontal scroll in sidebar */
+    .col-lg-3 .card-body {
+        overflow-x: hidden;
+    }
+
     /* Session List Enhancements */
+    .session-list {
+        overflow-x: hidden;
+    }
+
     .session-list .session-item {
         transition: all 0.3s ease;
         border-left: 3px solid transparent;
@@ -417,6 +424,8 @@
         border-radius: 0.375rem;
         cursor: pointer;
         border: 1px solid #e9ecef;
+        overflow-x: hidden;
+        word-wrap: break-word;
     }
 
     .session-list .session-item:hover {
@@ -424,6 +433,32 @@
         background-color: rgba(102, 126, 234, 0.05);
         transform: translateX(3px);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .session-list .session-item .flex-grow-1 {
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    .session-list .session-item .badge {
+        display: inline-block;
+        margin-bottom: 4px;
+        white-space: normal;
+        line-height: 1.3;
+        word-break: break-word;
+        max-width: 100%;
+        font-size: 0.7rem;
+    }
+
+    .session-list .session-item .d-flex.flex-wrap {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .session-list .session-item p {
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
     }
 
     .session-today-sidebar {
@@ -547,9 +582,11 @@
     }
 
     .day-events-column .event-slot {
-        display: block;
-        position: relative;
-        padding: 0;
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        align-items: flex-start;
+        padding: 2px;
     }
 
     .calendar-event {
@@ -569,6 +606,15 @@
         flex-wrap: wrap;
         gap: 2px;
         align-items: center;
+    }
+
+    .day-events-column .calendar-event {
+        position: relative !important;
+        flex: 1;
+        width: auto !important;
+        margin: 0 !important;
+        min-height: 54px;
+        height: auto !important;
     }
 
     .calendar-event:hover {
@@ -938,17 +984,13 @@
 
         dayEvents.forEach(event => {
             const startHour = parseInt(event.startTime.split(':')[0]);
-            const startMinute = parseInt(event.startTime.split(':')[1]);
-            const endHour = parseInt(event.endTime.split(':')[0]);
-            const endMinute = parseInt(event.endTime.split(':')[1]);
 
             if (startHour >= 6 && startHour <= 22) {
                 const eventSlot = eventsColumn.querySelector(`[data-hour="${startHour}"]`);
                 if (eventSlot) {
                     const eventEl = createEventElement(event);
-                    eventEl.style.marginTop = `${(startMinute / 60) * 100}%`;
-                    const duration = (endHour - startHour) + (endMinute - startMinute) / 60;
-                    eventEl.style.height = `${Math.max(duration * 60, 30)}px`;
+                    // Don't use absolute positioning for day view
+                    // Events will be displayed side-by-side using flexbox
                     eventSlot.appendChild(eventEl);
                 }
             }
