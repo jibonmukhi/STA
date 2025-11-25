@@ -11,9 +11,9 @@ Armenia,Armenia,Z252,AM,ARM
 Australia,Australia,Z700,AU,AUS
 Austria,Austria,Z102,AT,AUT
 Azerbaigian,Azerbaijan,Z253,AZ,AZE
-Bahamas,Bahamas,Z533,BS,BHS
+Bahamas,Bahamas,Z502,BS,BHS
 Bahrein,Bahrain,Z204,BH,BHR
-Bangladesh,Bangladesh,Z250,BD,BGD
+Bangladesh,Bangladesh,Z249,BD,BGD
 Barbados,Barbados,Z522,BB,BRB
 Belgio,Belgium,Z103,BE,BEL
 Belize,Belize,Z512,BZ,BLZ
@@ -100,7 +100,7 @@ Lussemburgo,Luxembourg,Z119,LU,LUX
 Madagascar,Madagascar,Z325,MG,MDG
 Malawi,Malawi,Z327,MW,MWI
 Maldive,Maldives,Z230,MV,MDV
-Malaysia,Malaysia,Z218,MY,MYS
+Malaysia,Malaysia,Z247,MY,MYS
 Mali,Mali,Z328,ML,MLI
 Malta,Malta,Z121,MT,MLT
 Marocco,Morocco,Z330,MA,MAR
@@ -125,12 +125,12 @@ Norvegia,Norway,Z126,NO,NOR
 Nuova Zelanda,New Zealand,Z719,NZ,NZL
 Oman,Oman,Z233,OM,OMN
 Paesi Bassi,Netherlands,Z127,NL,NLD
-Pakistan,Pakistan,Z234,PK,PAK
+Pakistan,Pakistan,Z236,PK,PAK
 Palau,Palau,Z727,PW,PLW
 Panama,Panama,Z515,PA,PAN
 Papua Nuova Guinea,Papua New Guinea,Z730,PG,PNG
 Paraguay,Paraguay,Z607,PY,PRY
-Perù,Peru,Z608,PE,PER
+Perù,Peru,Z611,PE,PER
 Polonia,Poland,Z128,PL,POL
 Portogallo,Portugal,Z129,PT,PRT
 Qatar,Qatar,Z235,QA,QAT
@@ -154,17 +154,17 @@ Serbia,Serbia,Z158,RS,SRB
 Seychelles,Seychelles,Z342,SC,SYC
 Sierra Leone,Sierra Leone,Z343,SL,SLE
 Singapore,Singapore,Z248,SG,SGP
-Siria,Syria,Z236,SY,SYR
+Siria,Syria,Z240,SY,SYR
 Slovacchia,Slovakia,Z155,SK,SVK
 Slovenia,Slovenia,Z150,SI,SVN
 Somalia,Somalia,Z344,SO,SOM
 Spagna,Spain,Z131,ES,ESP
-Sri Lanka,Sri Lanka,Z246,LK,LKA
+Sri Lanka,Sri Lanka,Z209,LK,LKA
 Stati Uniti,United States,Z404,US,USA
 Sudafrica,South Africa,Z360,ZA,ZAF
-Sudan,Sudan,Z345,SD,SDN
+Sudan,Sudan,Z348,SD,SDN
 Sudan del Sud,South Sudan,Z369,SS,SSD
-Suriname,Suriname,Z610,SR,SUR
+Suriname,Suriname,Z608,SR,SUR
 Svezia,Sweden,Z136,SE,SWE
 Svizzera,Switzerland,Z133,CH,CHE
 Swaziland,Swaziland,Z365,SZ,SWZ
@@ -172,9 +172,9 @@ Tagikistan,Tajikistan,Z257,TJ,TJK
 Tanzania,Tanzania,Z347,TZ,TZA
 Tailandia,Thailand,Z241,TH,THA
 Timor Est,East Timor,Z242,TL,TLS
-Togo,Togo,Z348,TG,TGO
+Togo,Togo,Z351,TG,TGO
 Tonga,Tonga,Z728,TO,TON
-Trinidad e Tobago,Trinidad and Tobago,Z523,TT,TTO
+Trinidad e Tobago,Trinidad and Tobago,Z612,TT,TTO
 Tunisia,Tunisia,Z349,TN,TUN
 Turchia,Turkey,Z243,TR,TUR
 Turkmenistan,Turkmenistan,Z258,TM,TKM
@@ -182,12 +182,12 @@ Tuvalu,Tuvalu,Z731,TV,TUV
 Ucraina,Ukraine,Z138,UA,UKR
 Uganda,Uganda,Z350,UG,UGA
 Ungheria,Hungary,Z134,HU,HUN
-Uruguay,Uruguay,Z611,UY,URY
+Uruguay,Uruguay,Z613,UY,URY
 Uzbekistan,Uzbekistan,Z259,UZ,UZB
 Vanuatu,Vanuatu,Z732,VU,VUT
 Città del Vaticano,Vatican City,Z106,VA,VAT
-Venezuela,Venezuela,Z612,VE,VEN
-Vietnam,Vietnam,Z245,VN,VNM
-Yemen,Yemen,Z247,YE,YEM
-Zambia,Zambia,Z351,ZM,ZMB
+Venezuela,Venezuela,Z614,VE,VEN
+Vietnam,Vietnam,Z251,VN,VNM
+Yemen,Yemen,Z246,YE,YEM
+Zambia,Zambia,Z355,ZM,ZMB
 Zimbabwe,Zimbabwe,Z352,ZW,ZWE
