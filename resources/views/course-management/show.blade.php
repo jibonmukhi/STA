@@ -362,8 +362,6 @@
                                         <th>Enrolled Date</th>
                                         <th>Progress</th>
                                         <th>Status</th>
-                                        <th>Score</th>
-                                        <th>Grade</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -397,8 +395,6 @@
                                             @endphp
                                             <span class="badge bg-{{ $color }}">{{ ucfirst(str_replace('_', ' ', $enrollment->status)) }}</span>
                                         </td>
-                                        <td>{{ $enrollment->final_score ?? '-' }}</td>
-                                        <td>{{ $enrollment->grade ?? '-' }}</td>
                                         <td>
                                             @can('manageStudents', $course)
                                             <form action="{{ route('enrollments.destroy', $enrollment) }}" method="POST" class="d-inline"
