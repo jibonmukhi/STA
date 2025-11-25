@@ -394,9 +394,6 @@
                                 <div class="text-muted">
                                     <small>{{ $related->created_at->diffForHumans() }}</small>
                                 </div>
-                                <a href="{{ route('audit-logs.show', $related) }}" class="btn btn-sm btn-link p-0">
-                                    View Details →
-                                </a>
                             </div>
                         </div>
                         @endforeach

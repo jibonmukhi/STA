@@ -18,13 +18,13 @@
                             <!-- View Mode Selector -->
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-outline-primary" id="view-day" onclick="changeView('day')">
-                                    <i class="fas fa-calendar-day"></i> Day
+                                    <i class="fas fa-calendar-day"></i> {{ trans('calendar.day') }}
                                 </button>
                                 <button type="button" class="btn btn-outline-primary" id="view-week" onclick="changeView('week')">
-                                    <i class="fas fa-calendar-week"></i> Week
+                                    <i class="fas fa-calendar-week"></i> {{ trans('calendar.week') }}
                                 </button>
                                 <button type="button" class="btn btn-outline-primary" id="view-month" onclick="changeView('month')">
-                                    <i class="fas fa-calendar-alt"></i> Month
+                                    <i class="fas fa-calendar-alt"></i> {{ trans('calendar.month') }}
                                 </button>
                             </div>
                             <!-- Navigation -->

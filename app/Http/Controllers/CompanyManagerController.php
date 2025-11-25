@@ -180,8 +180,17 @@ class CompanyManagerController extends Controller
         // Add the manager's own ID
         $companyUserIds[] = $user->id;
 
-        // Get audit logs for company-related users only
-        $query = AuditLog::whereIn('user_id', $companyUserIds);
+        // Define security-sensitive actions and modules to exclude from company manager view
+        $excludedActions = ['logged_in', 'logged_out', 'password_changed', 'role_assigned', 'role_removed'];
+        $excludedModules = ['auth', 'system', 'security'];
+
+        // Get audit logs for company-related users only, excluding security-sensitive activities
+        $query = AuditLog::whereIn('user_id', $companyUserIds)
+            ->whereNotIn('action', $excludedActions)
+            ->where(function($q) use ($excludedModules) {
+                $q->whereNotIn('module', $excludedModules)
+                  ->orWhereNull('module');
+            });
 
         // Filter by action
         if ($request->filled('action')) {
@@ -212,9 +221,19 @@ class CompanyManagerController extends Controller
             });
         }
 
-        // Get unique values for filters (only from company-related logs)
-        $actions = AuditLog::whereIn('user_id', $companyUserIds)->distinct()->pluck('action')->sort();
-        $modules = AuditLog::whereIn('user_id', $companyUserIds)->distinct()->pluck('module')->sort();
+        // Get unique values for filters (only from company-related logs, excluding security-sensitive items)
+        $actions = AuditLog::whereIn('user_id', $companyUserIds)
+            ->whereNotIn('action', $excludedActions)
+            ->distinct()
+            ->pluck('action')
+            ->sort();
+
+        $modules = AuditLog::whereIn('user_id', $companyUserIds)
+            ->whereNotIn('module', $excludedModules)
+            ->whereNotNull('module')
+            ->distinct()
+            ->pluck('module')
+            ->sort();
 
         // Sorting
         $sortField = $request->get('sort', 'created_at');
@@ -225,12 +244,19 @@ class CompanyManagerController extends Controller
         $perPage = $request->get('per_page', 25);
         $logs = $query->paginate($perPage)->withQueryString();
 
-        // Statistics (only from company-related logs)
+        // Statistics (only from company-related logs, excluding security-sensitive items)
+        $baseStatsQuery = AuditLog::whereIn('user_id', $companyUserIds)
+            ->whereNotIn('action', $excludedActions)
+            ->where(function($q) use ($excludedModules) {
+                $q->whereNotIn('module', $excludedModules)
+                  ->orWhereNull('module');
+            });
+
         $stats = [
-            'total_today' => AuditLog::whereIn('user_id', $companyUserIds)->whereDate('created_at', today())->count(),
-            'total_week' => AuditLog::whereIn('user_id', $companyUserIds)->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-            'total_month' => AuditLog::whereIn('user_id', $companyUserIds)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
-            'total_all' => AuditLog::whereIn('user_id', $companyUserIds)->count(),
+            'total_today' => (clone $baseStatsQuery)->whereDate('created_at', today())->count(),
+            'total_week' => (clone $baseStatsQuery)->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'total_month' => (clone $baseStatsQuery)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
+            'total_all' => (clone $baseStatsQuery)->count(),
         ];
 
         return view('company-manager.audit-logs', compact('logs', 'actions', 'modules', 'stats'));
