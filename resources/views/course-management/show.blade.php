@@ -260,8 +260,11 @@
                             $isPast = $session->session_date < now();
                             $isToday = $session->session_date->isToday();
                             $isFuture = $session->session_date > now();
+                            $sessionUrl = auth()->user()->hasRole(['sta_manager', 'super_admin'])
+                                ? route('sta.session-attendance-detail', $session)
+                                : '#';
                         @endphp
-                        <div class="list-group-item list-group-item-action session-item {{ $isToday ? 'session-today' : '' }} {{ $isCompleted ? 'session-completed' : '' }}" style="text-decoration: none; color: inherit;">
+                        <a href="{{ $sessionUrl }}" class="list-group-item list-group-item-action session-item {{ $isToday ? 'session-today' : '' }} {{ $isCompleted ? 'session-completed' : '' }}" style="text-decoration: none; color: inherit;">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-2">
@@ -306,7 +309,7 @@
                                     @endif
                                 </div>
                             </div>
-                        </div>
+                        </a>
                         @endforeach
                     </div>
 

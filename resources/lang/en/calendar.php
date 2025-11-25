@@ -3,6 +3,7 @@
 return [
     // Calendar Navigation
     'calendar' => 'Calendar',
+    'view_all_course_sessions' => 'View all course sessions',
     'today' => 'Today',
     'previous' => 'Previous',
     'next' => 'Next',
