@@ -71,6 +71,21 @@
                                 <i class="fas fa-clock"></i> View Schedule
                             </a>
                         </div>
+                        @if(auth()->user()->hasRole(['sta_manager', 'super_admin']))
+                        <div class="col-md-3">
+                            <a href="{{ route('sta.session-attendance', $course) }}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-clipboard-check"></i> Manage Attendance
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <form action="{{ route('teacher.generate-certificates', $course) }}" method="POST" class="w-100">
+                                @csrf
+                                <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to generate certificates for all eligible students in this course?')">
+                                    <i class="fas fa-certificate"></i> Generate Certificates
+                                </button>
+                            </form>
+                        </div>
+                        @endif
                         <div class="col-md-3">
                             <a href="{{ route('courses.planning') }}" class="btn btn-outline-secondary w-100">
                                 <i class="fas fa-project-diagram"></i> Course Planning

@@ -40,6 +40,14 @@ class SessionAttendance extends Model
     }
 
     /**
+     * Alias for student relationship for consistency
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
      * Get the enrollment this attendance is associated with
      */
     public function enrollment(): BelongsTo

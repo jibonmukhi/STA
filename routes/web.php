@@ -223,6 +223,13 @@ Route::middleware(['auth', 'role:sta_manager'])->group(function () {
         Route::post('/cleanup', [AuditLogController::class, 'cleanup'])->name('cleanup.perform');
         Route::get('/{auditLog}', [AuditLogController::class, 'show'])->name('show');
     });
+
+    // STA Manager Attendance Management Routes
+    Route::get('/sta/courses/{course}/sessions/attendance', [\App\Http\Controllers\STAManagerDashboardController::class, 'sessionAttendance'])->name('sta.session-attendance');
+    Route::get('/sta/sessions/{session}/attendance', [\App\Http\Controllers\STAManagerDashboardController::class, 'showSessionAttendance'])->name('sta.session-attendance-detail');
+    Route::post('/sta/sessions/{session}/attendance', [\App\Http\Controllers\STAManagerDashboardController::class, 'markAttendance'])->name('sta.mark-attendance');
+    Route::post('/sta/sessions/{session}/attendance/bulk', [\App\Http\Controllers\STAManagerDashboardController::class, 'bulkMarkAttendance'])->name('sta.bulk-mark-attendance');
+    Route::post('/sta/sessions/{session}/close', [\App\Http\Controllers\STAManagerDashboardController::class, 'closeSession'])->name('sta.close-session');
 });
 
 // Company Manager Routes
@@ -261,7 +268,7 @@ Route::middleware(['auth', 'role:company_manager'])->group(function () {
 });
 
 // Teacher Routes
-Route::middleware(['auth', 'role:teacher'])->group(function () {
+Route::middleware(['auth', 'role:teacher|sta_manager|super_admin'])->group(function () {
     // Teacher's courses management
     Route::get('/teacher/my-courses', [\App\Http\Controllers\TeacherDashboardController::class, 'myCourses'])->name('teacher.my-courses');
     Route::get('/teacher/courses/{course}', [\App\Http\Controllers\TeacherDashboardController::class, 'showCourse'])->name('teacher.course-details');
@@ -273,14 +280,14 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     // Teacher's certificates
     Route::get('/teacher/certificates', [\App\Http\Controllers\TeacherDashboardController::class, 'certificates'])->name('teacher.certificates');
 
-    // Session Attendance Management
+    // Session Attendance Management (Teachers and STA Managers)
     Route::get('/teacher/courses/{course}/sessions/attendance', [\App\Http\Controllers\TeacherDashboardController::class, 'sessionAttendance'])->name('teacher.session-attendance');
     Route::get('/teacher/sessions/{session}/attendance', [\App\Http\Controllers\TeacherDashboardController::class, 'showSessionAttendance'])->name('teacher.session-attendance-detail');
     Route::post('/teacher/sessions/{session}/attendance', [\App\Http\Controllers\TeacherDashboardController::class, 'markAttendance'])->name('teacher.mark-attendance');
     Route::post('/teacher/sessions/{session}/attendance/bulk', [\App\Http\Controllers\TeacherDashboardController::class, 'bulkMarkAttendance'])->name('teacher.bulk-mark-attendance');
     Route::post('/teacher/sessions/{session}/close', [\App\Http\Controllers\TeacherDashboardController::class, 'closeSession'])->name('teacher.close-session');
 
-    // Certificate Generation and Viewing
+    // Certificate Generation and Viewing (Teachers and STA Managers)
     Route::post('/teacher/courses/{course}/generate-certificates', [\App\Http\Controllers\TeacherDashboardController::class, 'generateCertificates'])->name('teacher.generate-certificates');
     Route::get('/teacher/courses/{course}/certificates', [\App\Http\Controllers\TeacherDashboardController::class, 'courseCertificates'])->name('teacher.course-certificates');
 });

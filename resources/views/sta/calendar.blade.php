@@ -190,7 +190,11 @@
                                     $courseColor = $course->color ?? 'info';
                                     $isCompleted = $session->status === 'completed';
                                 @endphp
-                                <div class="list-group-item list-group-item-action session-item session-today-sidebar {{ $isCompleted ? 'session-completed' : '' }}">
+                                <div class="list-group-item list-group-item-action session-item session-today-sidebar {{ $isCompleted ? 'session-completed' : '' }}"
+                                     style="cursor: pointer;"
+                                     data-session-id="{{ $session->id }}"
+                                     data-course-id="{{ $course->id }}"
+                                     onclick="window.location.href='{{ route('sta.session-attendance-detail', $session) }}'">
                                     <div class="d-flex align-items-start" style="width: 100%;">
                                         <span class="session-number-small me-2 flex-shrink-0">{{ $index + 1 }}</span>
                                         <div class="flex-grow-1" style="min-width: 0; max-width: 100%; overflow: hidden;">
@@ -245,7 +249,11 @@
                                     $isCompleted = $session->status === 'completed';
                                     $isToday = $session->session_date->isToday();
                                 @endphp
-                                <div class="list-group-item list-group-item-action session-item {{ $isToday ? 'session-today-sidebar' : '' }} {{ $isCompleted ? 'session-completed' : '' }}">
+                                <div class="list-group-item list-group-item-action session-item {{ $isToday ? 'session-today-sidebar' : '' }} {{ $isCompleted ? 'session-completed' : '' }}"
+                                     style="cursor: pointer;"
+                                     data-session-id="{{ $session->id }}"
+                                     data-course-id="{{ $course->id }}"
+                                     onclick="window.location.href='{{ route('sta.session-attendance-detail', $session) }}'">
                                     <div class="d-flex align-items-start" style="width: 100%;">
                                         <span class="session-number-small me-2 flex-shrink-0">{{ $index + 1 }}</span>
                                         <div class="flex-grow-1" style="min-width: 0; max-width: 100%; overflow: hidden;">
@@ -321,26 +329,28 @@
 
     .event-item {
         border-left: 3px solid;
-        font-size: 0.75rem;
-        padding: 4px 6px;
-        margin-bottom: 2px;
-        border-radius: 2px;
+        font-size: 0.8rem;
+        padding: 5px 8px;
+        margin-bottom: 3px;
+        border-radius: 3px;
         cursor: pointer;
         transition: all 0.2s ease;
         display: flex;
         flex-wrap: wrap;
-        gap: 2px;
+        gap: 3px;
         align-items: center;
     }
 
     .event-item:hover {
         transform: translateX(2px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
 
     .event-item .badge {
-        line-height: 1.2;
-        padding: 2px 6px;
+        line-height: 1.3;
+        padding: 3px 7px;
+        font-size: 0.75rem;
+        font-weight: 600;
         white-space: nowrap;
         max-width: 100%;
         overflow: hidden;
@@ -584,19 +594,31 @@
         position: absolute;
         width: calc(100% - 8px);
         margin: 0 4px;
-        padding: 6px 8px;
+        padding: 8px 10px;
         border-radius: 4px;
-        border-left: 3px solid;
+        border-left: 4px solid;
         background-color: #fff;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         overflow: visible;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.12);
         transition: all 0.2s ease;
         z-index: 1;
         display: flex;
         flex-wrap: wrap;
-        gap: 2px;
+        gap: 3px;
         align-items: center;
+    }
+
+    .calendar-event .badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 3px 7px;
+    }
+
+    .calendar-event .event-time-info {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #495057 !important;
     }
 
     .day-events-column .calendar-event {
@@ -604,12 +626,12 @@
         flex: 1;
         width: auto !important;
         margin: 0 !important;
-        min-height: 54px;
+        min-height: 60px;
         height: auto !important;
     }
 
     .calendar-event:hover {
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.18);
         transform: translateX(2px);
         z-index: 10;
     }
@@ -842,15 +864,22 @@
                     eventEl.className = `event-item ${event.eventType} ${statusClass}`;
                     eventEl.style.cursor = 'pointer';
 
+                    // Add click handler to redirect to attendance page
+                    eventEl.addEventListener('click', function() {
+                        window.location.href = `/sta/sessions/${event.sessionId}/attendance`;
+                    });
+
                     // Create badges for course, session, and company
                     const courseBadge = document.createElement('span');
                     courseBadge.className = `badge bg-${event.courseColor || 'primary'} me-1 mb-1`;
-                    courseBadge.style.fontSize = '0.65rem';
+                    courseBadge.style.fontSize = '0.75rem';
+                    courseBadge.style.fontWeight = '600';
                     courseBadge.textContent = event.courseTitle;
 
                     const sessionBadge = document.createElement('span');
                     sessionBadge.className = 'badge bg-info me-1 mb-1';
-                    sessionBadge.style.fontSize = '0.65rem';
+                    sessionBadge.style.fontSize = '0.75rem';
+                    sessionBadge.style.fontWeight = '600';
                     sessionBadge.textContent = event.sessionTitle;
 
                     eventEl.appendChild(courseBadge);
@@ -860,7 +889,8 @@
                     if (event.companyNames && event.companyNames.trim() !== '' && event.companyNames !== 'N/A') {
                         const companyBadge = document.createElement('span');
                         companyBadge.className = 'badge bg-secondary mb-1';
-                        companyBadge.style.fontSize = '0.65rem';
+                        companyBadge.style.fontSize = '0.75rem';
+                        companyBadge.style.fontWeight = '600';
                         companyBadge.textContent = event.companyNames;
                         eventEl.appendChild(companyBadge);
                     }
@@ -1092,15 +1122,22 @@
         eventEl.className = `calendar-event ${statusClass}`;
         eventEl.style.cursor = 'pointer';
 
+        // Add click handler to redirect to attendance page
+        eventEl.addEventListener('click', function() {
+            window.location.href = `/sta/sessions/${event.sessionId}/attendance`;
+        });
+
         // Create badges like month view
         const courseBadge = document.createElement('span');
         courseBadge.className = `badge bg-${event.courseColor || 'primary'} me-1 mb-1`;
-        courseBadge.style.fontSize = compact ? '0.6rem' : '0.7rem';
+        courseBadge.style.fontSize = compact ? '0.7rem' : '0.75rem';
+        courseBadge.style.fontWeight = '600';
         courseBadge.textContent = event.courseTitle;
 
         const sessionBadge = document.createElement('span');
         sessionBadge.className = 'badge bg-info me-1 mb-1';
-        sessionBadge.style.fontSize = compact ? '0.6rem' : '0.7rem';
+        sessionBadge.style.fontSize = compact ? '0.7rem' : '0.75rem';
+        sessionBadge.style.fontWeight = '600';
         sessionBadge.textContent = event.sessionTitle;
 
         eventEl.appendChild(courseBadge);
@@ -1110,7 +1147,8 @@
         if (event.companyNames && event.companyNames.trim() !== '' && event.companyNames !== 'N/A') {
             const companyBadge = document.createElement('span');
             companyBadge.className = 'badge bg-secondary mb-1';
-            companyBadge.style.fontSize = compact ? '0.6rem' : '0.7rem';
+            companyBadge.style.fontSize = compact ? '0.7rem' : '0.75rem';
+            companyBadge.style.fontWeight = '600';
             companyBadge.textContent = event.companyNames;
             eventEl.appendChild(companyBadge);
         }
@@ -1118,9 +1156,10 @@
         // Add time info
         const timeDiv = document.createElement('div');
         timeDiv.className = 'event-time-info';
-        timeDiv.style.fontSize = compact ? '0.65rem' : '0.75rem';
+        timeDiv.style.fontSize = compact ? '0.72rem' : '0.78rem';
         timeDiv.style.marginTop = '4px';
-        timeDiv.style.color = '#6c757d';
+        timeDiv.style.fontWeight = '500';
+        timeDiv.style.color = '#495057';
         timeDiv.innerHTML = `<i class="fas fa-clock"></i> ${event.startTime} - ${event.endTime}`;
         eventEl.appendChild(timeDiv);
 
