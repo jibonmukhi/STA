@@ -51,15 +51,19 @@ class EndUserDashboardController extends Controller
     public function calendar(Request $request): View
     {
         $user = Auth::user();
-        $currentMonth = (int) $request->get('month', now()->month);
-        $currentYear = (int) $request->get('year', now()->year);
+
+        // Use Italian timezone
+        $italianTime = now()->setTimezone('Europe/Rome');
+
+        $currentMonth = (int) $request->get('month', $italianTime->month);
+        $currentYear = (int) $request->get('year', $italianTime->year);
 
         // Validate month and year parameters
         if ($currentMonth < 1 || $currentMonth > 12) {
-            $currentMonth = now()->month;
+            $currentMonth = $italianTime->month;
         }
         if ($currentYear < 1900 || $currentYear > 2100) {
-            $currentYear = now()->year;
+            $currentYear = $italianTime->year;
         }
 
         // Get course schedules based on user role
@@ -109,20 +113,20 @@ class EndUserDashboardController extends Controller
             ->orderBy('start_time', 'asc')
             ->get();
 
-        // Get today's sessions
+        // Get today's sessions using Italian timezone
         $todaysSessions = CourseSession::query()
             ->with(['course.teachers', 'course.enrollments', 'course.assignedCompanies'])
             ->whereIn('course_id', $courseIds)
-            ->whereDate('session_date', now()->toDateString())
+            ->whereDate('session_date', $italianTime->toDateString())
             ->orderBy('start_time', 'asc')
             ->get();
 
-        // Get upcoming sessions (next 7 days)
+        // Get upcoming sessions (next 7 days) using Italian timezone
         $upcomingSessions = CourseSession::query()
             ->with(['course.teachers', 'course.enrollments', 'course.assignedCompanies'])
             ->whereIn('course_id', $courseIds)
-            ->whereDate('session_date', '>=', now()->toDateString())
-            ->whereDate('session_date', '<=', now()->addDays(7)->toDateString())
+            ->whereDate('session_date', '>=', $italianTime->toDateString())
+            ->whereDate('session_date', '<=', $italianTime->copy()->addDays(7)->toDateString())
             ->orderBy('session_date', 'asc')
             ->orderBy('start_time', 'asc')
             ->limit(10)

@@ -222,6 +222,7 @@ return [
     'course_title' => 'Titolo Corso',
     'hours_completed' => 'Ore Completate',
     'view_certificate' => 'Visualizza Certificato',
+    'view_certificates' => 'Visualizza Certificati',
     'no_certificates_yet' => 'Nessun Certificato Ancora',
     'no_certificates_message' => 'I certificati appariranno qui una volta generati per i tuoi corsi.',
 ];

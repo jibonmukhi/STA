@@ -222,6 +222,7 @@ return [
     'course_title' => 'Course Title',
     'hours_completed' => 'Hours Completed',
     'view_certificate' => 'View Certificate',
+    'view_certificates' => 'View Certificates',
     'no_certificates_yet' => 'No Certificates Yet',
     'no_certificates_message' => 'Certificates will appear here once generated for your courses.',
 ];

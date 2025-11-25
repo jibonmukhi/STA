@@ -775,6 +775,14 @@
     let currentView = 'day'; // Default to day view
     let courseEvents = @json($formattedEvents);
 
+    // Helper function to convert Date object to local date string (Y-m-d format)
+    function getLocalDateString(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     function generateCalendar() {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
@@ -816,7 +824,7 @@
 
                 // Add course events for this date
                 const dayEvents = courseEvents.filter(event =>
-                    event.date === cellDate.toISOString().split('T')[0]
+                    event.date === getLocalDateString(cellDate)
                 );
 
                 dayEvents.forEach(event => {
@@ -894,7 +902,7 @@
                 if (cellDate.getMonth() !== month) classes += 'text-muted ';
                 if (isToday(cellDate)) classes += 'today ';
 
-                html += `<td class="${classes}" onclick="goToDate('${cellDate.toISOString()}')">${cellDate.getDate()}</td>`;
+                html += `<td class="${classes}" onclick="goToDate('${getLocalDateString(cellDate)}')">${cellDate.getDate()}</td>`;
             }
             html += '</tr>';
         }
@@ -970,7 +978,7 @@
         }
 
         // Add events for this day
-        const dateString = currentDate.toISOString().split('T')[0];
+        const dateString = getLocalDateString(currentDate);
         const dayEvents = courseEvents.filter(event => event.date === dateString);
 
         dayEvents.forEach(event => {
@@ -1049,7 +1057,7 @@
             }
 
             // Add events for this day
-            const dateString = dayDate.toISOString().split('T')[0];
+            const dateString = getLocalDateString(dayDate);
             const dayEvents = courseEvents.filter(event => event.date === dateString);
 
             dayEvents.forEach(event => {
