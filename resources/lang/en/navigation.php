@@ -59,6 +59,7 @@ return [
 
     // Teacher menu
     'my_courses' => 'My Courses',
+    'my_enrolled_courses' => 'My Enrolled Courses',
     'schedule' => 'Schedule',
     'certificates' => 'Certificates',
     'teacher' => 'Teacher',

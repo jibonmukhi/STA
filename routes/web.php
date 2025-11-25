@@ -58,6 +58,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:end_user')
         ->name('user.calendar');
 
+    Route::get('/user/my-courses', [EndUserDashboardController::class, 'myCourses'])
+        ->middleware('role:end_user')
+        ->name('user.my-courses');
+
+    Route::get('/user/courses/{course}', [EndUserDashboardController::class, 'showCourse'])
+        ->middleware('role:end_user')
+        ->name('user.course-details');
+
     // Common Pages (accessible by all authenticated users with permission check)
     Route::get('/certificate', [EndUserDashboardController::class, 'certificate'])
         ->middleware('can:view personal reports')

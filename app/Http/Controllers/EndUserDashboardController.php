@@ -297,4 +297,89 @@ class EndUserDashboardController extends Controller
 
         return view('user.reports', compact('reportData'));
     }
+
+    /**
+     * Display user's enrolled courses
+     */
+    public function myCourses(Request $request): View
+    {
+        $user = Auth::user();
+
+        // Get user's enrolled courses with relationships
+        $query = CourseEnrollment::where('user_id', $user->id)
+            ->with(['course.teachers', 'course.assignedCompanies', 'course.sessions']);
+
+        // Apply filters
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('course', function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('course_code', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->whereHas('course', function($q) use ($request) {
+                $q->where('category', $request->category);
+            });
+        }
+
+        $perPage = $request->get('per_page', 12);
+        $enrollments = $query->orderBy('enrolled_at', 'desc')->paginate($perPage);
+
+        // Get categories for filter
+        $categories = Course::getCategories();
+
+        // Calculate stats
+        $stats = [
+            'total_enrolled' => CourseEnrollment::where('user_id', $user->id)->count(),
+            'in_progress' => CourseEnrollment::where('user_id', $user->id)
+                ->where('status', 'in_progress')
+                ->count(),
+            'completed' => CourseEnrollment::where('user_id', $user->id)
+                ->where('status', 'completed')
+                ->count(),
+            'average_progress' => CourseEnrollment::where('user_id', $user->id)
+                ->whereIn('status', ['enrolled', 'in_progress'])
+                ->avg('progress_percentage') ?? 0,
+        ];
+
+        return view('user.my-courses', compact('enrollments', 'categories', 'stats'));
+    }
+
+    /**
+     * Display course details for enrolled user
+     */
+    public function showCourse(Course $course): View
+    {
+        $user = Auth::user();
+
+        // Check if user is enrolled in this course
+        $enrollment = CourseEnrollment::where('user_id', $user->id)
+            ->where('course_id', $course->id)
+            ->first();
+
+        if (!$enrollment) {
+            abort(403, 'Non sei iscritto a questo corso.');
+        }
+
+        // Load relationships
+        $course->load([
+            'teachers',
+            'assignedCompanies',
+            'sessions' => function($query) {
+                $query->orderBy('session_date', 'asc')->orderBy('start_time', 'asc');
+            },
+            'materials' => function($query) {
+                $query->orderBy('order', 'asc')->orderBy('created_at', 'asc');
+            }
+        ]);
+
+        return view('user.course-details', compact('course', 'enrollment'));
+    }
 }

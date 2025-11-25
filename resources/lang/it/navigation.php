@@ -59,6 +59,7 @@ return [
 
     // Teacher menu
     'my_courses' => 'I Miei Corsi',
+    'my_enrolled_courses' => 'I Miei Corsi Iscritti',
     'schedule' => 'Calendario',
     'certificates' => 'Certificati',
     'teacher' => 'Insegnante',

@@ -286,36 +286,21 @@ return [
             'permission' => 'view dashboard'
         ],
         [
-            'title' => 'navigation.certificate_management',
-            'route' => 'certificates.index',
-            'icon' => 'fas fa-certificate',
-            'permission' => 'view personal reports',
-            'submenu' => [
-                [
-                    'title' => 'navigation.my_certificates',
-                    'route' => 'certificates.index',
-                    'permission' => 'view personal reports'
-                ]
-            ]
-        ],
-        [
-            'title' => 'navigation.course_management',
-            'icon' => 'fas fa-graduation-cap',
-            'submenu' => [
-                [
-                    'title' => 'navigation.my_company_courses',
-                    'route' => 'course-management.index'
-                ],
-                [
-                    'title' => 'navigation.course_planning',
-                    'route' => 'courses.planning'
-                ]
-            ]
+            'title' => 'navigation.my_enrolled_courses',
+            'route' => 'user.my-courses',
+            'icon' => 'fas fa-book',
+            'permission' => 'view dashboard'
         ],
         [
             'title' => 'navigation.calendar',
             'route' => 'user.calendar',
             'icon' => 'fas fa-calendar',
+            'permission' => 'view personal reports'
+        ],
+        [
+            'title' => 'navigation.my_certificates',
+            'route' => 'certificates.index',
+            'icon' => 'fas fa-certificate',
             'permission' => 'view personal reports'
         ],
         [
