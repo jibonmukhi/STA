@@ -1,0 +1,193 @@
+nome_italiano,nome_inglese,codice_catastale,codice_iso_alpha2,codice_iso_alpha3
+Afghanistan,Afghanistan,Z200,AF,AFG
+Albania,Albania,Z100,AL,ALB
+Algeria,Algeria,Z301,DZ,DZA
+Andorra,Andorra,Z101,AD,AND
+Angola,Angola,Z302,AO,AGO
+Antigua e Barbuda,Antigua and Barbuda,Z532,AG,ATG
+Arabia Saudita,Saudi Arabia,Z203,SA,SAU
+Argentina,Argentina,Z600,AR,ARG
+Armenia,Armenia,Z252,AM,ARM
+Australia,Australia,Z700,AU,AUS
+Austria,Austria,Z102,AT,AUT
+Azerbaigian,Azerbaijan,Z253,AZ,AZE
+Bahamas,Bahamas,Z533,BS,BHS
+Bahrein,Bahrain,Z204,BH,BHR
+Bangladesh,Bangladesh,Z250,BD,BGD
+Barbados,Barbados,Z522,BB,BRB
+Belgio,Belgium,Z103,BE,BEL
+Belize,Belize,Z512,BZ,BLZ
+Benin,Benin,Z314,BJ,BEN
+Bhutan,Bhutan,Z205,BT,BTN
+Bielorussia,Belarus,Z139,BY,BLR
+Bolivia,Bolivia,Z601,BO,BOL
+Bosnia ed Erzegovina,Bosnia and Herzegovina,Z153,BA,BIH
+Botswana,Botswana,Z358,BW,BWA
+Brasile,Brazil,Z602,BR,BRA
+Brunei,Brunei,Z206,BN,BRN
+Bulgaria,Bulgaria,Z104,BG,BGR
+Burkina Faso,Burkina Faso,Z354,BF,BFA
+Burundi,Burundi,Z305,BI,BDI
+Cambogia,Cambodia,Z207,KH,KHM
+Camerun,Cameroon,Z306,CM,CMR
+Canada,Canada,Z401,CA,CAN
+Capo Verde,Cape Verde,Z307,CV,CPV
+Ciad,Chad,Z309,TD,TCD
+Cile,Chile,Z603,CL,CHL
+Cina,China,Z210,CN,CHN
+Cipro,Cyprus,Z211,CY,CYP
+Colombia,Colombia,Z604,CO,COL
+Comore,Comoros,Z310,KM,COM
+Congo,Congo,Z312,CG,COG
+Corea del Nord,North Korea,Z214,KP,PRK
+Corea del Sud,South Korea,Z213,KR,KOR
+Costa d'Avorio,Ivory Coast,Z313,CI,CIV
+Costa Rica,Costa Rica,Z503,CR,CRI
+Croazia,Croatia,Z149,HR,HRV
+Cuba,Cuba,Z509,CU,CUB
+Danimarca,Denmark,Z107,DK,DNK
+Dominica,Dominica,Z526,DM,DMA
+Ecuador,Ecuador,Z605,EC,ECU
+Egitto,Egypt,Z336,EG,EGY
+El Salvador,El Salvador,Z504,SV,SLV
+Emirati Arabi Uniti,United Arab Emirates,Z215,AE,ARE
+Eritrea,Eritrea,Z368,ER,ERI
+Estonia,Estonia,Z144,EE,EST
+Etiopia,Ethiopia,Z315,ET,ETH
+Figi,Fiji,Z720,FJ,FJI
+Filippine,Philippines,Z216,PH,PHL
+Finlandia,Finland,Z108,FI,FIN
+Francia,France,Z110,FR,FRA
+Gabon,Gabon,Z316,GA,GAB
+Gambia,Gambia,Z317,GM,GMB
+Georgia,Georgia,Z254,GE,GEO
+Germania,Germany,Z112,DE,DEU
+Ghana,Ghana,Z318,GH,GHA
+Giamaica,Jamaica,Z507,JM,JAM
+Giappone,Japan,Z219,JP,JPN
+Gibuti,Djibouti,Z361,DJ,DJI
+Giordania,Jordan,Z220,JO,JOR
+Grecia,Greece,Z115,GR,GRC
+Grenada,Grenada,Z530,GD,GRD
+Guatemala,Guatemala,Z505,GT,GTM
+Guinea,Guinea,Z319,GN,GIN
+Guinea-Bissau,Guinea-Bissau,Z320,GW,GNB
+Guinea Equatoriale,Equatorial Guinea,Z321,GQ,GNQ
+Guyana,Guyana,Z606,GY,GUY
+Haiti,Haiti,Z510,HT,HTI
+Honduras,Honduras,Z506,HN,HND
+India,India,Z222,IN,IND
+Indonesia,Indonesia,Z223,ID,IDN
+Iran,Iran,Z224,IR,IRN
+Iraq,Iraq,Z225,IQ,IRQ
+Irlanda,Ireland,Z116,IE,IRL
+Islanda,Iceland,Z117,IS,ISL
+Israele,Israel,Z226,IL,ISR
+Kazakistan,Kazakhstan,Z255,KZ,KAZ
+Kenya,Kenya,Z322,KE,KEN
+Kirghizistan,Kyrgyzstan,Z256,KG,KGZ
+Kiribati,Kiribati,Z721,KI,KIR
+Kuwait,Kuwait,Z227,KW,KWT
+Laos,Laos,Z228,LA,LAO
+Lesotho,Lesotho,Z359,LS,LSO
+Lettonia,Latvia,Z145,LV,LVA
+Libano,Lebanon,Z229,LB,LBN
+Liberia,Liberia,Z323,LR,LBR
+Libia,Libya,Z326,LY,LBY
+Liechtenstein,Liechtenstein,Z118,LI,LIE
+Lituania,Lithuania,Z146,LT,LTU
+Lussemburgo,Luxembourg,Z119,LU,LUX
+Madagascar,Madagascar,Z325,MG,MDG
+Malawi,Malawi,Z327,MW,MWI
+Maldive,Maldives,Z230,MV,MDV
+Malaysia,Malaysia,Z218,MY,MYS
+Mali,Mali,Z328,ML,MLI
+Malta,Malta,Z121,MT,MLT
+Marocco,Morocco,Z330,MA,MAR
+Isole Marshall,Marshall Islands,Z724,MH,MHL
+Mauritania,Mauritania,Z331,MR,MRT
+Maurizio,Mauritius,Z332,MU,MUS
+Messico,Mexico,Z514,MX,MEX
+Micronesia,Micronesia,Z722,FM,FSM
+Moldavia,Moldova,Z140,MD,MDA
+Monaco,Monaco,Z123,MC,MCO
+Mongolia,Mongolia,Z231,MN,MNG
+Montenegro,Montenegro,Z159,ME,MNE
+Mozambico,Mozambique,Z333,MZ,MOZ
+Myanmar,Myanmar,Z217,MM,MMR
+Namibia,Namibia,Z362,NA,NAM
+Nauru,Nauru,Z725,NR,NRU
+Nepal,Nepal,Z232,NP,NPL
+Nicaragua,Nicaragua,Z508,NI,NIC
+Niger,Niger,Z335,NE,NER
+Nigeria,Nigeria,Z334,NG,NGA
+Norvegia,Norway,Z126,NO,NOR
+Nuova Zelanda,New Zealand,Z719,NZ,NZL
+Oman,Oman,Z233,OM,OMN
+Paesi Bassi,Netherlands,Z127,NL,NLD
+Pakistan,Pakistan,Z234,PK,PAK
+Palau,Palau,Z727,PW,PLW
+Panama,Panama,Z515,PA,PAN
+Papua Nuova Guinea,Papua New Guinea,Z730,PG,PNG
+Paraguay,Paraguay,Z607,PY,PRY
+Perù,Peru,Z608,PE,PER
+Polonia,Poland,Z128,PL,POL
+Portogallo,Portugal,Z129,PT,PRT
+Qatar,Qatar,Z235,QA,QAT
+Regno Unito,United Kingdom,Z114,GB,GBR
+Repubblica Ceca,Czech Republic,Z156,CZ,CZE
+Repubblica Centrafricana,Central African Republic,Z308,CF,CAF
+Repubblica Democratica del Congo,Democratic Republic of the Congo,Z311,CD,COD
+Repubblica Dominicana,Dominican Republic,Z511,DO,DOM
+Romania,Romania,Z130,RO,ROU
+Ruanda,Rwanda,Z338,RW,RWA
+Russia,Russia,Z154,RU,RUS
+Saint Kitts e Nevis,Saint Kitts and Nevis,Z528,KN,KNA
+Saint Lucia,Saint Lucia,Z527,LC,LCA
+Saint Vincent e Grenadine,Saint Vincent and the Grenadines,Z531,VC,VCT
+Isole Salomone,Solomon Islands,Z729,SB,SLB
+Samoa,Samoa,Z726,WS,WSM
+San Marino,San Marino,Z132,SM,SMR
+Sao Tomé e Principe,Sao Tome and Principe,Z340,ST,STP
+Senegal,Senegal,Z341,SN,SEN
+Serbia,Serbia,Z158,RS,SRB
+Seychelles,Seychelles,Z342,SC,SYC
+Sierra Leone,Sierra Leone,Z343,SL,SLE
+Singapore,Singapore,Z248,SG,SGP
+Siria,Syria,Z236,SY,SYR
+Slovacchia,Slovakia,Z155,SK,SVK
+Slovenia,Slovenia,Z150,SI,SVN
+Somalia,Somalia,Z344,SO,SOM
+Spagna,Spain,Z131,ES,ESP
+Sri Lanka,Sri Lanka,Z246,LK,LKA
+Stati Uniti,United States,Z404,US,USA
+Sudafrica,South Africa,Z360,ZA,ZAF
+Sudan,Sudan,Z345,SD,SDN
+Sudan del Sud,South Sudan,Z369,SS,SSD
+Suriname,Suriname,Z610,SR,SUR
+Svezia,Sweden,Z136,SE,SWE
+Svizzera,Switzerland,Z133,CH,CHE
+Swaziland,Swaziland,Z365,SZ,SWZ
+Tagikistan,Tajikistan,Z257,TJ,TJK
+Tanzania,Tanzania,Z347,TZ,TZA
+Tailandia,Thailand,Z241,TH,THA
+Timor Est,East Timor,Z242,TL,TLS
+Togo,Togo,Z348,TG,TGO
+Tonga,Tonga,Z728,TO,TON
+Trinidad e Tobago,Trinidad and Tobago,Z523,TT,TTO
+Tunisia,Tunisia,Z349,TN,TUN
+Turchia,Turkey,Z243,TR,TUR
+Turkmenistan,Turkmenistan,Z258,TM,TKM
+Tuvalu,Tuvalu,Z731,TV,TUV
+Ucraina,Ukraine,Z138,UA,UKR
+Uganda,Uganda,Z350,UG,UGA
+Ungheria,Hungary,Z134,HU,HUN
+Uruguay,Uruguay,Z611,UY,URY
+Uzbekistan,Uzbekistan,Z259,UZ,UZB
+Vanuatu,Vanuatu,Z732,VU,VUT
+Città del Vaticano,Vatican City,Z106,VA,VAT
+Venezuela,Venezuela,Z612,VE,VEN
+Vietnam,Vietnam,Z245,VN,VNM
+Yemen,Yemen,Z247,YE,YEM
+Zambia,Zambia,Z351,ZM,ZMB
+Zimbabwe,Zimbabwe,Z352,ZW,ZWE

@@ -117,8 +117,10 @@
                                 <label for="date_of_birth" class="form-label">
                                     {{ __('users.date_of_birth') }} <span class="text-danger">*</span>
                                 </label>
-                                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror"
-                                       id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') }}" required>
+                                <input type="text" class="form-control datepicker @error('date_of_birth') is-invalid @enderror"
+                                       id="date_of_birth_display" name="date_of_birth_display" value="{{ old('date_of_birth') }}"
+                                       placeholder="DD/MM/YYYY" autocomplete="off" required readonly>
+                                <input type="hidden" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') }}">
                                 @error('date_of_birth')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -352,77 +354,102 @@
     }
 
     // Belfiore codes cache (loaded from Data Vault)
-    let belfioreCodesCache = null;
+    let comuniCache = null;
+    let countriesCache = null;
 
-    // Load Belfiore codes from Data Vault
-    async function loadBelfioreCodes() {
-        if (belfioreCodesCache) {
-            return belfioreCodesCache;
+    // Load Italian Comuni codes
+    async function loadComuni() {
+        if (comuniCache) {
+            return comuniCache;
         }
 
         try {
-            const response = await fetch('/api/data-vault/belfiore_code');
+            const response = await fetch('/api/codice-fiscale/comuni');
             if (response.ok) {
-                belfioreCodesCache = await response.json();
-                return belfioreCodesCache;
+                comuniCache = await response.json();
+                return comuniCache;
             }
         } catch (error) {
-            console.error('Error loading Belfiore codes:', error);
+            console.error('Error loading comuni:', error);
         }
 
         return [];
     }
 
-    // Get Belfiore code for a place and country
-    function getBelfioreCode(place, countryCode) {
-        // Default fallback codes
-        const fallbackCodes = {
-            'US': 'Z404', 'GB': 'Z114', 'FR': 'Z110', 'DE': 'Z112', 'ES': 'Z131', 'CH': 'Z133',
-            'AR': 'Z600', 'BR': 'Z602', 'CA': 'Z401', 'AU': 'Z700', 'NZ': 'Z719',
-            'CN': 'Z210', 'IN': 'Z222', 'JP': 'Z219', 'KR': 'Z230', 'RU': 'Z154',
-            'AL': 'Z100', 'AT': 'Z102', 'BE': 'Z103', 'NL': 'Z126', 'GR': 'Z115',
-            'PL': 'Z127', 'PT': 'Z128', 'RO': 'Z129', 'SE': 'Z132', 'TR': 'Z134',
-            'EG': 'Z336', 'MA': 'Z330', 'ZA': 'Z359', 'AE': 'Z255', 'IL': 'Z224',
-            'MX': 'Z514', 'VE': 'Z523', 'CL': 'Z506', 'CO': 'Z508',
-        };
-
-        // For foreign countries, use fallback Z-codes
-        if (countryCode !== 'IT') {
-            return fallbackCodes[countryCode] || 'Z999';
+    // Load Foreign Countries codes
+    async function loadCountries() {
+        if (countriesCache) {
+            return countriesCache;
         }
 
-        // For Italian cities, try to match place name with Belfiore codes from cache
-        if (belfioreCodesCache && belfioreCodesCache.length > 0) {
+        try {
+            const response = await fetch('/api/codice-fiscale/countries');
+            if (response.ok) {
+                countriesCache = await response.json();
+                return countriesCache;
+            }
+        } catch (error) {
+            console.error('Error loading countries:', error);
+        }
+
+        return [];
+    }
+
+    // Get cadastral code for a place and country
+    function getBelfioreCode(place, countryCode) {
+        // For foreign countries, look up in countries cache
+        if (countryCode !== 'IT') {
+            if (countriesCache && countriesCache.length > 0) {
+                // Try to find country by ISO code
+                const countryMatch = countriesCache.find(item =>
+                    item.iso_code === countryCode
+                );
+                if (countryMatch) {
+                    return countryMatch.code;
+                }
+            }
+            // Fallback for unknown countries
+            return 'Z999';
+        }
+
+        // For Italian cities, try to match place name with comuni from cache
+        if (comuniCache && comuniCache.length > 0) {
             const normalizedPlace = place.toUpperCase().trim();
 
-            // Try exact match first
-            const exactMatch = belfioreCodesCache.find(item => {
-                const label = (item.label || '').toUpperCase().trim();
-                return label === normalizedPlace && item.metadata &&
-                       JSON.parse(item.metadata).country === 'IT';
+            // Try exact match first - match against comune name
+            const exactMatch = comuniCache.find(item => {
+                const nome = (item.nome || '').toUpperCase().trim();
+                return nome === normalizedPlace;
             });
 
-            if (exactMatch && exactMatch.metadata) {
-                const metadata = JSON.parse(exactMatch.metadata);
-                return metadata.belfiore;
+            if (exactMatch) {
+                return exactMatch.code;
             }
 
-            // Try partial match
-            const partialMatch = belfioreCodesCache.find(item => {
-                const label = (item.label || '').toUpperCase().trim();
-                return label.includes(normalizedPlace) && item.metadata &&
-                       JSON.parse(item.metadata).country === 'IT';
+            // Try partial match - check if place name contains comune name or vice versa
+            const partialMatch = comuniCache.find(item => {
+                const nome = (item.nome || '').toUpperCase().trim();
+                return nome.includes(normalizedPlace) || normalizedPlace.includes(nome);
             });
 
-            if (partialMatch && partialMatch.metadata) {
-                const metadata = JSON.parse(partialMatch.metadata);
-                return metadata.belfiore;
+            if (partialMatch) {
+                return partialMatch.code;
+            }
+
+            // Try matching with label (includes province code)
+            const labelMatch = comuniCache.find(item => {
+                const label = (item.label || '').toUpperCase().trim();
+                return label.includes(normalizedPlace);
+            });
+
+            if (labelMatch) {
+                return labelMatch.code;
             }
         }
 
-        // Fallback: generate placeholder from place name
-        const cleanPlace = place.toUpperCase().replace(/[^A-Z0-9]/g, '');
-        return (cleanPlace + 'XXXX').substring(0, 4);
+        // Fallback: return placeholder
+        console.warn('Could not find cadastral code for:', place, countryCode);
+        return 'XXXX';
     }
 
     // Generate CF from personal information
@@ -430,7 +457,7 @@
         const surname = document.getElementById('surname')?.value || '';
         const name = document.getElementById('name')?.value || '';
         const gender = document.getElementById('gender')?.value || '';
-        const dateOfBirth = document.getElementById('date_of_birth')?.value || '';
+        const dateOfBirth = document.getElementById('date_of_birth_display')?.value || '';
         const placeOfBirth = document.getElementById('place_of_birth')?.value || '';
         const country = document.getElementById('country')?.value || 'IT';
 
@@ -466,42 +493,81 @@
         if (name) {
             const consonants = getConsonants(name);
             const vowels = getVowels(name);
+            let nameCode;
             if (consonants.length >= 4) {
                 // Take 1st, 3rd, 4th consonants
-                cf += consonants.charAt(0) + consonants.charAt(2) + consonants.charAt(3);
+                nameCode = consonants.charAt(0) + consonants.charAt(2) + consonants.charAt(3);
             } else {
-                cf += padString(consonants + vowels, 3);
+                nameCode = padString(consonants + vowels, 3);
             }
+            console.log('Name encoding:', name, '-> Consonants:', consonants, ', Vowels:', vowels, ', Code:', nameCode);
+            cf += nameCode;
         } else {
             cf += 'XXX';
         }
 
         // 3. Year of birth (2 chars)
         if (dateOfBirth) {
-            const date = new Date(dateOfBirth);
-            const year = date.getFullYear().toString().substring(2);
-            cf += year;
+            // Parse date from dd/mm/yyyy format
+            let parts, year, month, day;
+            if (dateOfBirth.includes('/')) {
+                // dd/mm/yyyy format
+                parts = dateOfBirth.split('/');
+                day = parseInt(parts[0], 10);
+                month = parseInt(parts[1], 10);
+                year = parts[2];
+            } else if (dateOfBirth.includes('-')) {
+                // yyyy-mm-dd format (fallback)
+                parts = dateOfBirth.split('-');
+                year = parts[0];
+                month = parseInt(parts[1], 10);
+                day = parseInt(parts[2], 10);
+            }
+            console.log('Date parsing:', dateOfBirth, '-> Year:', year, ', Month:', month, ', Day:', day);
+            cf += year.substring(2); // Last 2 digits of year
         } else {
             cf += 'XX';
         }
 
         // 4. Month of birth (1 char) - Official month codes
         if (dateOfBirth) {
-            const date = new Date(dateOfBirth);
+            // Parse month from date
+            let month;
+            if (dateOfBirth.includes('/')) {
+                // dd/mm/yyyy format
+                const parts = dateOfBirth.split('/');
+                month = parseInt(parts[1], 10);
+            } else if (dateOfBirth.includes('-')) {
+                // yyyy-mm-dd format (fallback)
+                const parts = dateOfBirth.split('-');
+                month = parseInt(parts[1], 10);
+            }
             const monthCodes = ['A', 'B', 'C', 'D', 'E', 'H', 'L', 'M', 'P', 'R', 'S', 'T'];
-            cf += monthCodes[date.getMonth()];
+            const monthCode = monthCodes[month - 1]; // Array is 0-indexed
+            console.log('Month encoding:', month, '-> Code:', monthCode);
+            cf += monthCode;
         } else {
             cf += 'X';
         }
 
         // 5. Day of birth and gender (2 chars)
         if (dateOfBirth) {
-            const date = new Date(dateOfBirth);
-            let day = date.getDate();
+            // Parse day from date
+            let day;
+            if (dateOfBirth.includes('/')) {
+                // dd/mm/yyyy format
+                const parts = dateOfBirth.split('/');
+                day = parseInt(parts[0], 10);
+            } else if (dateOfBirth.includes('-')) {
+                // yyyy-mm-dd format (fallback)
+                const parts = dateOfBirth.split('-');
+                day = parseInt(parts[2], 10);
+            }
             // For females, add 40 to day
             if (gender === 'female') {
                 day += 40;
             }
+            console.log('Day encoding:', day, '-> Adjusted day:', day, '(gender:', gender + ')');
             cf += day.toString().padStart(2, '0');
         } else {
             cf += 'XX';
@@ -624,10 +690,42 @@
     }
 
     // Load Belfiore codes for CF generation
-    loadBelfioreCodes();
+    loadComuni();
+    loadCountries();
+
+    // Initialize jQuery UI Datepicker
+    jQuery(function($) {
+        $('#date_of_birth_display').datepicker({
+            dateFormat: 'dd/mm/yy',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: '1900:' + new Date().getFullYear(),
+            maxDate: new Date(),
+            onSelect: function(dateText) {
+                // Convert dd/mm/yyyy to yyyy-mm-dd for hidden field
+                const parts = dateText.split('/');
+                const isoDate = parts[2] + '-' + parts[1] + '-' + parts[0];
+                $('#date_of_birth').val(isoDate);
+                // Trigger CF generation
+                generateCF();
+            }
+        });
+
+        // Make the field clickable to open datepicker
+        $('#date_of_birth_display').on('click', function() {
+            $(this).datepicker('show');
+        });
+
+        // Convert existing value from yyyy-mm-dd to dd/mm/yyyy if present
+        const currentValue = $('#date_of_birth').val();
+        if (currentValue && currentValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const parts = currentValue.split('-');
+            $('#date_of_birth_display').val(parts[2] + '/' + parts[1] + '/' + parts[0]);
+        }
+    });
 
     // Attach event listeners to all relevant fields for CF generation
-    const fieldsToWatch = ['surname', 'name', 'gender', 'date_of_birth', 'place_of_birth', 'country'];
+    const fieldsToWatch = ['surname', 'name', 'gender', 'date_of_birth_display', 'place_of_birth', 'country'];
 
     fieldsToWatch.forEach(fieldId => {
         const field = document.getElementById(fieldId);

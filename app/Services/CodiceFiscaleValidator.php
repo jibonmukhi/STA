@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use DateTime;
+use App\Models\ItalianComune;
+use App\Models\ForeignCountry;
 
 class CodiceFiscaleValidator
 {
@@ -293,11 +295,93 @@ class CodiceFiscaleValidator
     }
 
     /**
+     * Validate birth place code (Codice Catastale)
+     *
+     * @param string $cf
+     * @param string|null $birthPlace Expected birth place name (optional)
+     * @return bool
+     */
+    public function validateBirthPlace(string $cf, ?string $birthPlace = null): bool
+    {
+        $cf = strtoupper($cf);
+        $birthPlaceCode = substr($cf, 11, 4);
+
+        // Check if it's a valid Italian comune
+        $comune = ItalianComune::findByCodiceCatastale($birthPlaceCode);
+        if ($comune) {
+            if ($birthPlace === null) {
+                return true; // Code exists
+            }
+            // Check if the name matches
+            return stripos($comune->nome, $birthPlace) !== false || stripos($birthPlace, $comune->nome) !== false;
+        }
+
+        // Check if it's a valid foreign country
+        $country = ForeignCountry::findByCodiceCatastale($birthPlaceCode);
+        if ($country) {
+            if ($birthPlace === null) {
+                return true; // Code exists
+            }
+            // Check if the name matches
+            return stripos($country->nome_italiano, $birthPlace) !== false ||
+                   stripos($country->nome_inglese, $birthPlace) !== false ||
+                   stripos($birthPlace, $country->nome_italiano) !== false ||
+                   stripos($birthPlace, $country->nome_inglese) !== false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get birth place information from CF
+     *
+     * @param string $cf
+     * @return array|null ['type' => 'comune'|'country', 'name' => string, 'code' => string, 'details' => array]
+     */
+    public function getBirthPlaceInfo(string $cf): ?array
+    {
+        $cf = strtoupper($cf);
+        $birthPlaceCode = substr($cf, 11, 4);
+
+        // Check if it's a valid Italian comune
+        $comune = ItalianComune::findByCodiceCatastale($birthPlaceCode);
+        if ($comune) {
+            return [
+                'type' => 'comune',
+                'name' => $comune->nome,
+                'code' => $comune->codice_catastale,
+                'details' => [
+                    'regione' => $comune->regione,
+                    'provincia' => $comune->provincia,
+                    'sigla_provincia' => $comune->sigla_provincia,
+                ]
+            ];
+        }
+
+        // Check if it's a valid foreign country
+        $country = ForeignCountry::findByCodiceCatastale($birthPlaceCode);
+        if ($country) {
+            return [
+                'type' => 'country',
+                'name' => $country->nome_italiano,
+                'code' => $country->codice_catastale,
+                'details' => [
+                    'nome_inglese' => $country->nome_inglese,
+                    'codice_iso_alpha2' => $country->codice_iso_alpha2,
+                    'codice_iso_alpha3' => $country->codice_iso_alpha3,
+                ]
+            ];
+        }
+
+        return null;
+    }
+
+    /**
      * Perform full validation of Codice Fiscale
      *
      * @param string $cf
-     * @param array $userData ['name', 'surname', 'date_of_birth', 'gender']
-     * @return array ['valid' => bool, 'errors' => array]
+     * @param array $userData ['name', 'surname', 'date_of_birth', 'gender', 'birth_place']
+     * @return array ['valid' => bool, 'errors' => array, 'birth_place_info' => array|null]
      */
     public function validate(string $cf, array $userData = []): array
     {
@@ -307,13 +391,13 @@ class CodiceFiscaleValidator
         // 1. Format validation
         if (!$this->validateFormat($cf)) {
             $errors[] = 'Invalid Codice Fiscale format. Expected format: RSSMRA80A01H501U';
-            return ['valid' => false, 'errors' => $errors];
+            return ['valid' => false, 'errors' => $errors, 'birth_place_info' => null];
         }
 
         // If CF contains X placeholders, skip strict validations
         // This allows auto-generated CFs during form filling
         if ($this->hasPlaceholders($cf)) {
-            return ['valid' => true, 'errors' => []];
+            return ['valid' => true, 'errors' => [], 'birth_place_info' => null];
         }
 
         // 2. Checksum validation
@@ -326,32 +410,44 @@ class CodiceFiscaleValidator
             $errors[] = 'Invalid date encoding in Codice Fiscale.';
         }
 
+        // 4. Birth place validation
+        $birthPlaceInfo = $this->getBirthPlaceInfo($cf);
+        if (!$birthPlaceInfo) {
+            $errors[] = 'Invalid birth place code. The cadastral code does not match any Italian municipality or foreign country.';
+        }
+
         // If user data is provided, perform additional validations
         if (!empty($userData)) {
-            // 4. Gender validation
+            // 5. Gender validation
             if (isset($userData['gender']) && !$this->validateGender($cf, $userData['gender'])) {
                 $errors[] = 'Gender does not match Codice Fiscale.';
             }
 
-            // 5. Date of birth validation
+            // 6. Date of birth validation
             if (isset($userData['date_of_birth']) && !$this->validateDateOfBirth($cf, $userData['date_of_birth'])) {
                 $errors[] = 'Date of birth does not match Codice Fiscale.';
             }
 
-            // 6. Surname validation
+            // 7. Surname validation
             if (isset($userData['surname']) && !$this->validateSurname($cf, $userData['surname'])) {
                 $errors[] = 'Surname does not match Codice Fiscale encoding.';
             }
 
-            // 7. Name validation
+            // 8. Name validation
             if (isset($userData['name']) && !$this->validateName($cf, $userData['name'])) {
                 $errors[] = 'Name does not match Codice Fiscale encoding.';
+            }
+
+            // 9. Birth place validation with user data
+            if (isset($userData['birth_place']) && !$this->validateBirthPlace($cf, $userData['birth_place'])) {
+                $errors[] = 'Birth place does not match Codice Fiscale cadastral code.';
             }
         }
 
         return [
             'valid' => empty($errors),
-            'errors' => $errors
+            'errors' => $errors,
+            'birth_place_info' => $birthPlaceInfo
         ];
     }
 }

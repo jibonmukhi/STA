@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <title>{{ config('app.name', 'Laravel') }} - Dashboard</title>
 
@@ -21,6 +24,66 @@
     @stack('styles')
 
     <style>
+        /* jQuery UI Datepicker Custom Styling */
+        .ui-datepicker {
+            z-index: 9999 !important;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .ui-datepicker-header {
+            background: #4f46e5;
+            color: white;
+            border-radius: 5px;
+            padding: 8px;
+        }
+        .ui-datepicker-title {
+            color: white;
+            font-weight: 600;
+        }
+        .ui-datepicker-prev, .ui-datepicker-next {
+            cursor: pointer;
+        }
+        .ui-datepicker td a {
+            text-align: center;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .ui-datepicker td a:hover {
+            background: #4f46e5;
+            color: white;
+        }
+        .ui-state-active {
+            background: #4f46e5 !important;
+            color: white !important;
+        }
+        .datepicker {
+            cursor: pointer;
+            background-color: white;
+        }
+        /* Dropdown select styling for month and year */
+        .ui-datepicker select.ui-datepicker-month,
+        .ui-datepicker select.ui-datepicker-year {
+            color: #333 !important;
+            background-color: white !important;
+            border: 1px solid #ddd !important;
+            padding: 4px !important;
+            margin: 2px !important;
+            font-size: 14px !important;
+            border-radius: 4px !important;
+        }
+        .ui-datepicker select.ui-datepicker-month:hover,
+        .ui-datepicker select.ui-datepicker-year:hover {
+            border-color: #4f46e5 !important;
+        }
+        .ui-datepicker select.ui-datepicker-month:focus,
+        .ui-datepicker select.ui-datepicker-year:focus {
+            outline: 2px solid #4f46e5 !important;
+            outline-offset: 1px !important;
+        }
+
         :root {
             --primary-color: #4f46e5;
             --primary-dark: #3730a3;
@@ -1083,7 +1146,12 @@
     <!-- Scripts -->
     <script src="{{ asset('assets/js/bootstrap/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/chartjs/chart.min.js') }}"></script>
-    
+
+    <!-- jQuery and jQuery UI for datepicker -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
     <script>
         // Sidebar Toggle
         function toggleSidebar() {

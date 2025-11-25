@@ -89,6 +89,43 @@ Route::middleware('auth')->group(function () {
         return response()->json(dataVaultItems($categoryCode));
     })->name('api.data-vault');
 
+    // Codice Fiscale - Italian Comuni API
+    Route::get('/api/codice-fiscale/comuni', function() {
+        $comuni = \App\Models\ItalianComune::select('nome', 'regione', 'provincia', 'sigla_provincia', 'codice_catastale')
+            ->orderBy('nome')
+            ->get()
+            ->map(function($comune) {
+                return [
+                    'label' => $comune->nome . ' (' . $comune->sigla_provincia . ')',
+                    'value' => $comune->codice_catastale,
+                    'code' => $comune->codice_catastale,
+                    'nome' => $comune->nome,
+                    'regione' => $comune->regione,
+                    'provincia' => $comune->provincia,
+                    'sigla_provincia' => $comune->sigla_provincia,
+                ];
+            });
+        return response()->json($comuni);
+    })->name('api.codice-fiscale.comuni');
+
+    // Codice Fiscale - Foreign Countries API
+    Route::get('/api/codice-fiscale/countries', function() {
+        $countries = \App\Models\ForeignCountry::select('nome_italiano', 'nome_inglese', 'codice_catastale', 'codice_iso_alpha2')
+            ->orderBy('nome_italiano')
+            ->get()
+            ->map(function($country) {
+                return [
+                    'label' => $country->nome_italiano,
+                    'value' => $country->codice_catastale,
+                    'code' => $country->codice_catastale,
+                    'nome_italiano' => $country->nome_italiano,
+                    'nome_inglese' => $country->nome_inglese,
+                    'iso_code' => $country->codice_iso_alpha2,
+                ];
+            });
+        return response()->json($countries);
+    })->name('api.codice-fiscale.countries');
+
     // Notification Routes (available to all authenticated users)
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
