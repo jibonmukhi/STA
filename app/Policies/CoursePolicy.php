@@ -84,4 +84,19 @@ class CoursePolicy
         // Use the same authorization logic as markAttendance
         return $this->markAttendance($user, $course);
     }
+
+    public function close(User $user, Course $course)
+    {
+        // STA managers can close any course
+        if ($user->hasRole(['admin', 'sta_manager'])) {
+            return true;
+        }
+
+        // Teachers can only close their own courses
+        if ($user->hasRole('teacher')) {
+            return $course->teachers()->where('teacher_id', $user->id)->exists() || $course->teacher_id === $user->id;
+        }
+
+        return false;
+    }
 }

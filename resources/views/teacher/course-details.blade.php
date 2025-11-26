@@ -65,6 +65,18 @@
                                 </button>
                             </form>
                         </div>
+                        @php
+                            $totalSessions = $course->sessions()->count();
+                            $completedSessions = $course->sessions()->where('status', 'completed')->count();
+                            $canClose = $totalSessions > 0 && $completedSessions === $totalSessions && $course->status !== 'done';
+                        @endphp
+                        @if($canClose)
+                            <div class="col">
+                                <button type="button" class="btn btn-success w-100" onclick="confirmCloseCourseDetail({{ $course->id }}, '{{ addslashes($course->title) }}')">
+                                    <i class="fas fa-check-circle"></i> {{ __('teacher.close_course') }}
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -174,18 +186,18 @@
                     @if($course->assignedCompanies && $course->assignedCompanies->count() > 0)
                         <div class="row mb-3">
                             <div class="col-sm-3">
-                                <strong>{{ __('teacher.company') }}:</strong>
+                                <strong>{{ $course->assignedCompanies->count() > 1 ? __('teacher.companies') : __('teacher.company') }}:</strong>
                             </div>
                             <div class="col-sm-9">
-                                @php
-                                    $assignedCompany = $course->assignedCompanies->first();
-                                @endphp
-                                <span class="badge bg-info" style="font-size: 0.875rem; padding: 0.5rem 0.75rem;">
-                                    <i class="fas fa-building me-1"></i>{{ $assignedCompany->name }}
-                                    @if($assignedCompany->pivot->is_mandatory)
-                                        <span class="badge bg-warning ms-1">{{ __('teacher.mandatory') }}</span>
-                                    @endif
-                                </span>
+                                @foreach($course->assignedCompanies as $assignedCompany)
+                                    <a href="{{ route('teacher.company.show', $assignedCompany) }}" class="badge bg-info text-decoration-none" style="font-size: 0.875rem; padding: 0.5rem 0.75rem;" title="{{ __('teacher.view_company_details') }}">
+                                        <i class="fas fa-building me-1"></i>{{ $assignedCompany->name }}
+                                        @if($assignedCompany->pivot->is_mandatory)
+                                            <span class="badge bg-warning ms-1">{{ __('teacher.mandatory') }}</span>
+                                        @endif
+                                    </a>
+                                    @if(!$loop->last)<br class="mb-2">@endif
+                                @endforeach
                             </div>
                         </div>
                     @endif
@@ -529,4 +541,43 @@
     animation: pulse 2s infinite ease-in-out;
 }
 </style>
+
+<!-- Close Course Confirmation Modal -->
+<div class="modal fade" id="closeCourseModal" tabindex="-1" aria-labelledby="closeCourseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="closeCourseModalLabel">{{ __('teacher.close_course_confirmation') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ __('teacher.close_course_message') }}</p>
+                <p><strong id="courseTitle"></strong></p>
+                <p class="text-muted">{{ __('teacher.close_course_note') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('teacher.cancel') }}</button>
+                <form id="closeCourseForm" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-success">{{ __('teacher.close_course_confirm') }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmCloseCourseDetail(courseId, courseTitle) {
+    // Set the course title in the modal
+    document.getElementById('courseTitle').textContent = courseTitle;
+
+    // Set the form action URL
+    const form = document.getElementById('closeCourseForm');
+    form.action = '/teacher/courses/' + courseId + '/close';
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('closeCourseModal'));
+    modal.show();
+}
+</script>
 @endpush

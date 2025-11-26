@@ -50,7 +50,8 @@
                                     <option value="">{{ __('teacher.all_statuses') }}</option>
                                     <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>{{ __('teacher.active') }}</option>
                                     <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>{{ __('teacher.inactive') }}</option>
-                                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>{{ __('teacher.completed') }}</option>
+                                    <option value="ongoing" {{ request('status') == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+                                    <option value="done" {{ request('status') == 'done' ? 'selected' : '' }}>Done</option>
                                 </select>
                             </div>
                         </div>
@@ -123,7 +124,12 @@
                                             </td>
                                             <td>
                                                 @if($course->assignedCompanies && $course->assignedCompanies->count() > 0)
-                                                    <span class="badge bg-info">{{ $course->assignedCompanies->first()->name }}</span>
+                                                    @foreach($course->assignedCompanies as $company)
+                                                        <a href="{{ route('teacher.company.show', $company) }}" class="badge bg-info text-decoration-none" title="{{ __('teacher.view_company_details') }}">
+                                                            <i class="fas fa-building"></i> {{ $company->name }}
+                                                        </a>
+                                                        @if(!$loop->last)<br>@endif
+                                                    @endforeach
                                                 @else
                                                     <span class="text-muted">-</span>
                                                 @endif
@@ -177,6 +183,18 @@
                                                     <a href="{{ route('teacher.course-students', $course) }}" class="btn btn-sm btn-outline-primary" title="{{ __('teacher.view_students') }}">
                                                         <i class="fas fa-users"></i>
                                                     </a>
+                                                    @php
+                                                        $totalSessions = $course->sessions()->count();
+                                                        $completedSessions = $course->sessions()->where('status', 'completed')->count();
+                                                        $canClose = $totalSessions > 0 && $completedSessions === $totalSessions && $course->status !== 'done';
+                                                    @endphp
+                                                    @if($canClose)
+                                                        <button type="button" class="btn btn-sm btn-outline-success"
+                                                                onclick="confirmCloseCourse({{ $course->id }}, '{{ $course->title }}')"
+                                                                title="{{ __('teacher.close_course') }}">
+                                                            <i class="fas fa-check-circle"></i>
+                                                        </button>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -216,6 +234,30 @@
                         </div>
                     @endif
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Close Course Confirmation Modal -->
+<div class="modal fade" id="closeCourseModal" tabindex="-1" aria-labelledby="closeCourseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="closeCourseModalLabel">{{ __('teacher.close_course_confirmation') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ __('teacher.close_course_message') }}</p>
+                <p><strong id="courseTitle"></strong></p>
+                <p class="text-muted">{{ __('teacher.close_course_note') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('teacher.cancel') }}</button>
+                <form id="closeCourseForm" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-success">{{ __('teacher.close_course_confirm') }}</button>
+                </form>
             </div>
         </div>
     </div>
@@ -268,5 +310,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function confirmCloseCourse(courseId, courseTitle) {
+    // Set the course title in the modal
+    document.getElementById('courseTitle').textContent = courseTitle;
+
+    // Set the form action URL
+    const form = document.getElementById('closeCourseForm');
+    form.action = '/teacher/courses/' + courseId + '/close';
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('closeCourseModal'));
+    modal.show();
+}
 </script>
 @endsection

@@ -118,7 +118,10 @@ class CourseSession extends Model
      */
     public function getAttendanceStats(): array
     {
-        $totalEnrolled = $this->course->enrollments()->count();
+        // Only count active enrollments (matching what's displayed in the attendance view)
+        $totalEnrolled = $this->course->enrollments()
+            ->whereIn('status', ['enrolled', 'in_progress', 'completed'])
+            ->count();
         $present = $this->attendances()->where('status', 'present')->count();
         $absent = $this->attendances()->where('status', 'absent')->count();
         $late = $this->attendances()->where('status', 'late')->count();

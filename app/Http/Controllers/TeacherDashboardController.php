@@ -14,7 +14,11 @@ use App\Models\Certificate;
 use App\Models\CourseSession;
 use App\Models\SessionAttendance;
 use App\Models\User;
+use App\Models\Company;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\CourseClosedNotification;
+use App\Services\AuditLogService;
 
 class TeacherDashboardController extends Controller
 {
@@ -94,8 +98,8 @@ class TeacherDashboardController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         } else {
-            // By default, show active courses
-            $query->where('status', 'active');
+            // By default, show active and ongoing courses (exclude done/completed courses)
+            $query->whereIn('status', ['active', 'ongoing']);
         }
 
         $perPage = $request->get('per_page', 25);
@@ -721,5 +725,119 @@ class TeacherDashboardController extends Controller
         ];
 
         return view('teacher.course-certificates', compact('course', 'certificates', 'stats'));
+    }
+
+    /**
+     * Close a course when all sessions are completed
+     * Notifies STA managers about the course closure
+     */
+    public function closeCourse(Course $course)
+    {
+        // Check authorization
+        $this->authorize('close', $course);
+
+        try {
+            // Verify all sessions are closed
+            $totalSessions = $course->sessions()->count();
+            $completedSessions = $course->sessions()->where('status', 'completed')->count();
+
+            if ($totalSessions === 0) {
+                return redirect()->back()->with('error', __('teacher.no_sessions_to_close'));
+            }
+
+            if ($completedSessions < $totalSessions) {
+                $pendingSessions = $totalSessions - $completedSessions;
+                return redirect()->back()->with('error', __('teacher.cannot_close_course_pending_sessions', ['count' => $pendingSessions]));
+            }
+
+            DB::beginTransaction();
+
+            try {
+                // Update course status to 'done'
+                $course->update(['status' => 'done']);
+
+                // Log the action
+                AuditLogService::logCustom(
+                    'course_closed',
+                    "Course '{$course->title}' ({$course->code}) was closed by teacher " . Auth::user()->name,
+                    'courses',
+                    'info',
+                    [
+                        'course_id' => $course->id,
+                        'course_title' => $course->title,
+                        'course_code' => $course->code,
+                        'teacher_id' => Auth::id(),
+                        'teacher_name' => Auth::user()->name,
+                        'total_sessions' => $totalSessions,
+                    ]
+                );
+
+                DB::commit();
+
+                // Send notification to STA managers (outside transaction to prevent rollback on email failure)
+                try {
+                    $staManagers = User::role('sta_manager')->get();
+                    if ($staManagers->count() > 0) {
+                        Notification::send($staManagers, new CourseClosedNotification($course, Auth::user()));
+                    }
+                } catch (\Exception $e) {
+                    // Log email failure but don't fail the course closure
+                    \Log::warning('Course closed successfully but notification email failed: ' . $e->getMessage(), [
+                        'course_id' => $course->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+
+                return redirect()->back()->with('success', __('teacher.course_closed_successfully'));
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                \Log::error('Course closure failed: ' . $e->getMessage(), [
+                    'exception' => $e,
+                    'course_id' => $course->id,
+                    'trace' => $e->getTraceAsString()
+                ]);
+                return redirect()->back()->with('error', __('teacher.course_closure_failed') . ' Error: ' . $e->getMessage());
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Course closure authorization or validation failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', __('teacher.course_closure_failed'));
+        }
+    }
+
+    /**
+     * Show company details for teachers
+     * Teachers can only view companies assigned to their courses
+     */
+    public function showCompany(Company $company): View
+    {
+        $user = Auth::user();
+
+        // Verify teacher has access to this company through their courses
+        $hasAccess = $user->teacherCourses()
+            ->whereHas('assignedCompanies', function($q) use ($company) {
+                $q->where('companies.id', $company->id);
+            })
+            ->exists();
+
+        if (!$hasAccess) {
+            abort(403, 'You do not have access to view this company.');
+        }
+
+        // Load company with users and their roles
+        $company->load(['users' => function($query) {
+            $query->with('roles')->orderBy('name');
+        }]);
+
+        // Get courses for this company that the teacher is assigned to
+        $courses = $user->teacherCourses()
+            ->whereHas('assignedCompanies', function($q) use ($company) {
+                $q->where('companies.id', $company->id);
+            })
+            ->with(['enrollments', 'sessions'])
+            ->get();
+
+        return view('teacher.company-details', compact('company', 'courses'));
     }
 }

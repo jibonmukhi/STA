@@ -1137,7 +1137,7 @@
                 </div>
             @endif
 
-            <div class="animate-slide-in-right">
+            <div class="animate-slide-in-right" id="content-wrapper">
                 @yield('content')
             </div>
         </div>
@@ -1153,6 +1153,16 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
     <script>
+        // Remove animation class after animation completes to prevent modal stacking issues
+        document.addEventListener('DOMContentLoaded', function() {
+            const contentWrapper = document.getElementById('content-wrapper');
+            if (contentWrapper) {
+                contentWrapper.addEventListener('animationend', function() {
+                    this.classList.remove('animate-slide-in-right');
+                }, { once: true });
+            }
+        });
+
         // Sidebar Toggle
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');

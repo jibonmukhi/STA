@@ -335,6 +335,12 @@ Route::middleware(['auth', 'role:teacher|sta_manager|super_admin'])->group(funct
     // Certificate Generation and Viewing (Teachers and STA Managers)
     Route::post('/teacher/courses/{course}/generate-certificates', [\App\Http\Controllers\TeacherDashboardController::class, 'generateCertificates'])->name('teacher.generate-certificates');
     Route::get('/teacher/courses/{course}/certificates', [\App\Http\Controllers\TeacherDashboardController::class, 'courseCertificates'])->name('teacher.course-certificates');
+
+    // Course Closure
+    Route::post('/teacher/courses/{course}/close', [\App\Http\Controllers\TeacherDashboardController::class, 'closeCourse'])->name('teacher.courses.close');
+
+    // Company Details
+    Route::get('/teacher/companies/{company}', [\App\Http\Controllers\TeacherDashboardController::class, 'showCompany'])->name('teacher.company.show');
 });
 
 // Public certificate verification (no auth required)

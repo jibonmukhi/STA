@@ -43,8 +43,11 @@ class CourseManagementController extends Controller
         }
 
         // Filter by status
-        if ($request->has('status') && $request->status) {
+        if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
+        } else {
+            // By default, show active and ongoing courses (exclude done and inactive)
+            $query->whereIn('status', ['active', 'ongoing']);
         }
 
         // Filter by company
