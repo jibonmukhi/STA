@@ -96,7 +96,7 @@ class UserController extends Controller
         $sortField = $request->get('sort', 'name');
         $sortDirection = $request->get('direction', 'asc');
         
-        if (!in_array($sortField, ['name', 'surname', 'email', 'phone', 'mobile', 'cf', 'date_of_birth', 'status', 'created_at'])) {
+        if (!in_array($sortField, ['name', 'surname', 'username', 'email', 'phone', 'mobile', 'cf', 'date_of_birth', 'status', 'created_at'])) {
             $sortField = 'name';
         }
         
@@ -429,6 +429,7 @@ class UserController extends Controller
                 'place_of_birth' => $validated['place_of_birth'] ?? null,
                 'country' => $validated['country'] ?? 'IT',
                 'email' => $validated['email'],
+                'username' => $validated['username'],
                 'phone' => $validated['phone'] ?? null,
                 'mobile' => $validated['mobile'] ?? null,
                 'gender' => $validated['gender'] ?? null,

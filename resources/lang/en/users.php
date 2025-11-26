@@ -22,7 +22,7 @@ return [
     'email' => 'Email',
     'email_address' => 'Email Address',
     'username' => 'Username',
-    'username_hint' => 'Alphanumeric characters, dots, hyphens, and underscores allowed',
+    'username_hint' => 'Alphanumeric characters, dots, hyphens, underscores, and @ symbol allowed',
     'use_email_as_username' => 'Use email as username',
     'allow_edit_username' => 'Allow editing username',
     'mobile' => 'Mobile',

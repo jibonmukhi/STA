@@ -449,8 +449,19 @@ document.addEventListener('DOMContentLoaded', function() {
                                         @endif
                                     </a>
                                 </th>
+                                <th width="12%">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'username', 'direction' => request('sort') === 'username' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
+                                       class="text-decoration-none text-dark">
+                                        {{ __('users.username') }}
+                                        @if(request('sort') === 'username')
+                                            <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                        @else
+                                            <i class="fas fa-sort ms-1 text-muted"></i>
+                                        @endif
+                                    </a>
+                                </th>
                                 <th width="15%">
-                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'email', 'direction' => request('sort') === 'email' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'email', 'direction' => request('sort') === 'email' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
                                        class="text-decoration-none text-dark">
                                         {{ __('users.email') }}
                                         @if(request('sort') === 'email')
@@ -461,7 +472,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </a>
                                 </th>
                                 <th width="10%">
-                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'mobile', 'direction' => request('sort') === 'mobile' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'mobile', 'direction' => request('sort') === 'mobile' && request('direction') === 'asc' ? 'desc' : 'asc']) }}"
                                        class="text-decoration-none text-dark">
                                         {{ __('users.mobile') }}
                                         @if(request('sort') === 'mobile')
@@ -521,6 +532,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                             @endif
                                         </div>
                                     </div>
+                                </td>
+                                <td>
+                                    <span class="text-muted">{{ $user->username ?: '-' }}</span>
                                 </td>
                                 <td>
                                     <a href="mailto:{{ $user->email }}" class="text-decoration-none">

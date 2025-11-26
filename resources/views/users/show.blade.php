@@ -104,7 +104,13 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">{{ __('users.username') }}</label>
+                            <p class="fw-bold mb-1">{{ $user->username ?: '-' }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="mb-3">
                             <label class="form-label text-muted small">{{ __('users.email_address') }}</label>
                             <p class="fw-bold mb-1">
@@ -114,7 +120,7 @@
                             </p>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="mb-3">
                             <label class="form-label text-muted small">{{ __('users.mobile') }}</label>
                             <p class="fw-bold mb-1">

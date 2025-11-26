@@ -32,7 +32,7 @@ class StoreUserRequest extends FormRequest
             'place_of_birth' => 'required|string|max:255',
             'country' => 'required|string|size:2',
             'email' => 'required|string|email|max:255',
-            'username' => 'required|string|max:50|unique:users,username|regex:/^[a-zA-Z0-9_.-]+$/',
+            'username' => 'required|string|max:50|unique:users,username|regex:/^[a-zA-Z0-9_.@-]+$/',
             'phone' => 'nullable|string|max:20',
             'mobile' => 'nullable|string|max:20', // Keep for backward compatibility
             'gender' => 'required|in:male,female,other',
@@ -64,29 +64,31 @@ class StoreUserRequest extends FormRequest
         ];
     }
 
-    public function withValidator($validator)
+    protected function prepareForValidation()
     {
         // Clean up empty company values before validation
         $companies = array_filter($this->input('companies', []), function($company) {
             return !empty($company) && $company !== null && $company !== '';
         });
-        
+
         // Re-index array to have sequential keys
         $companies = array_values($companies);
-        
+
         // Clean up primary company - only keep if it's in the selected companies
         $primaryCompany = $this->input('primary_company');
         if ($primaryCompany && !in_array($primaryCompany, $companies)) {
             $primaryCompany = null;
         }
-        
+
         // Update the input with cleaned data
         $this->merge([
             'companies' => $companies,
             'primary_company' => $primaryCompany
         ]);
-        
-        
+    }
+
+    public function withValidator($validator)
+    {
         $validator->after(function ($validator) {
             // Validate photo file extension manually (without fileinfo dependency)
             if ($this->hasFile('photo')) {
@@ -130,7 +132,7 @@ class StoreUserRequest extends FormRequest
             'country.in' => 'Please select a valid country.',
             'username.required' => 'Username is required.',
             'username.unique' => 'This username is already taken.',
-            'username.regex' => 'Username can only contain letters, numbers, dots, hyphens, and underscores.',
+            'username.regex' => 'Username can only contain letters, numbers, dots, hyphens, underscores, and @ symbol.',
             'cf.unique' => 'This Codice Fiscale is already registered.',
             'cf.regex' => 'Please enter a valid Italian Codice Fiscale format (e.g. RSSMRA90A01H501X).',
             'photo.image' => 'The photo must be an image file.',
