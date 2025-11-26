@@ -1,6 +1,6 @@
 @extends('layouts.advanced-dashboard')
 
-@section('page-title', __('navigation.my_enrolled_courses'))
+@section('page-title', __('navigation.my_courses'))
 
 @section('content')
 <div class="container-fluid">
@@ -9,8 +9,8 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2>{{ __('navigation.my_enrolled_courses') }}</h2>
-                    <p class="text-muted">Corsi assegnati a te</p>
+                    <h2>{{ __('navigation.my_courses') }}</h2>
+                    <p class="text-muted">{{ __('courses.assigned_courses_description') }}</p>
                 </div>
             </div>
         </div>
@@ -24,14 +24,14 @@
                     <form method="GET" action="{{ route('user.my-courses') }}">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Cerca</label>
+                                <label class="form-label">{{ __('common.search') }}</label>
                                 <input type="text" class="form-control" name="search" value="{{ request('search') }}"
-                                       placeholder="Cerca corsi...">
+                                       placeholder="{{ __('courses.search_courses') }}">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Categoria</label>
+                                <label class="form-label">{{ __('courses.category') }}</label>
                                 <select class="form-select" name="category">
-                                    <option value="">Tutte le Categorie</option>
+                                    <option value="">{{ __('courses.all_categories') }}</option>
                                     @foreach($categories as $key => $value)
                                         <option value="{{ $key }}" {{ request('category') == $key ? 'selected' : '' }}>
                                             {{ $value }}
@@ -40,13 +40,12 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Stato</label>
+                                <label class="form-label">{{ __('common.status') }}</label>
                                 <select class="form-select" name="status">
-                                    <option value="">Tutti gli Stati</option>
-                                    <option value="enrolled" {{ request('status') == 'enrolled' ? 'selected' : '' }}>Iscritto</option>
-                                    <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Corso</option>
-                                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completato</option>
-                                    <option value="dropped" {{ request('status') == 'dropped' ? 'selected' : '' }}>Abbandonato</option>
+                                    <option value="">{{ __('courses.all_statuses') }}</option>
+                                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>{{ __('common.active') }}</option>
+                                    <option value="ongoing" {{ request('status') == 'ongoing' ? 'selected' : '' }}>{{ __('courses.ongoing') }}</option>
+                                    <option value="done" {{ request('status') == 'done' ? 'selected' : '' }}>{{ __('courses.done') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -54,10 +53,10 @@
                             <div class="col-md-12 d-flex justify-content-end">
                                 <div class="d-flex gap-2">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-search"></i> Filtra
+                                        <i class="fas fa-search"></i> {{ __('common.filter') }}
                                     </button>
                                     <a href="{{ route('user.my-courses') }}" class="btn btn-outline-secondary">
-                                        <i class="fas fa-times"></i> Cancella Filtri
+                                        <i class="fas fa-times"></i> {{ __('courses.clear_filters') }}
                                     </a>
                                 </div>
                             </div>
@@ -76,25 +75,25 @@
                     @if($enrollments->isEmpty())
                         <div class="text-center py-5">
                             <i class="fas fa-book fa-4x text-muted mb-3"></i>
-                            <h4 class="text-muted">Nessun Corso Trovato</h4>
-                            <p class="text-muted">Non sei ancora iscritto a nessun corso.</p>
+                            <h4 class="text-muted">{{ __('courses.no_courses_enrolled') }}</h4>
+                            <p class="text-muted">{{ __('courses.not_enrolled_message') }}</p>
                         </div>
                     @else
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Codice Corso</th>
-                                        <th>Titolo</th>
-                                        <th>Categoria</th>
-                                        <th>Azienda</th>
-                                        <th>Data Inizio</th>
-                                        <th>Data Fine</th>
-                                        <th>Ore</th>
-                                        <th>Modalità</th>
-                                        <th>Progresso</th>
-                                        <th>Stato</th>
-                                        <th class="text-end">Azioni</th>
+                                        <th>{{ __('courses.course_code') }}</th>
+                                        <th>{{ __('courses.title') }}</th>
+                                        <th>{{ __('courses.category') }}</th>
+                                        <th>{{ __('courses.company') }}</th>
+                                        <th>{{ __('courses.start_date') }}</th>
+                                        <th>{{ __('courses.end_date') }}</th>
+                                        <th>{{ __('courses.hours') }}</th>
+                                        <th>{{ __('courses.delivery_method') }}</th>
+                                        <th>{{ __('courses.progress') }}</th>
+                                        <th>{{ __('common.status') }}</th>
+                                        <th class="text-end">{{ __('common.actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -112,10 +111,10 @@
                                                 default => 'secondary'
                                             };
                                             $statusLabel = match($enrollment->status) {
-                                                'enrolled' => 'Iscritto',
-                                                'in_progress' => 'In Corso',
-                                                'completed' => 'Completato',
-                                                'dropped' => 'Abbandonato',
+                                                'enrolled' => __('courses.status_enrolled'),
+                                                'in_progress' => __('courses.in_progress'),
+                                                'completed' => __('courses.completed'),
+                                                'dropped' => __('courses.status_dropped'),
                                                 default => ucfirst($enrollment->status)
                                             };
                                             $progressPercentage = $enrollment->progress_percentage ?? 0;
@@ -127,7 +126,7 @@
                                             <td>
                                                 <strong>{{ $course->title }}</strong>
                                                 @if($course->is_mandatory)
-                                                    <span class="badge bg-warning ms-1">Obbligatorio</span>
+                                                    <span class="badge bg-warning ms-1">{{ __('courses.mandatory') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -166,11 +165,11 @@
                                             <td>
                                                 <span class="badge bg-secondary">
                                                     @if($course->delivery_method == 'online')
-                                                        Online
+                                                        {{ __('courses.delivery_methods.online') }}
                                                     @elseif($course->delivery_method == 'offline')
-                                                        In Presenza
+                                                        {{ __('courses.delivery_methods.offline') }}
                                                     @else
-                                                        Ibrido
+                                                        {{ __('courses.delivery_methods.hybrid') }}
                                                     @endif
                                                 </span>
                                             </td>
@@ -195,7 +194,7 @@
                                             </td>
                                             <td class="text-end">
                                                 <div class="btn-group" role="group">
-                                                    <a href="{{ route('user.course-details', $course) }}" class="btn btn-sm btn-outline-info" title="Vedi Dettagli">
+                                                    <a href="{{ route('user.course-details', $course) }}" class="btn btn-sm btn-outline-info" title="{{ __('courses.view_details') }}">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                 </div>
@@ -210,7 +209,7 @@
                             <div class="row align-items-center">
                                 <div class="col-md-3">
                                     <div class="d-flex align-items-center">
-                                        <label class="me-2 mb-0 text-nowrap">Righe per pagina:</label>
+                                        <label class="me-2 mb-0 text-nowrap">{{ __('courses.rows_per_page') }}:</label>
                                         <select class="form-select form-select-sm" id="perPageSelect" style="width: auto;">
                                             <option value="10" {{ request('per_page', 25) == 10 ? 'selected' : '' }}>10</option>
                                             <option value="25" {{ request('per_page', 25) == 25 ? 'selected' : '' }}>25</option>
@@ -221,8 +220,11 @@
                                 </div>
                                 <div class="col-md-6 text-center my-2 my-md-0">
                                     <small class="text-muted">
-                                        Mostrando {{ $enrollments->firstItem() ?? 0 }} a {{ $enrollments->lastItem() ?? 0 }}
-                                        di {{ $enrollments->total() }} corsi
+                                        {{ __('courses.showing_courses', [
+                                            'from' => $enrollments->firstItem() ?? 0,
+                                            'to' => $enrollments->lastItem() ?? 0,
+                                            'total' => $enrollments->total()
+                                        ]) }}
                                     </small>
                                 </div>
                                 <div class="col-md-3">

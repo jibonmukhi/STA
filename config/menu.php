@@ -286,7 +286,7 @@ return [
             'permission' => 'view dashboard'
         ],
         [
-            'title' => 'navigation.my_enrolled_courses',
+            'title' => 'navigation.my_courses',
             'route' => 'user.my-courses',
             'icon' => 'fas fa-book',
             'permission' => 'view dashboard'
@@ -307,12 +307,6 @@ return [
             'title' => 'navigation.my_companies',
             'route' => 'user.dashboard',
             'icon' => 'fas fa-building',
-            'permission' => 'view personal reports'
-        ],
-        [
-            'title' => 'navigation.my_reports',
-            'route' => 'reports',
-            'icon' => 'fas fa-chart-pie',
             'permission' => 'view personal reports'
         ]
     ]

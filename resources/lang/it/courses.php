@@ -179,7 +179,24 @@ Vuoi procedere?',
     'actions' => 'Azioni',
     'rows_per_page' => 'Righe per pagina',
     'showing_entries' => 'Mostrando da :from a :to di :total risultati',
+    'showing_courses' => 'Mostrando :from a :to di :total corsi',
     'participation' => 'Partecipazione',
+    'company' => 'Azienda',
+    'progress' => 'Progresso',
+    'view_details' => 'Vedi Dettagli',
+
+    // User My Courses
+    'my_enrolled_courses' => 'I Miei Corsi',
+    'assigned_courses_description' => 'Corsi assegnati a te',
+    'no_courses_enrolled' => 'Nessun Corso Trovato',
+    'not_enrolled_message' => 'Non sei ancora iscritto a nessun corso.',
+    'all_statuses' => 'Tutti gli Stati',
+    'ongoing' => 'In Corso',
+    'done' => 'Completato',
+
+    // Enrollment Status
+    'status_enrolled' => 'Iscritto',
+    'status_dropped' => 'Abbandonato',
 
     // Course Management (Instances)
     'course_instances' => 'Istanze dei Corsi',

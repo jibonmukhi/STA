@@ -179,7 +179,24 @@ Do you want to proceed?',
     'actions' => 'Actions',
     'rows_per_page' => 'Rows per page',
     'showing_entries' => 'Showing :from to :to of :total entries',
+    'showing_courses' => 'Showing :from to :to of :total courses',
     'participation' => 'Participation',
+    'company' => 'Company',
+    'progress' => 'Progress',
+    'view_details' => 'View Details',
+
+    // User My Courses
+    'my_enrolled_courses' => 'My Enrolled Courses',
+    'assigned_courses_description' => 'Courses assigned to you',
+    'no_courses_enrolled' => 'No Courses Found',
+    'not_enrolled_message' => 'You are not yet enrolled in any courses.',
+    'all_statuses' => 'All Statuses',
+    'ongoing' => 'Ongoing',
+    'done' => 'Done',
+
+    // Enrollment Status
+    'status_enrolled' => 'Enrolled',
+    'status_dropped' => 'Dropped',
 
     // Course Management (Instances)
     'course_instances' => 'Course Instances',

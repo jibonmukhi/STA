@@ -309,9 +309,22 @@ class EndUserDashboardController extends Controller
         $query = CourseEnrollment::where('user_id', $user->id)
             ->with(['course.teachers', 'course.assignedCompanies', 'course.sessions']);
 
-        // Apply filters
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        // Always exclude inactive courses - end users should NEVER see them
+        $query->whereHas('course', function($q) {
+            $q->where('status', '!=', 'inactive');
+        });
+
+        // Filter by course status
+        if ($request->filled('status') && $request->status !== '') {
+            // Show specific selected status (active, ongoing, or done)
+            $query->whereHas('course', function($q) use ($request) {
+                $q->where('status', $request->status);
+            });
+        } else {
+            // By default (no filter), show only active and ongoing courses
+            $query->whereHas('course', function($q) {
+                $q->whereIn('status', ['active', 'ongoing']);
+            });
         }
 
         if ($request->filled('search')) {
