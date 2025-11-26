@@ -56,6 +56,14 @@ class CoursePolicy
             return true;
         }
 
+        // Company managers can manage students for courses assigned to their companies
+        if ($user->hasRole('company_manager')) {
+            $userCompanyIds = $user->companies->pluck('id')->toArray();
+            return $course->assignedCompanies()
+                ->whereIn('companies.id', $userCompanyIds)
+                ->exists();
+        }
+
         // Teachers can only manage students in their own courses (check both old teacher_id and new many-to-many relationship)
         if ($user->hasRole('teacher')) {
             return $course->teachers()->where('teacher_id', $user->id)->exists() || $course->teacher_id === $user->id;

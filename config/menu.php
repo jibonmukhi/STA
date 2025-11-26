@@ -213,17 +213,8 @@ return [
         ],
         [
             'title' => 'navigation.course_management',
+            'route' => 'company.course-management.index',
             'icon' => 'fas fa-graduation-cap',
-            'submenu' => [
-                [
-                    'title' => 'navigation.my_company_courses',
-                    'route' => 'course-management.index'
-                ],
-                [
-                    'title' => 'navigation.course_planning',
-                    'route' => 'courses.planning'
-                ]
-            ]
         ],
         [
             'title' => 'navigation.calendar',

@@ -16,9 +16,30 @@ class CourseManagementController extends Controller
     {
         // Apply authorization middleware to all methods except 'show'
         $this->middleware(function ($request, $next) {
-            if (!auth()->user()->hasRole(['sta_manager', 'super_admin'])) {
-                abort(403, 'Unauthorized access. This page is only accessible to STA managers.');
+            if (!auth()->user()->hasRole(['sta_manager', 'super_admin', 'company_manager'])) {
+                abort(403, 'Unauthorized access. This page is only accessible to STA managers and Company managers.');
             }
+
+            // Redirect company managers to their specific routes
+            if (auth()->user()->hasRole('company_manager') && !str_starts_with($request->route()->getName(), 'company.')) {
+                // Get the route action (index, show, create, etc.)
+                $routeName = $request->route()->getName();
+                $action = str_replace('course-management.', '', $routeName);
+
+                // Get route parameters
+                $parameters = $request->route()->parameters();
+
+                // Build company route name
+                $companyRouteName = 'company.course-management.' . $action;
+
+                // Redirect to company-specific route
+                if (empty($parameters)) {
+                    return redirect()->route($companyRouteName);
+                } else {
+                    return redirect()->route($companyRouteName, $parameters);
+                }
+            }
+
             return $next($request);
         })->except(['show']);
     }
@@ -30,20 +51,28 @@ class CourseManagementController extends Controller
     {
         $query = Course::query()->instances();
 
-        if ($request->has('category') && $request->category) {
+        // If company manager, filter to only show courses assigned to their companies
+        if (auth()->user()->hasRole('company_manager')) {
+            $userCompanyIds = auth()->user()->companies->pluck('id')->toArray();
+            $query->whereHas('assignedCompanies', function($q) use ($userCompanyIds) {
+                $q->whereIn('companies.id', $userCompanyIds);
+            });
+        }
+
+        if ($request->filled('category')) {
             $query->byCategory($request->category);
         }
 
-        if ($request->has('level') && $request->level) {
+        if ($request->filled('level')) {
             $query->byLevel($request->level);
         }
 
-        if ($request->has('delivery_method') && $request->delivery_method) {
+        if ($request->filled('delivery_method')) {
             $query->where('delivery_method', $request->delivery_method);
         }
 
         // Filter by status
-        if ($request->has('status') && $request->status !== '') {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         } else {
             // By default, show active and ongoing courses (exclude done and inactive)
@@ -51,30 +80,30 @@ class CourseManagementController extends Controller
         }
 
         // Filter by company
-        if ($request->has('company_id') && $request->company_id) {
+        if ($request->filled('company_id')) {
             $query->whereHas('assignedCompanies', function($q) use ($request) {
                 $q->where('companies.id', $request->company_id);
             });
         }
 
         // Filter by teacher
-        if ($request->has('teacher_id') && $request->teacher_id) {
+        if ($request->filled('teacher_id')) {
             $query->whereHas('teachers', function($q) use ($request) {
                 $q->where('users.id', $request->teacher_id);
             });
         }
 
         // Filter by start date
-        if ($request->has('start_date') && $request->start_date) {
+        if ($request->filled('start_date')) {
             $query->whereDate('start_date', '>=', $request->start_date);
         }
 
         // Filter by end date
-        if ($request->has('end_date') && $request->end_date) {
+        if ($request->filled('end_date')) {
             $query->whereDate('end_date', '<=', $request->end_date);
         }
 
-        if ($request->has('search') && $request->search) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
@@ -575,6 +604,21 @@ class CourseManagementController extends Controller
 
         return redirect()->route('course-management.index')
                         ->with('success', 'Course instance deleted successfully.');
+    }
+
+    /**
+     * Display the course schedule with all scheduled sessions
+     */
+    public function schedule(Course $course): View
+    {
+        $this->authorize('view', $course);
+
+        $events = $course->courseEvents()
+                         ->orderBy('start_date', 'asc')
+                         ->orderBy('start_time', 'asc')
+                         ->get();
+
+        return view('course-management.schedule', compact('course', 'events'));
     }
 
     /**

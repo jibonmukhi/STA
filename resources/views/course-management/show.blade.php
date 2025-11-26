@@ -32,7 +32,7 @@
                             <i class="fas fa-arrow-left"></i> Back to My Courses
                         </a>
                     @else
-                        <a href="{{ route('course-management.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ courseManagementRoute('index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back to List
                         </a>
                     @endif
@@ -49,7 +49,7 @@
                     <div class="row g-3">
                         @can('manageStudents', $course)
                         <div class="col-md-3">
-                            <a href="{{ route('courses.enrollments.create', $course) }}" class="btn btn-outline-primary w-100">
+                            <a href="{{ courseEnrollmentRoute('create', $course) }}" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-users"></i> Manage Enrollments
                             </a>
                         </div>
@@ -67,7 +67,7 @@
                         </div>
                         @endcan
                         <div class="col-md-3">
-                            <a href="{{ route('courses.schedule', $course) }}" class="btn btn-outline-success w-100">
+                            <a href="{{ courseScheduleRoute($course) }}" class="btn btn-outline-success w-100">
                                 <i class="fas fa-clock"></i> View Schedule
                             </a>
                         </div>
@@ -86,11 +86,13 @@
                             </form>
                         </div>
                         @endif
+                        @if(!auth()->user()->hasRole('company_manager'))
                         <div class="col-md-3">
                             <a href="{{ route('courses.planning') }}" class="btn btn-outline-secondary w-100">
                                 <i class="fas fa-project-diagram"></i> Course Planning
                             </a>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -315,7 +317,7 @@
 
                     @if($course->sessions->count() > 10)
                         <div class="text-center mt-3">
-                            <a href="{{ route('courses.schedule', $course) }}" class="btn btn-sm btn-outline-primary">
+                            <a href="{{ courseScheduleRoute($course) }}" class="btn btn-sm btn-outline-primary">
                                 {{ trans('courses.view_all_sessions') }} ({{ $course->sessions->count() }})
                             </a>
                         </div>
@@ -364,7 +366,7 @@
                         <span class="badge bg-white text-primary ms-2">{{ $course->enrollments->count() }}</span>
                     </h5>
                     @can('manageStudents', $course)
-                    <a href="{{ route('courses.enrollments.create', $course) }}" class="btn btn-sm btn-primary">
+                    <a href="{{ courseEnrollmentRoute('create', $course) }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-cog"></i> Manage All
                     </a>
                     @endcan

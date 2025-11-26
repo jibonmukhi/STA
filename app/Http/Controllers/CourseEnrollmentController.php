@@ -34,8 +34,14 @@ class CourseEnrollmentController extends Controller
     {
         $this->authorize('manageStudents', $course);
 
-        // Get all companies for the filter dropdown
-        $companies = \App\Models\Company::orderBy('name')->get();
+        // Get companies based on user role
+        if (auth()->user()->hasRole('company_manager')) {
+            // Company managers only see their own companies
+            $companies = auth()->user()->companies()->orderBy('name')->get();
+        } else {
+            // STA managers and teachers see all companies
+            $companies = \App\Models\Company::orderBy('name')->get();
+        }
 
         // Get currently enrolled users with their company info
         $enrolledUsers = $course->enrollments()
@@ -57,6 +63,14 @@ class CourseEnrollmentController extends Controller
             ->whereDoesntHave('roles', function($q) {
                 $q->where('name', 'admin');
             });
+
+        // If company manager, filter to only show users from their companies
+        if (auth()->user()->hasRole('company_manager')) {
+            $userCompanyIds = auth()->user()->companies->pluck('id')->toArray();
+            $query->whereHas('companies', function($q) use ($userCompanyIds) {
+                $q->whereIn('companies.id', $userCompanyIds);
+            });
+        }
 
         // Filter by company if selected
         if ($request->has('company_id') && $request->company_id) {
@@ -117,7 +131,7 @@ class CourseEnrollmentController extends Controller
 
         // If no users selected, redirect back with info message
         if (empty($request->user_ids)) {
-            return redirect()->route('course-management.show', $course)
+            return redirect()->to(courseManagementRoute('show', $course))
                 ->with('info', 'No users were enrolled as none were selected.');
         }
 
@@ -195,7 +209,7 @@ class CourseEnrollmentController extends Controller
             }
         }
 
-        return redirect()->route('course-management.show', $course)
+        return redirect()->to(courseManagementRoute('show', $course))
             ->with('success', "{$enrolled} user(s) enrolled successfully.");
     }
 

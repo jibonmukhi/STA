@@ -31,7 +31,7 @@
                         <i class="fas fa-calendar-alt"></i> {{ trans('courses.view_calendar') }}
                     </a>
                     @can('create', App\Models\Course::class)
-                    <a href="{{ route('course-management.create') }}" class="btn btn-primary">
+                    <a href="{{ courseManagementRoute('create') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> {{ trans('courses.start_new') }}
                     </a>
                     @endcan
@@ -44,7 +44,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('course-management.index') }}">
+                    <form method="GET" action="{{ courseManagementRoute('index') }}">
                         <div class="row g-3">
                             <div class="col-md-3">
                                 <label class="form-label">{{ trans('courses.search') }}</label>
@@ -133,7 +133,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-search"></i> {{ trans('courses.filter') }}
                                     </button>
-                                    <a href="{{ route('course-management.index') }}" class="btn btn-outline-secondary">
+                                    <a href="{{ courseManagementRoute('index') }}" class="btn btn-outline-secondary">
                                         <i class="fas fa-times"></i> {{ trans('courses.clear_filters') }}
                                     </a>
                                 </div>
@@ -155,7 +155,7 @@
                             <h4 class="text-muted">{{ trans('courses.no_courses_found') }}</h4>
                             <p class="text-muted">{{ trans('courses.no_courses_message') }}</p>
                             @can('create', App\Models\Course::class)
-                            <a href="{{ route('course-management.create') }}" class="btn btn-primary">
+                            <a href="{{ courseManagementRoute('create') }}" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> {{ trans('courses.start_new_course') }}
                             </a>
                             @endcan
@@ -291,11 +291,11 @@
                                             </td>
                                             <td class="text-end">
                                                 <div class="btn-group" role="group">
-                                                    <a href="{{ route('course-management.show', $course) }}" class="btn btn-sm btn-outline-info" title="{{ trans('courses.view') }}">
+                                                    <a href="{{ courseManagementRoute('show', $course) }}" class="btn btn-sm btn-outline-info" title="{{ trans('courses.view') }}">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     @can('update', $course)
-                                                    <a href="{{ route('course-management.edit', $course) }}" class="btn btn-sm btn-outline-primary" title="{{ trans('courses.edit') }}">
+                                                    <a href="{{ courseManagementRoute('edit', $course) }}" class="btn btn-sm btn-outline-primary" title="{{ trans('courses.edit') }}">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-outline-success send-email-btn"
@@ -306,7 +306,7 @@
                                                     </button>
                                                     @endcan
                                                     @can('delete', $course)
-                                                    <form action="{{ route('course-management.destroy', $course) }}" method="POST" class="d-inline">
+                                                    <form action="{{ courseManagementRoute('destroy', $course) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ trans('courses.delete') }}"

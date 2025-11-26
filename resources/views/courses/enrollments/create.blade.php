@@ -14,13 +14,13 @@
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('courses.index') }}">Courses</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('courses.show', $course) }}">{{ $course->title }}</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('courses.enrollments.index', $course) }}">Enrollments</a></li>
+                            <li class="breadcrumb-item"><a href="{{ courseEnrollmentRoute('index', $course) }}">Enrollments</a></li>
                             <li class="breadcrumb-item active">Enroll Users</li>
                         </ol>
                     </nav>
                 </div>
                 <div>
-                    <a href="{{ route('course-management.show', $course) }}" class="btn btn-outline-secondary">
+                    <a href="{{ courseManagementRoute('show', $course) }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Course
                     </a>
                 </div>
@@ -36,7 +36,7 @@
                 </div>
                 <div class="card-body">
                     @if($allUsers->count() > 0)
-                        <form action="{{ route('courses.enrollments.store', $course) }}" method="POST">
+                        <form action="{{ courseEnrollmentRoute('store', $course) }}" method="POST">
                             @csrf
 
                             @php
@@ -60,6 +60,7 @@
                                 <input type="text" class="form-control" value="{{ $course->title }} ({{ $course->course_code }})" readonly>
                             </div>
 
+                            @if(!auth()->user()->hasRole('company_manager'))
                             <div class="mb-3">
                                 <label class="form-label">Filter by Company</label>
                                 <div class="mb-2">
@@ -114,6 +115,13 @@
                                     @endforeach
                                 </div>
                             </div>
+                            @else
+                            <div class="mb-3">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> You can enroll users from your company: <strong>{{ auth()->user()->companies->first()?->name }}</strong>
+                                </div>
+                            </div>
+                            @endif
 
                             <div class="mb-3">
                                 <label class="form-label">Select Users</label>

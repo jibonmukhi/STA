@@ -58,6 +58,53 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:end_user')
         ->name('user.calendar');
 
+    // Company Manager Course Management Routes
+    Route::get('/company/course-management', [\App\Http\Controllers\CourseManagementController::class, 'index'])
+        ->middleware('role:company_manager')
+        ->name('company.course-management.index');
+
+    Route::get('/company/course-management/create', [\App\Http\Controllers\CourseManagementController::class, 'create'])
+        ->middleware('role:company_manager')
+        ->name('company.course-management.create');
+
+    Route::post('/company/course-management', [\App\Http\Controllers\CourseManagementController::class, 'store'])
+        ->middleware('role:company_manager')
+        ->name('company.course-management.store');
+
+    Route::get('/company/course-management/{courseManagement}', [\App\Http\Controllers\CourseManagementController::class, 'show'])
+        ->middleware('role:company_manager')
+        ->name('company.course-management.show');
+
+    Route::get('/company/course-management/{courseManagement}/edit', [\App\Http\Controllers\CourseManagementController::class, 'edit'])
+        ->middleware('role:company_manager')
+        ->name('company.course-management.edit');
+
+    Route::put('/company/course-management/{courseManagement}', [\App\Http\Controllers\CourseManagementController::class, 'update'])
+        ->middleware('role:company_manager')
+        ->name('company.course-management.update');
+
+    Route::delete('/company/course-management/{courseManagement}', [\App\Http\Controllers\CourseManagementController::class, 'destroy'])
+        ->middleware('role:company_manager')
+        ->name('company.course-management.destroy');
+
+    // Company Manager Enrollment Routes
+    Route::get('/company/courses/{course}/enrollments', [\App\Http\Controllers\CourseEnrollmentController::class, 'index'])
+        ->middleware('role:company_manager')
+        ->name('company.courses.enrollments.index');
+
+    Route::get('/company/courses/{course}/enrollments/create', [\App\Http\Controllers\CourseEnrollmentController::class, 'create'])
+        ->middleware('role:company_manager')
+        ->name('company.courses.enrollments.create');
+
+    Route::post('/company/courses/{course}/enrollments', [\App\Http\Controllers\CourseEnrollmentController::class, 'store'])
+        ->middleware('role:company_manager')
+        ->name('company.courses.enrollments.store');
+
+    // Company Manager Course Schedule Route
+    Route::get('/company/courses/{course}/schedule', [\App\Http\Controllers\CourseManagementController::class, 'schedule'])
+        ->middleware('role:company_manager')
+        ->name('company.courses.schedule');
+
     Route::get('/user/my-courses', [EndUserDashboardController::class, 'myCourses'])
         ->middleware('role:end_user')
         ->name('user.my-courses');
@@ -155,11 +202,21 @@ Route::middleware('auth')->group(function () {
 
     // Course Management Routes - Course Instances (Started Courses)
     // Define custom routes BEFORE resource route to avoid conflicts
-    Route::patch('/course-management/{courseManagement}/update-status', [\App\Http\Controllers\CourseManagementController::class, 'updateStatus'])->name('course-management.update-status');
-    Route::post('/course-management/{courseManagement}/send-notifications', [\App\Http\Controllers\CourseManagementController::class, 'sendNotifications'])->name('course-management.send-notifications');
-    Route::get('/course-management/{courseManagement}/bulk-invite', [\App\Http\Controllers\CourseManagementController::class, 'showBulkInvite'])->name('course-management.bulk-invite');
-    Route::post('/course-management/{courseManagement}/bulk-invite', [\App\Http\Controllers\CourseManagementController::class, 'sendBulkInvite'])->name('course-management.send-bulk-invite');
-    Route::resource('course-management', \App\Http\Controllers\CourseManagementController::class);
+    // Only STA managers can access these routes, company managers use /company/course-management
+    Route::patch('/course-management/{courseManagement}/update-status', [\App\Http\Controllers\CourseManagementController::class, 'updateStatus'])
+        ->middleware('role:sta_manager|super_admin')
+        ->name('course-management.update-status');
+    Route::post('/course-management/{courseManagement}/send-notifications', [\App\Http\Controllers\CourseManagementController::class, 'sendNotifications'])
+        ->middleware('role:sta_manager|super_admin')
+        ->name('course-management.send-notifications');
+    Route::get('/course-management/{courseManagement}/bulk-invite', [\App\Http\Controllers\CourseManagementController::class, 'showBulkInvite'])
+        ->middleware('role:sta_manager|super_admin')
+        ->name('course-management.bulk-invite');
+    Route::post('/course-management/{courseManagement}/bulk-invite', [\App\Http\Controllers\CourseManagementController::class, 'sendBulkInvite'])
+        ->middleware('role:sta_manager|super_admin')
+        ->name('course-management.send-bulk-invite');
+    Route::resource('course-management', \App\Http\Controllers\CourseManagementController::class)
+        ->middleware('role:sta_manager|super_admin');
 
     // Course Materials Routes
     Route::get('/courses/{course}/materials/create', [\App\Http\Controllers\CourseMaterialController::class, 'create'])->name('course-materials.create');
